@@ -1,0 +1,16 @@
+node_modules
+vendor
+.git
+.env
+.idea
+.vscode
+storage/*.key
+storage/app/*
+!storage/app/public/.gitignore
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/testing/*
+storage/framework/views/*
+storage/logs/*
+phpunit.xml
+.phpunit.result.cache

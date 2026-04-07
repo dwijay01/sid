@@ -1,0 +1,58 @@
+version: "3.7"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sid-app
+    container_name: sid_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - public_data:/var/www/public
+      - storage_data:/var/www/storage
+      - bootstrap_cache:/var/www/bootstrap/cache
+      - ./.env:/var/www/.env
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - sid_network
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:alpine
+    container_name: sid_nginx
+    restart: unless-stopped
+    ports:
+      - "8087:80"
+    volumes:
+      - public_data:/var/www/public
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - sid_network
+    depends_on:
+      - app
+
+  db:
+    image: mysql:8.0
+    container_name: sid_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    volumes:
+      - sid_db_data:/var/lib/mysql
+    networks:
+      - sid_network
+
+networks:
+  sid_network:
+    driver: bridge
+
+volumes:
+  sid_db_data:
+  public_data:
+  storage_data:
+  bootstrap_cache:
