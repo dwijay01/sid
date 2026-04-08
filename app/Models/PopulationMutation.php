@@ -15,10 +15,12 @@ class PopulationMutation extends Model
         'asal_tujuan',
         'no_surat_mutasi',
         'processed_by',
+        'metadata',
     ];
 
     protected $casts = [
         'tanggal_mutasi' => 'date',
+        'metadata' => 'array',
     ];
 
     public function resident(): BelongsTo

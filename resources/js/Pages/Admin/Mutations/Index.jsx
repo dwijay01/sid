@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Search, Plus, Trash2, ArrowUpDown } from 'lucide-react';
+import { Search, Plus, Trash2, Printer, ChevronDown } from 'lucide-react';
 import StatusBadge from '@/Components/ui/StatusBadge';
+import Dropdown from '@/Components/Dropdown';
 import { MUTATION_TYPES } from '@/Helpers/constants';
 import { formatDate } from '@/Helpers/formatters';
 
@@ -38,13 +39,29 @@ export default function Index({ mutations, filters }) {
                     Catat perpindahan, kelahiran, dan kematian penduduk.
                 </p>
                 <div className="mt-4 sm:mt-0">
-                    <Link
-                        href={route('admin.mutations.create')}
-                        className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 transition-colors"
-                    >
-                        <Plus size={16} />
-                        Catat Mutasi
-                    </Link>
+                    <Dropdown>
+                        <Dropdown.Trigger>
+                            <button
+                                type="button"
+                                className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 transition-colors"
+                            >
+                                <Plus size={16} />
+                                Catat Mutasi
+                                <ChevronDown size={14} className="ml-1" />
+                            </button>
+                        </Dropdown.Trigger>
+                        <Dropdown.Content align="right" width="48">
+                            <Dropdown.Link href={route('admin.mutations.createBirth')}>
+                                Kematian / Kelahiran (Lahir)
+                            </Dropdown.Link>
+                            <Dropdown.Link href={route('admin.mutations.createDeath')}>
+                                Kematian (Meninggal)
+                            </Dropdown.Link>
+                            <Dropdown.Link href={route('admin.mutations.create')}>
+                                Mutasi Lainnya (Pindah/Datang)
+                            </Dropdown.Link>
+                        </Dropdown.Content>
+                    </Dropdown>
                 </div>
             </div>
 
@@ -111,10 +128,25 @@ export default function Index({ mutations, filters }) {
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">{formatDate(m.tanggal_mutasi)}</td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">{m.asal_tujuan || '-'}</td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">{m.processor?.name || '-'}</td>
-                                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm sm:pr-6">
-                                            <button onClick={() => handleDelete(m.id)} className="text-red-500 hover:text-red-700 p-1.5 rounded-full hover:bg-red-50 dark:bg-red-900/30 transition-colors">
-                                                <Trash2 size={16} />
-                                            </button>
+                                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                            <div className="flex items-center justify-end gap-2">
+                                                {(m.type === 'lahir' || m.type === 'mati') && (
+                                                    <Link 
+                                                        href={route('admin.mutations.print', m.id)}
+                                                        className="text-slate-500 hover:text-emerald-600 p-1.5 rounded-full hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
+                                                        title="Cetak Surat Keterangan"
+                                                    >
+                                                        <Printer size={16} />
+                                                    </Link>
+                                                )}
+                                                <button 
+                                                    onClick={() => handleDelete(m.id)} 
+                                                    className="text-red-500 hover:text-red-700 p-1.5 rounded-full hover:bg-red-50 dark:bg-red-900/30 transition-colors"
+                                                    title="Hapus Data"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))

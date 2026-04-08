@@ -26,13 +26,13 @@ class FamilyCard extends Model
         return $this->belongsTo(WilayahRtRw::class, 'wilayah_id');
     }
 
-    public function members(): HasMany
+    public function anggotaKeluarga(): HasMany
     {
         return $this->hasMany(Resident::class, 'family_card_id');
     }
 
     public function getMemberCountAttribute(): int
     {
-        return $this->members()->count();
+        return $this->anggotaKeluarga()->count();
     }
 }

@@ -62,9 +62,11 @@ export default function Create({ residents }) {
                                 className="block w-full rounded-lg border-0 py-2.5 text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 focus:ring-2 focus:ring-inset focus:ring-emerald-600 sm:text-sm bg-slate-50 dark:bg-slate-800/50"
                             >
                                 <option value="">-- Pilih Jenis --</option>
-                                {Object.entries(MUTATION_TYPES).map(([key, label]) => (
-                                    <option key={key} value={key}>{label}</option>
-                                ))}
+                                {Object.entries(MUTATION_TYPES)
+                                    .filter(([key]) => !['lahir', 'mati'].includes(key))
+                                    .map(([key, label]) => (
+                                        <option key={key} value={key}>{label}</option>
+                                    ))}
                             </select>
                             {errors.type && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.type}</p>}
                         </div>

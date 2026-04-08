@@ -79,6 +79,11 @@ Route::middleware('auth')->group(function () {
         Route::resource('residents', ResidentController::class);
         Route::resource('family-cards', FamilyCardController::class);
         Route::resource('wilayah', WilayahController::class)->except(['show']);
+        Route::get('mutations/create-birth', [MutationController::class, 'createBirth'])->name('mutations.createBirth');
+        Route::post('mutations/birth', [MutationController::class, 'storeBirth'])->name('mutations.storeBirth');
+        Route::get('mutations/create-death', [MutationController::class, 'createDeath'])->name('mutations.createDeath');
+        Route::post('mutations/death', [MutationController::class, 'storeDeath'])->name('mutations.storeDeath');
+        Route::get('mutations/{mutation}/print', [MutationController::class, 'print'])->name('mutations.print');
         Route::resource('mutations', MutationController::class)->except(['show', 'edit', 'update']);
         
         // Letters
