@@ -23,10 +23,20 @@ use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Kades\DashboardController as KadesDashboardController;
 use App\Http\Controllers\Kades\ReportController as KadesReportController;
 
-// RT/RW Controllers
-use App\Http\Controllers\RtRw\RtRwDashboardController;
-use App\Http\Controllers\RtRw\ApprovalController;
-use App\Http\Controllers\RtRw\BypassInputController;
+// RW Controllers
+use App\Http\Controllers\Rw\RwDashboardController;
+use App\Http\Controllers\Rw\RtUserController;
+
+// RT Controllers
+use App\Http\Controllers\Rt\RtDashboardController;
+use App\Http\Controllers\Rt\RtResidentController;
+use App\Http\Controllers\Rt\RtMutationController;
+use App\Http\Controllers\Rt\RtRukemController;
+use App\Http\Controllers\Rt\RtLetterController;
+use App\Http\Controllers\Rt\RtFamilyCardController;
+
+// Sie Rukem Controllers
+use App\Http\Controllers\SieRukem\SieRukemDashboardController;
 
 // Warga Controllers
 use App\Http\Controllers\Warga\DashboardController as WargaDashboardController;
@@ -45,7 +55,7 @@ Route::middleware('auth')->group(function () {
         return redirect()->route(auth()->user()->getDashboardRoute());
     })->name('dashboard');
 
-    // MymProfile routes
+    // My Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -109,19 +119,67 @@ Route::middleware('auth')->group(function () {
     });
 
     // -------------------------------------------------------------
-    // RT / RW ROUTES
+    // RW ROUTES (KETUA RW)
     // -------------------------------------------------------------
-    Route::middleware(['role:rt_rw'])->prefix('rtrw')->name('rtrw.')->group(function () {
-        Route::get('/dashboard', [RtRwDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/history', [RtRwDashboardController::class, 'history'])->name('history');
-        Route::get('/my-residents', [RtRwDashboardController::class, 'residents'])->name('residents');
+    Route::middleware(['role:rw'])->prefix('rw')->name('rw.')->group(function () {
+        Route::get('/dashboard', [RwDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/residents', [RwDashboardController::class, 'residents'])->name('residents');
+        Route::get('/rukem', [RwDashboardController::class, 'rukemMembers'])->name('rukem');
+        Route::get('/reports', [RwDashboardController::class, 'reports'])->name('reports');
+        Route::get('/letters', [RwDashboardController::class, 'letters'])->name('letters');
+
+        // Manage RT Users
+        Route::get('/rt-users', [RtUserController::class, 'index'])->name('rt-users.index');
+        Route::post('/rt-users/{user}/toggle', [RtUserController::class, 'toggleActive'])->name('rt-users.toggle');
+    });
+
+    // -------------------------------------------------------------
+    // RT ROUTES (KETUA RT)
+    // -------------------------------------------------------------
+    Route::middleware(['role:rt'])->prefix('rt')->name('rt.')->group(function () {
+        Route::get('/dashboard', [RtDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/residents', [RtDashboardController::class, 'residents'])->name('residents');
         
-        Route::get('/approval/{letterRequest}', [ApprovalController::class, 'show'])->name('approval.show');
-        Route::post('/approval/{letterRequest}/approve', [ApprovalController::class, 'approve'])->name('approval.approve');
-        Route::post('/approval/{letterRequest}/reject', [ApprovalController::class, 'reject'])->name('approval.reject');
-        
-        Route::get('/bypass-input', [BypassInputController::class, 'create'])->name('bypass.create');
-        Route::post('/bypass-input', [BypassInputController::class, 'store'])->name('bypass.store');
+        // Family Cards
+        Route::resource('family-cards', RtFamilyCardController::class)->except(['show']);
+
+        // Resident CRUD
+        Route::get('/residents/create', [RtResidentController::class, 'create'])->name('residents.create');
+        Route::post('/residents', [RtResidentController::class, 'store'])->name('residents.store');
+        Route::get('/residents/{resident}/edit', [RtResidentController::class, 'edit'])->name('residents.edit');
+        Route::put('/residents/{resident}', [RtResidentController::class, 'update'])->name('residents.update');
+
+        // Mutations
+        Route::get('/mutations', [RtMutationController::class, 'index'])->name('mutations.index');
+        Route::get('/mutations/move-out', [RtMutationController::class, 'createMoveOut'])->name('mutations.move-out');
+        Route::post('/mutations/move-out', [RtMutationController::class, 'storeMoveOut'])->name('mutations.store-move-out');
+        Route::get('/mutations/move-in', [RtMutationController::class, 'createMoveIn'])->name('mutations.move-in');
+        Route::post('/mutations/move-in', [RtMutationController::class, 'storeMoveIn'])->name('mutations.store-move-in');
+        Route::get('/mutations/death', [RtMutationController::class, 'createDeath'])->name('mutations.death');
+        Route::post('/mutations/death', [RtMutationController::class, 'storeDeath'])->name('mutations.store-death');
+        Route::get('/mutations/birth', [RtMutationController::class, 'createBirth'])->name('mutations.birth');
+        Route::post('/mutations/birth', [RtMutationController::class, 'storeBirth'])->name('mutations.store-birth');
+
+        // Rukun Kematian
+        Route::get('/rukem', [RtRukemController::class, 'index'])->name('rukem.index');
+        Route::get('/rukem/create', [RtRukemController::class, 'create'])->name('rukem.create');
+        Route::post('/rukem', [RtRukemController::class, 'store'])->name('rukem.store');
+        Route::get('/rukem/{rukem}/edit', [RtRukemController::class, 'edit'])->name('rukem.edit');
+        Route::put('/rukem/{rukem}', [RtRukemController::class, 'update'])->name('rukem.update');
+
+        // Letters (approval)
+        Route::get('/letters', [RtLetterController::class, 'index'])->name('letters.index');
+        Route::get('/letters/{letterRequest}', [RtLetterController::class, 'show'])->name('letters.show');
+        Route::post('/letters/{letterRequest}/approve', [RtLetterController::class, 'approve'])->name('letters.approve');
+        Route::post('/letters/{letterRequest}/reject', [RtLetterController::class, 'reject'])->name('letters.reject');
+    });
+
+    // -------------------------------------------------------------
+    // SIE RUKEM ROUTES
+    // -------------------------------------------------------------
+    Route::middleware(['role:sie_rukem'])->prefix('sie-rukem')->name('sie-rukem.')->group(function () {
+        Route::get('/dashboard', [SieRukemDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/members', [SieRukemDashboardController::class, 'members'])->name('members');
     });
 
     // -------------------------------------------------------------

@@ -75,11 +75,35 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is RT/RW chief.
+     * Check if user is Ketua RW.
+     */
+    public function isRw(): bool
+    {
+        return $this->hasRole('rw');
+    }
+
+    /**
+     * Check if user is Ketua RT.
+     */
+    public function isRt(): bool
+    {
+        return $this->hasRole('rt');
+    }
+
+    /**
+     * Check if user is RT/RW (legacy compat).
      */
     public function isRtRw(): bool
     {
-        return $this->hasRole('rt_rw');
+        return $this->hasRole(['rt', 'rw']);
+    }
+
+    /**
+     * Check if user is Sie Rukun Kematian.
+     */
+    public function isSieRukem(): bool
+    {
+        return $this->hasRole('sie_rukem');
     }
 
     /**
@@ -105,7 +129,26 @@ class User extends Authenticatable
     {
         if ($this->isKades()) return 'kades.dashboard';
         if ($this->isOperator()) return 'admin.dashboard';
-        if ($this->isRtRw()) return 'rtrw.dashboard';
+        if ($this->isRw()) return 'rw.dashboard';
+        if ($this->isRt()) return 'rt.dashboard';
+        if ($this->isSieRukem()) return 'sie-rukem.dashboard';
         return 'warga.dashboard';
+    }
+
+    /**
+     * Get all wilayah under this RW user's managed area.
+     */
+    public function getManagedWilayahIds(): array
+    {
+        $wilayah = $this->managedWilayah;
+        if (!$wilayah) return [];
+
+        // If user is RW, get all wilayah in same RW
+        if ($this->isRw()) {
+            return WilayahRtRw::where('rw', $wilayah->rw)->pluck('id')->toArray();
+        }
+
+        // If user is RT, get only their own wilayah
+        return [$wilayah->id];
     }
 }

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\FamilyCard;
 use App\Models\Resident;
+use App\Models\RukemMember;
 use App\Models\User;
 use App\Models\WilayahRtRw;
 use App\Models\LetterRequest;
@@ -40,7 +41,29 @@ class DemoDataSeeder extends Seeder
         ]);
         $operator->assignRole('operator');
 
-        // Create RT/RW Users — one per wilayah
+        // Create RW User (manages first RW grouping)
+        $rwUser = User::create([
+            'name' => 'H. Suroto, SE',
+            'email' => 'rw@sid.test',
+            'nik' => '3301012001010050',
+            'phone' => '081234567850',
+            'password' => Hash::make('password'),
+            'is_active' => true,
+        ]);
+        $rwUser->assignRole('rw');
+
+        // Create Sie Rukem User
+        $sieRukemUser = User::create([
+            'name' => 'Endang Rahayu',
+            'email' => 'sierukem@sid.test',
+            'nik' => '3301012001010060',
+            'phone' => '081234567860',
+            'password' => Hash::make('password'),
+            'is_active' => true,
+        ]);
+        $sieRukemUser->assignRole('sie_rukem');
+
+        // Create RT Users — one per wilayah
         $rtUsers = [];
         $rtNames = [
             'Bambang Hermanto', 'Dedi Supriadi', 'Rudi Hartono',
@@ -48,6 +71,7 @@ class DemoDataSeeder extends Seeder
             'Hendra Gunawan', 'Joko Widodo',
         ];
 
+        $rwLinked = false;
         foreach ($wilayahList as $i => $wilayah) {
             $rtUser = User::create([
                 'name' => $rtNames[$i] ?? 'Ketua RT ' . $wilayah->rt,
@@ -57,12 +81,26 @@ class DemoDataSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'is_active' => true,
             ]);
-            $rtUser->assignRole('rt_rw');
+            $rtUser->assignRole('rt');
             $wilayah->update([
                 'ketua_user_id' => $rtUser->id,
                 'nama_ketua' => $rtUser->name,
             ]);
             $rtUsers[] = $rtUser;
+        }
+
+        // Create a dedicated wilayah entry for the RW user so they can be linked
+        // We'll set the first wilayah's rw value for scoping
+        if ($wilayahList->isNotEmpty()) {
+            $firstWilayah = $wilayahList->first();
+            // Create a "virtual" RW-level wilayah entry for RW user linkage
+            $rwWilayah = WilayahRtRw::create([
+                'rt' => '000',
+                'rw' => $firstWilayah->rw,
+                'dusun' => $firstWilayah->dusun,
+                'ketua_user_id' => $rwUser->id,
+                'nama_ketua' => $rwUser->name,
+            ]);
         }
 
         // Create sample families with residents
@@ -378,7 +416,7 @@ class DemoDataSeeder extends Seeder
 
             // Add approval data for approved requests
             if (in_array($status, ['disetujui_rt', 'diproses_desa', 'selesai'])) {
-                $rtUser = User::role('rt_rw')
+                $rtUser = User::role('rt')
                     ->whereHas('managedWilayah', fn($q) => $q->where('id', $familyCard->wilayah_id))
                     ->first();
 
@@ -414,5 +452,17 @@ class DemoDataSeeder extends Seeder
             'asal_tujuan' => 'Kabupaten Banyumas',
             'processed_by' => $operator->id,
         ]);
+
+        // Create sample Rukun Kematian members
+        $activeResidents = Resident::where('status_penduduk', 'aktif')->take(5)->get();
+        foreach ($activeResidents as $i => $resident) {
+            RukemMember::create([
+                'resident_id' => $resident->id,
+                'nomor_anggota' => 'RKM-' . str_pad($i + 1, 5, '0', STR_PAD_LEFT),
+                'tanggal_gabung' => now()->subMonths(rand(1, 24)),
+                'status_keanggotaan' => $i < 4 ? 'aktif' : 'nonaktif',
+                'keterangan' => $i === 0 ? 'Anggota pendiri' : null,
+            ]);
+        }
     }
 }

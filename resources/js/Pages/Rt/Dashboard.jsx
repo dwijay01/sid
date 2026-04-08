@@ -1,0 +1,99 @@
+import React from 'react';
+import { Head, Link } from '@inertiajs/react';
+import RtLayout from '@/Layouts/RtLayout';
+import { Users, CreditCard, Heart, FileText, ArrowUpDown, ChevronRight, Clock, UserPlus, Baby, Skull, ArrowRightLeft } from 'lucide-react';
+import { MUTATION_TYPES } from '@/Helpers/constants';
+
+export default function Dashboard({ stats, recentMutations, pendingApprovals }) {
+    return (
+        <RtLayout header="Dashboard Ketua RT">
+            <Head title="Dashboard RT" />
+
+            <div className="mb-8">
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-8 shadow-lg sm:px-12">
+                    <div className="absolute inset-0 bg-blue-700/30 backdrop-blur-xl blur-2xl z-0" />
+                    <div className="relative z-10">
+                        <h2 className="text-2xl font-bold tracking-tight text-white mb-2">Selamat Datang, Ketua RT</h2>
+                        <p className="text-blue-100 text-sm max-w-2xl">
+                            Kelola data penduduk, mutasi, dan anggota Rukun Kematian di wilayah RT Anda.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+                {[
+                    { label: 'Total Penduduk', value: stats.total_penduduk, icon: Users, color: 'emerald' },
+                    { label: 'Kartu Keluarga', value: stats.total_kk, icon: CreditCard, color: 'blue' },
+                    { label: 'Anggota Rukem', value: stats.total_rukem, icon: Heart, color: 'rose' },
+                    { label: 'Surat Pending', value: stats.pending_letters, icon: FileText, color: 'amber' },
+                ].map((stat) => (
+                    <div key={stat.label} className={`relative overflow-hidden rounded-xl bg-white dark:bg-slate-800 p-6 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 hover:shadow-md transition-all border-l-4 border-${stat.color}-500`}>
+                        <dt className="flex items-center gap-x-3">
+                            <div className={`p-2.5 bg-${stat.color}-100 dark:bg-${stat.color}-900/30 rounded-lg text-${stat.color}-600`}>
+                                <stat.icon size={20} />
+                            </div>
+                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{stat.label}</div>
+                        </dt>
+                        <dd className="mt-4 text-3xl font-black text-slate-900 dark:text-white">{stat.value?.toLocaleString('id-ID') || 0}</dd>
+                    </div>
+                ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Pending Letter Approvals */}
+                <div className="lg:col-span-2 bg-white dark:bg-slate-800 shadow-sm rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                    <div className="border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-6 py-4 flex justify-between items-center">
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <Clock size={18} className="text-amber-500" /> Surat Menunggu Persetujuan
+                        </h3>
+                        <Link href={route('rt.letters.index')} className="text-sm font-semibold text-blue-600 hover:text-blue-500">Lihat Semua →</Link>
+                    </div>
+                    <div className="divide-y divide-slate-100 dark:divide-slate-700">
+                        {pendingApprovals.length > 0 ? pendingApprovals.slice(0, 5).map((l) => (
+                            <div key={l.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                                <div>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{l.resident?.nama_lengkap}</p>
+                                    <p className="text-xs text-slate-500">{l.letter_type?.nama_surat} — {l.keperluan}</p>
+                                </div>
+                                <Link href={route('rt.letters.show', l.id)} className="inline-flex items-center rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-500 transition-colors">
+                                    Review <ChevronRight size={14} className="ml-1" />
+                                </Link>
+                            </div>
+                        )) : (
+                            <div className="px-6 py-12 text-center text-sm text-slate-500">Tidak ada surat menunggu persetujuan.</div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="space-y-6">
+                    <div className="bg-white dark:bg-slate-800 p-6 shadow-sm rounded-xl border border-slate-200 dark:border-slate-700">
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Input Data Cepat</h3>
+                        <div className="space-y-2">
+                            {[
+                                { label: 'Input KK Baru', href: route('rt.family-cards.create'), icon: CreditCard, color: 'blue' },
+                                { label: 'Input Penduduk Baru', href: route('rt.residents.create'), icon: UserPlus, color: 'emerald' },
+                                { label: 'Kelahiran', href: route('rt.mutations.birth'), icon: Baby, color: 'pink' },
+                                { label: 'Kematian', href: route('rt.mutations.death'), icon: Skull, color: 'red' },
+                                { label: 'Warga Pindah', href: route('rt.mutations.move-out'), icon: ArrowRightLeft, color: 'amber' },
+                                { label: 'Warga Masuk', href: route('rt.mutations.move-in'), icon: ArrowRightLeft, color: 'indigo' },
+                                { label: 'Input Anggota Rukem', href: route('rt.rukem.create'), icon: Heart, color: 'rose' },
+                            ].map((a) => (
+                                <Link key={a.label} href={a.href} className="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 group transition-all">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`bg-${a.color}-100 dark:bg-${a.color}-900/30 p-1.5 rounded text-${a.color}-600`}>
+                                            <a.icon size={14} />
+                                        </div>
+                                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{a.label}</span>
+                                    </div>
+                                    <ChevronRight size={14} className="text-slate-400" />
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </RtLayout>
+    );
+}

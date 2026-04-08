@@ -23,7 +23,9 @@ export default function Index({ users, roles, filters }) {
     const roleColor = {
         kades: 'bg-purple-50 text-purple-700 ring-purple-600/20',
         operator: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 ring-blue-600/20',
-        rt_rw: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 ring-emerald-600/20',
+        rw: 'bg-teal-50 dark:bg-teal-900/30 text-teal-700 ring-teal-600/20',
+        rt: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 ring-emerald-600/20',
+        sie_rukem: 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 ring-violet-600/20',
         kepala_kk: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 ring-amber-600/20',
         warga: 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 ring-slate-600/20',
     };

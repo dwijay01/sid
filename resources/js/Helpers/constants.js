@@ -49,7 +49,7 @@ export const BLOOD_TYPES = ['A', 'B', 'AB', 'O', 'tidak_tahu'];
  * Marital status labels
  */
 export const MARITAL_STATUS = {
-    belum: 'Belum Kawin',
+    belum_kawin: 'Belum Kawin',
     kawin: 'Kawin',
     cerai_hidup: 'Cerai Hidup',
     cerai_mati: 'Cerai Mati',
@@ -111,7 +111,24 @@ export const RESIDENT_STATUS_COLORS = {
 export const ROLE_LABELS = {
     kades: 'Kepala Desa',
     operator: 'Operator/Admin',
-    rt_rw: 'Ketua RT/RW',
+    rw: 'Ketua RW',
+    rt: 'Ketua RT',
+    sie_rukem: 'Sie. Rukun Kematian',
     kepala_kk: 'Kepala Keluarga',
     warga: 'Warga',
+};
+
+/**
+ * Rukem membership status
+ */
+export const RUKEM_STATUS = {
+    aktif: 'Aktif',
+    nonaktif: 'Nonaktif',
+    keluar: 'Keluar',
+};
+
+export const RUKEM_STATUS_COLORS = {
+    aktif: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+    nonaktif: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+    keluar: 'bg-red-50 text-red-700 ring-red-600/20',
 };

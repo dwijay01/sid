@@ -12,6 +12,8 @@ class Resident extends Model
 {
     use SoftDeletes;
 
+    protected $appends = [];
+
     protected $fillable = [
         'family_card_id',
         'nik',
@@ -74,5 +76,10 @@ class Resident extends Model
             $alamat = $this->familyCard->alamat;
         }
         return $alamat ?? '-';
+    }
+
+    public function rukemMember(): HasOne
+    {
+        return $this->hasOne(RukemMember::class);
     }
 }
