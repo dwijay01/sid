@@ -130,6 +130,7 @@ Route::middleware('auth')->group(function () {
 
         // Manage RT Users
         Route::get('/rt-users', [RtUserController::class, 'index'])->name('rt-users.index');
+        Route::post('/rt-users', [RtUserController::class, 'store'])->name('rt-users.store');
         Route::post('/rt-users/{user}/toggle', [RtUserController::class, 'toggleActive'])->name('rt-users.toggle');
     });
 
@@ -141,6 +142,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/residents', [RtDashboardController::class, 'residents'])->name('residents');
         
         // Family Cards
+        Route::post('/family-cards/quick-store', [RtFamilyCardController::class, 'quickStore'])->name('family-cards.quick-store');
         Route::resource('family-cards', RtFamilyCardController::class)->except(['show']);
 
         // Resident CRUD

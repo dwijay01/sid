@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import RtLayout from '@/Layouts/RtLayout';
-import { CreditCard, Search, Plus, Edit, Trash2 } from 'lucide-react';
+import { CreditCard, Search, Plus, Edit, Trash2, UserPlus } from 'lucide-react';
 import { STATUS_COLORS } from '@/Helpers/constants'; // Optional, or define locally
 
 export default function Index({ familyCards, filters }) {
@@ -83,7 +83,10 @@ export default function Index({ familyCards, filters }) {
                                             </span>
                                         </td>
                                         <td className="whitespace-nowrap py-4 pl-3 pr-6 text-right text-sm font-medium flex justify-end gap-2">
-                                            <Link href={route('rt.family-cards.edit', kk.id)} className="text-blue-600 hover:text-blue-900 p-1.5 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30">
+                                            <Link href={route('rt.residents.create', { family_card_id: kk.id })} className="text-emerald-600 hover:text-emerald-900 p-1.5 rounded hover:bg-emerald-50 dark:hover:bg-emerald-900/30" title="Tambah Anggota KK">
+                                                <UserPlus size={16} />
+                                            </Link>
+                                            <Link href={route('rt.family-cards.edit', kk.id)} className="text-blue-600 hover:text-blue-900 p-1.5 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30" title="Edit KK">
                                                 <Edit size={16} />
                                             </Link>
                                             <button onClick={() => handleDelete(kk.id)} className="text-red-600 hover:text-red-900 p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/30">

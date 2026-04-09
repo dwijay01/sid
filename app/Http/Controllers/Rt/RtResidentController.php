@@ -15,7 +15,7 @@ class RtResidentController extends Controller
         return auth()->user()->managedWilayah?->id;
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $wilayahId = $this->getWilayahId();
         $familyCards = FamilyCard::where('wilayah_id', $wilayahId)
@@ -24,6 +24,7 @@ class RtResidentController extends Controller
 
         return Inertia::render('Rt/Residents/Form', [
             'familyCards' => $familyCards,
+            'defaultFamilyCardId' => $request->query('family_card_id', ''),
         ]);
     }
 

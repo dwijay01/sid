@@ -1,10 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
 import RtLayout from '@/Layouts/RtLayout';
 import { RELIGIONS, BLOOD_TYPES, EDUCATION_LEVELS, FAMILY_RELATIONS, MARITAL_STATUS, GENDER_LABELS } from '@/Helpers/constants';
+import { Plus, X } from 'lucide-react';
+import axios from 'axios';
 
-export default function Form({ resident, familyCards = [] }) {
+export default function Form({ resident, familyCards = [], defaultFamilyCardId = '' }) {
     const isEdit = !!resident;
+    const [localFamilyCards, setLocalFamilyCards] = useState(familyCards);
+    
+    // Quick Add KK state
+    const [showKkModal, setShowKkModal] = useState(false);
+    const [kkForm, setKkForm] = useState({ no_kk: '', alamat: '' });
+    const [kkError, setKkError] = useState('');
+    const [savingKk, setSavingKk] = useState(false);
+
     const { data, setData, post, put, processing, errors } = useForm({
         nik: resident?.nik || '',
         nama_lengkap: resident?.nama_lengkap || '',
@@ -17,7 +27,7 @@ export default function Form({ resident, familyCards = [] }) {
         pekerjaan: resident?.pekerjaan || '',
         pendidikan: resident?.pendidikan || 'tidak_sekolah',
         hubungan_keluarga: resident?.hubungan_keluarga || 'kepala',
-        family_card_id: resident?.family_card_id || '',
+        family_card_id: resident?.family_card_id || defaultFamilyCardId || '',
         alamat_sekarang: resident?.alamat_sekarang || '',
     });
 
@@ -27,6 +37,29 @@ export default function Form({ resident, familyCards = [] }) {
             put(route('rt.residents.update', resident.id));
         } else {
             post(route('rt.residents.store'));
+        }
+    };
+
+    const handleQuickStoreKk = async (e) => {
+        e.preventDefault();
+        setSavingKk(true);
+        setKkError('');
+        
+        try {
+            const response = await axios.post(route('rt.family-cards.quick-store'), kkForm);
+            if (response.data.success) {
+                const newKk = response.data.family_card;
+                // Add to local list and select it
+                setLocalFamilyCards([...localFamilyCards, newKk]);
+                setData('family_card_id', newKk.id);
+                // Reset and close modal
+                setKkForm({ no_kk: '', alamat: '' });
+                setShowKkModal(false);
+            }
+        } catch (err) {
+            setKkError(err.response?.data?.message || 'Gagal menyimpan Kartu Keluarga. Pastikan Nomor KK belum terdaftar dan terdiri dari 16 digit.');
+        } finally {
+            setSavingKk(false);
         }
     };
 
@@ -103,10 +136,19 @@ export default function Form({ resident, familyCards = [] }) {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kartu Keluarga</label>
-                                <select value={data.family_card_id} onChange={(e) => setData('family_card_id', e.target.value)} className={inputClass}>
-                                    <option value="">-- Pilih KK --</option>
-                                    {familyCards.map((fc) => <option key={fc.id} value={fc.id}>{fc.no_kk}</option>)}
-                                </select>
+                                <div className="flex gap-2">
+                                    <select value={data.family_card_id} onChange={(e) => setData('family_card_id', e.target.value)} className={inputClass}>
+                                        <option value="">-- Pilih KK --</option>
+                                        {localFamilyCards.map((fc) => <option key={fc.id} value={fc.id}>{fc.no_kk}</option>)}
+                                    </select>
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setShowKkModal(true)}
+                                        className="shrink-0 px-3 py-2.5 bg-blue-50 text-blue-600 rounded-lg font-medium hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 flex items-center gap-1 transition-colors"
+                                    >
+                                        <Plus size={16} /> KK Baru
+                                    </button>
+                                </div>
                             </div>
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Alamat Sekarang</label>
@@ -123,6 +165,75 @@ export default function Form({ resident, familyCards = [] }) {
                     </div>
                 </form>
             </div>
+
+            {/* Quick Add KK Modal */}
+            {showKkModal && (
+                <div className="fixed inset-0 z-50 overflow-y-auto">
+                    <div className="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
+                        <div className="fixed inset-0 bg-slate-900/75 backdrop-blur-sm transition-opacity" onClick={() => setShowKkModal(false)} />
+                        
+                        <div className="relative transform overflow-hidden rounded-xl bg-white dark:bg-slate-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-slate-200 dark:border-slate-700">
+                            <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <Plus size={20} className="text-blue-600" />
+                                    Tambah Kartu Keluarga
+                                </h3>
+                                <button onClick={() => setShowKkModal(false)} className="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
+                                    <X size={20} />
+                                </button>
+                            </div>
+                            <form onSubmit={handleQuickStoreKk}>
+                                <div className="px-6 py-5 space-y-4">
+                                    {kkError && (
+                                        <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm p-3 rounded-lg border border-red-100 dark:border-red-900/50">
+                                            {kkError}
+                                        </div>
+                                    )}
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nomor Kartu Keluarga *</label>
+                                        <input 
+                                            type="text" 
+                                            value={kkForm.no_kk} 
+                                            onChange={(e) => setKkForm({...kkForm, no_kk: e.target.value})}
+                                            maxLength={16}
+                                            required
+                                            className="block w-full rounded-lg border-0 py-2.5 text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 focus:ring-2 focus:ring-blue-600 sm:text-sm bg-slate-50 dark:bg-slate-800/50 font-mono"
+                                            placeholder="16 digit No. KK"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Alamat KK *</label>
+                                        <textarea 
+                                            value={kkForm.alamat} 
+                                            onChange={(e) => setKkForm({...kkForm, alamat: e.target.value})}
+                                            rows={3}
+                                            required
+                                            className="block w-full rounded-lg border-0 py-2.5 text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 focus:ring-2 focus:ring-blue-600 sm:text-sm bg-slate-50 dark:bg-slate-800/50"
+                                            placeholder="Contoh: Jl. Sukamaju No. 1 RT 001/RW 001"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="bg-slate-50 dark:bg-slate-800/50 px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-3">
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setShowKkModal(false)}
+                                        className="px-4 py-2 font-semibold text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                                    >
+                                        Batal
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        disabled={savingKk || !kkForm.no_kk || !kkForm.alamat}
+                                        className="px-5 py-2 font-bold text-sm text-white bg-blue-600 hover:bg-blue-500 rounded-lg shadow-sm transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+                                    >
+                                        {savingKk ? 'Menyimpan...' : 'Simpan KK'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
         </RtLayout>
     );
 }

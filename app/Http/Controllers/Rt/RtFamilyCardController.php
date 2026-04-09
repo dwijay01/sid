@@ -79,6 +79,24 @@ class RtFamilyCardController extends Controller
             ->with('success', 'Kartu Keluarga berhasil ditambahkan.');
     }
 
+    public function quickStore(Request $request)
+    {
+        $validated = $request->validate([
+            'no_kk' => 'required|string|size:16|unique:family_cards',
+            'alamat' => 'required|string',
+        ]);
+
+        $validated['wilayah_id'] = $this->getWilayahId();
+        $validated['status'] = 'aktif';
+
+        $familyCard = FamilyCard::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'family_card' => $familyCard
+        ]);
+    }
+
     public function edit(FamilyCard $familyCard)
     {
         if ($familyCard->wilayah_id != $this->getWilayahId()) {
