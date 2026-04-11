@@ -3,10 +3,10 @@ import { Head, useForm, Link } from '@inertiajs/react';
 import RtLayout from '@/Layouts/RtLayout';
 import { RUKEM_STATUS } from '@/Helpers/constants';
 
-export default function Form({ member, residents = [] }) {
+export default function Form({ member, familyCards = [] }) {
     const isEdit = !!member;
     const { data, setData, post, put, processing, errors } = useForm({
-        resident_id: member?.resident_id || '',
+        family_card_id: member?.family_card_id || '',
         tanggal_gabung: member?.tanggal_gabung?.split('T')[0] || '',
         status_keanggotaan: member?.status_keanggotaan || 'aktif',
         keterangan: member?.keterangan || '',
@@ -30,21 +30,21 @@ export default function Form({ member, residents = [] }) {
             <div className="max-w-2xl mx-auto">
                 <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6 space-y-6">
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-4">
-                        {isEdit ? `Edit Anggota: ${member.resident?.nama_lengkap}` : 'Pendaftaran Anggota Rukun Kematian'}
+                        {isEdit ? `Edit Keanggotaan KK: ${member.family_card?.kepala_keluarga?.nama_lengkap}` : 'Pendaftaran Anggota Rukun Kematian'}
                     </h3>
 
                     {!isEdit && (
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Pilih Warga *</label>
-                            <select value={data.resident_id} onChange={(e) => setData('resident_id', e.target.value)} className={inputClass}>
-                                <option value="">-- Pilih Warga yang belum terdaftar --</option>
-                                {residents.map((r) => (
-                                    <option key={r.id} value={r.id}>{r.nama_lengkap} ({r.nik})</option>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Pilih Keluarga (KK) *</label>
+                            <select value={data.family_card_id} onChange={(e) => setData('family_card_id', e.target.value)} className={inputClass}>
+                                <option value="">-- Pilih Keluarga yang belum terdaftar --</option>
+                                {familyCards.map((fc) => (
+                                    <option key={fc.id} value={fc.id}>{fc.kepala_keluarga?.nama_lengkap} (KK: {fc.no_kk})</option>
                                 ))}
                             </select>
-                            {errors.resident_id && <p className="mt-1 text-sm text-red-600">{errors.resident_id}</p>}
-                            {residents.length === 0 && (
-                                <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">Semua warga di RT Anda sudah terdaftar sebagai anggota Rukem.</p>
+                            {errors.family_card_id && <p className="mt-1 text-sm text-red-600">{errors.family_card_id}</p>}
+                            {familyCards.length === 0 && (
+                                <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">Semua keluarga (KK) di RT Anda sudah terdaftar sebagai anggota Rukem.</p>
                             )}
                         </div>
                     )}
@@ -57,17 +57,15 @@ export default function Form({ member, residents = [] }) {
                         </div>
                     )}
 
-                    {isEdit && (
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Status Keanggotaan *</label>
-                            <select value={data.status_keanggotaan} onChange={(e) => setData('status_keanggotaan', e.target.value)} className={inputClass}>
-                                {Object.entries(RUKEM_STATUS).map(([k, v]) => (
-                                    <option key={k} value={k}>{v}</option>
-                                ))}
-                            </select>
-                            {errors.status_keanggotaan && <p className="mt-1 text-sm text-red-600">{errors.status_keanggotaan}</p>}
-                        </div>
-                    )}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Status Keanggotaan *</label>
+                        <select value={data.status_keanggotaan} onChange={(e) => setData('status_keanggotaan', e.target.value)} className={inputClass}>
+                            {Object.entries(RUKEM_STATUS).map(([k, v]) => (
+                                <option key={k} value={k}>{v}</option>
+                            ))}
+                        </select>
+                        {errors.status_keanggotaan && <p className="mt-1 text-sm text-red-600">{errors.status_keanggotaan}</p>}
+                    </div>
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Keterangan</label>

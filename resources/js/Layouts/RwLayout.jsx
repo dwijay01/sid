@@ -9,7 +9,8 @@ import {
     FileText,
     LogOut,
     Menu,
-    Bell
+    Bell,
+    Store
 } from 'lucide-react';
 import Dropdown from '@/Components/Dropdown';
 import ThemeToggle from '@/Components/ThemeToggle';
@@ -21,9 +22,9 @@ export default function RwLayout({ header, children }) {
     const navigation = [
         { name: 'Dashboard', href: route('rw.dashboard'), icon: Home, current: route().current('rw.dashboard') },
         { name: 'Data Penduduk', href: route('rw.residents'), icon: Users, current: route().current('rw.residents') },
+        { name: 'Data UMKM', href: route('rw.umkm'), icon: Store, current: route().current('rw.umkm') },
         { name: 'Data Rukun Kematian', href: route('rw.rukem'), icon: Heart, current: route().current('rw.rukem') },
         { name: 'Report & Cetak', href: route('rw.reports'), icon: FileBarChart, current: route().current('rw.reports') },
-        { name: 'Surat Masuk', href: route('rw.letters'), icon: FileText, current: route().current('rw.letters') },
         { name: 'Kelola Akses RT', href: route('rw.rt-users.index'), icon: UserCog, current: route().current('rw.rt-users.*') },
     ];
 

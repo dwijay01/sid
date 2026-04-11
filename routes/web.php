@@ -34,6 +34,7 @@ use App\Http\Controllers\Rt\RtMutationController;
 use App\Http\Controllers\Rt\RtRukemController;
 use App\Http\Controllers\Rt\RtLetterController;
 use App\Http\Controllers\Rt\RtFamilyCardController;
+use App\Http\Controllers\Rt\RtUmkmController;
 
 // Sie Rukem Controllers
 use App\Http\Controllers\SieRukem\SieRukemDashboardController;
@@ -125,6 +126,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [RwDashboardController::class, 'index'])->name('dashboard');
         Route::get('/residents', [RwDashboardController::class, 'residents'])->name('residents');
         Route::get('/rukem', [RwDashboardController::class, 'rukemMembers'])->name('rukem');
+        Route::get('/umkm', [RwDashboardController::class, 'umkm'])->name('umkm');
         Route::get('/reports', [RwDashboardController::class, 'reports'])->name('reports');
         Route::get('/letters', [RwDashboardController::class, 'letters'])->name('letters');
 
@@ -168,6 +170,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/rukem', [RtRukemController::class, 'store'])->name('rukem.store');
         Route::get('/rukem/{rukem}/edit', [RtRukemController::class, 'edit'])->name('rukem.edit');
         Route::put('/rukem/{rukem}', [RtRukemController::class, 'update'])->name('rukem.update');
+
+        // UMKM
+        Route::resource('umkm', RtUmkmController::class);
 
         // Letters (approval)
         Route::get('/letters', [RtLetterController::class, 'index'])->name('letters.index');

@@ -8,6 +8,7 @@ use App\Models\LetterRequest;
 use App\Models\PopulationMutation;
 use App\Models\Resident;
 use App\Models\RukemMember;
+use App\Models\Umkm;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -32,11 +33,7 @@ class RtDashboardController extends Controller
         $totalKK = FamilyCard::where('wilayah_id', $wilayahId)->where('status', 'aktif')->count();
 
         $totalRukem = RukemMember::where('status_keanggotaan', 'aktif')
-            ->whereHas('resident.familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
-            ->count();
-
-        $pendingLetters = LetterRequest::where('wilayah_id', $wilayahId)
-            ->where('status', 'diajukan')
+            ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
             ->count();
 
         $recentMutations = PopulationMutation::with('resident')
@@ -45,21 +42,16 @@ class RtDashboardController extends Controller
             ->take(5)
             ->get();
 
-        $pendingApprovals = LetterRequest::with(['resident', 'letterType'])
-            ->where('wilayah_id', $wilayahId)
-            ->where('status', 'diajukan')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
         return Inertia::render('Rt/Dashboard', [
             'stats' => [
                 'total_penduduk' => $totalPenduduk,
                 'total_kk' => $totalKK,
                 'total_rukem' => $totalRukem,
-                'pending_letters' => $pendingLetters,
+                'total_umkm' => Umkm::where('status', 'aktif')
+                    ->whereHas('resident.familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+                    ->count(),
             ],
             'recentMutations' => $recentMutations,
-            'pendingApprovals' => $pendingApprovals,
         ]);
     }
 

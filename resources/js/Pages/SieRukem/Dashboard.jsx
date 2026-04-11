@@ -20,12 +20,14 @@ export default function Dashboard({ stats, recentMembers }) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
                 {[
-                    { label: 'Total Anggota', value: stats.total, icon: Users, color: 'violet' },
+                    { label: 'Total KK', value: stats.total, icon: Users, color: 'violet' },
                     { label: 'Anggota Aktif', value: stats.aktif, icon: UserCheck, color: 'emerald' },
+                    { label: 'Anggota Khusus', value: stats.khusus, icon: UserCheck, color: 'blue' },
                     { label: 'Nonaktif', value: stats.nonaktif, icon: UserX, color: 'amber' },
                     { label: 'Keluar', value: stats.keluar, icon: UserX, color: 'red' },
+                    { label: 'Tidak Ikut', value: stats.tidak_ikut, icon: UserX, color: 'slate' },
                 ].map((stat) => (
                     <div key={stat.label} className={`relative overflow-hidden rounded-xl bg-white dark:bg-slate-800 p-6 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 hover:shadow-md transition-all border-l-4 border-${stat.color}-500`}>
                         <dt className="flex items-center gap-x-3">
@@ -50,12 +52,12 @@ export default function Dashboard({ stats, recentMembers }) {
                             <div key={m.id} className="px-6 py-4 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="h-10 w-10 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-700 dark:text-violet-400 font-bold">
-                                        {m.resident?.nama_lengkap?.charAt(0) || '?'}
+                                        {m.familyCard?.kepalaKeluarga?.nama_lengkap?.charAt(0) || '?'}
                                     </div>
                                     <div>
-                                        <p className="text-sm font-bold text-slate-900 dark:text-white">{m.resident?.nama_lengkap}</p>
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">{m.familyCard?.kepalaKeluarga?.nama_lengkap || '-'}</p>
                                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                                            {m.nomor_anggota} • {m.resident?.family_card?.wilayah ? `RT ${m.resident.family_card.wilayah.rt}/RW ${m.resident.family_card.wilayah.rw}` : ''}
+                                            {m.nomor_anggota} • KK: {m.familyCard?.no_kk} • {m.familyCard?.wilayah ? `RT ${m.familyCard.wilayah.rt}/RW ${m.familyCard.wilayah.rw}` : ''}
                                         </p>
                                     </div>
                                 </div>

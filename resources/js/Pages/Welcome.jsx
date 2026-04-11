@@ -125,7 +125,7 @@ export default function Welcome({ auth, desa, landing, statistik }) {
 
     return (
         <>
-            <Head title={`${namaDesa} - Sistem Informasi Desa`} />
+            <Head title={namaDesa} />
 
             <div className="min-h-screen bg-white dark:bg-slate-800 font-sans antialiased">
                 {/* ───── NAVBAR ───── */}
@@ -157,7 +157,7 @@ export default function Welcome({ auth, desa, landing, statistik }) {
                                             scrolled ? 'text-slate-900 dark:text-white' : 'text-white'
                                         }`}
                                     >
-                                        SIDesa
+                                        SIRAWE
                                     </h1>
                                     <p
                                         className={`text-[10px] font-medium -mt-0.5 tracking-wider uppercase transition-colors duration-500 ${
@@ -171,7 +171,7 @@ export default function Welcome({ auth, desa, landing, statistik }) {
 
                             {/* Desktop nav links */}
                             <div className="hidden lg:flex items-center gap-1">
-                                {['Beranda', 'Profil', 'Statistik', 'Visi Misi', 'Layanan'].map(
+                                {['Beranda', 'Statistik'].map(
                                     (item) => (
                                         <a
                                             key={item}
@@ -227,7 +227,7 @@ export default function Welcome({ auth, desa, landing, statistik }) {
                     {mobileMenuOpen && (
                         <div className="lg:hidden bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 shadow-xl">
                             <div className="p-4 space-y-1">
-                                {['Beranda', 'Profil', 'Statistik', 'Visi Misi', 'Layanan'].map(
+                                {['Beranda', 'Statistik'].map(
                                     (item) => (
                                         <a
                                             key={item}
@@ -296,7 +296,7 @@ export default function Welcome({ auth, desa, landing, statistik }) {
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/20 border border-emerald-400/30 backdrop-blur-sm mb-8 animate-fade-in">
                                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                                 <span className="text-emerald-300 text-xs font-semibold tracking-wider uppercase">
-                                    Sistem Informasi Desa
+                                    Sistem Informasi RT-RW
                                 </span>
                             </div>
 
@@ -621,7 +621,7 @@ export default function Welcome({ auth, desa, landing, statistik }) {
                                 </span>
                             </div>
                             <h2 className="text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white mb-4">
-                                Layanan Sistem Informasi Desa
+                                Layanan Sistem Informasi RT-RW
                             </h2>
                             <p className="text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
                                 Berbagai layanan administrasi desa yang dapat diakses secara digital
@@ -724,12 +724,12 @@ export default function Welcome({ auth, desa, landing, statistik }) {
                                         <Building2 className="w-5 h-5 text-white" />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold">SIDesa</h3>
+                                        <h3 className="text-lg font-bold">SIRAWE</h3>
                                         <p className="text-xs text-emerald-400 font-medium">{namaDesa}</p>
                                     </div>
                                 </div>
                                 <p className="text-slate-400 leading-relaxed max-w-md">
-                                    Sistem Informasi Desa {namaDesa} untuk pelayanan administrasi
+                                    Sistem Informasi RT-RW {namaDesa} untuk pelayanan administrasi
                                     yang lebih cepat, transparan, dan akuntabel bagi seluruh warga.
                                 </p>
                             </div>
@@ -755,7 +755,7 @@ export default function Welcome({ auth, desa, landing, statistik }) {
                                     Tautan Cepat
                                 </h4>
                                 <ul className="space-y-3">
-                                    {['Beranda', 'Profil', 'Statistik', 'Visi Misi', 'Layanan'].map(
+                                    {['Beranda', 'Statistik'].map(
                                         (item) => (
                                             <li key={item}>
                                                 <a
@@ -773,7 +773,7 @@ export default function Welcome({ auth, desa, landing, statistik }) {
 
                         <div className="mt-12 pt-8 border-t border-slate-800 text-center">
                             <p className="text-slate-500 dark:text-slate-400 text-sm">
-                                © {new Date().getFullYear()} SIDesa {namaDesa}. Hak Cipta Dilindungi.
+                                © {new Date().getFullYear()} SIRAWE {namaDesa}. Hak Cipta Dilindungi.
                             </p>
                         </div>
                     </div>

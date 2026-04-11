@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import RwLayout from '@/Layouts/RwLayout';
-import { Users, Heart, CreditCard, MapPin, FileText, ArrowUpDown, ChevronRight } from 'lucide-react';
+import { Users, Heart, CreditCard, MapPin, FileText, ArrowUpDown, ChevronRight, Store } from 'lucide-react';
 import { MUTATION_TYPES } from '@/Helpers/constants';
 
 export default function Dashboard({ stats, recentMutations }) {
@@ -25,8 +25,8 @@ export default function Dashboard({ stats, recentMutations }) {
                 {[
                     { label: 'Total Penduduk', value: stats.total_penduduk, icon: Users, color: 'emerald', link: route('rw.residents') },
                     { label: 'Anggota Rukem', value: stats.total_rukem, icon: Heart, color: 'rose', link: route('rw.rukem') },
+                    { label: 'Unit UMKM', value: stats.total_umkm, icon: Store, color: 'amber', link: route('rw.umkm') },
                     { label: 'Kartu Keluarga', value: stats.total_kk, icon: CreditCard, color: 'blue' },
-                    { label: 'Surat Pending', value: stats.pending_letters, icon: FileText, color: 'amber', link: route('rw.letters') },
                 ].map((stat) => (
                     <div key={stat.label} className={`relative overflow-hidden rounded-xl bg-white dark:bg-slate-800 p-6 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 hover:shadow-md transition-all border-l-4 border-${stat.color}-500`}>
                         <dt className="flex items-center gap-x-3">
@@ -93,8 +93,9 @@ export default function Dashboard({ stats, recentMutations }) {
                             {[
                                 { label: 'Lihat Data Penduduk', href: route('rw.residents'), color: 'emerald' },
                                 { label: 'Data Rukun Kematian', href: route('rw.rukem'), color: 'rose' },
+                                { label: 'Data UMKM', href: route('rw.umkm'), color: 'amber' },
                                 { label: 'Report & Cetak', href: route('rw.reports'), color: 'blue' },
-                                { label: 'Kelola Akses RT', href: route('rw.rt-users.index'), color: 'amber' },
+                                { label: 'Kelola Akses RT', href: route('rw.rt-users.index'), color: 'violet' },
                             ].map((action) => (
                                 <Link key={action.label} href={action.href} className={`flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-${action.color}-500 hover:bg-${action.color}-50 dark:hover:bg-${action.color}-900/30 group transition-all`}>
                                     <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{action.label}</span>

@@ -30,7 +30,7 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <>
-            <Head title="Login - Sistem Informasi Desa" />
+            <Head title="Login" />
 
             <div className="min-h-screen flex font-sans antialiased">
                 {/* ───── Left Panel - Decorative ───── */}
@@ -53,22 +53,22 @@ export default function Login({ status, canResetPassword }) {
                                 <Building2 className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-bold text-white tracking-tight">SIDesa</h1>
-                                <p className="text-xs text-emerald-300 font-medium">Sistem Informasi Desa</p>
+                                <h1 className="text-xl font-bold text-white tracking-tight">SIRAWE</h1>
+                                <p className="text-xs text-emerald-300 font-medium">Sistem Informasi RT-RW</p>
                             </div>
                         </div>
 
                         {/* Center content */}
                         <div className="my-auto">
                             <h2 className="text-4xl xl:text-5xl font-extrabold text-white leading-tight mb-6">
-                                Portal Layanan
+                                Portal
                                 <br />
                                 <span className="bg-gradient-to-r from-emerald-300 to-teal-200 bg-clip-text text-transparent">
-                                    Administrasi Desa
+                                    Administrasi RT-RW
                                 </span>
                             </h2>
                             <p className="text-emerald-100/80 text-lg leading-relaxed max-w-lg mb-10">
-                                Akses layanan administrasi desa secara digital. Ajukan surat, pantau status permohonan, dan kelola data kependudukan dengan mudah.
+                                Akses layanan administrasi RT-RW secara digital. Ajukan surat, pantau status permohonan, dan kelola data kependudukan dengan mudah.
                             </p>
 
                             {/* Feature highlights */}
@@ -115,8 +115,8 @@ export default function Login({ status, canResetPassword }) {
                                 <Building2 className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">SIDesa</h1>
-                                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Sistem Informasi Desa</p>
+                                <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">SIRAWE</h1>
+                                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Sistem Informasi RT-RW</p>
                             </div>
                         </div>
 
@@ -317,10 +317,10 @@ export default function Login({ status, canResetPassword }) {
                                 </div>
                                 <div>
                                     <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                                        <strong className="text-slate-700 dark:text-slate-300">Warga:</strong> Login menggunakan NIK 16 digit dan password yang sudah diberikan oleh operator desa.
+                                        <strong className="text-slate-700 dark:text-slate-300">Warga:</strong> Login menggunakan NIK 16 digit dan password yang sudah diberikan oleh operator.
                                     </p>
                                     <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-1">
-                                        <strong className="text-slate-700 dark:text-slate-300">Perangkat Desa:</strong> Login menggunakan email dan password yang telah didaftarkan.
+                                        <strong className="text-slate-700 dark:text-slate-300">Perangkat:</strong> Login menggunakan email dan password yang telah didaftarkan.
                                     </p>
                                 </div>
                             </div>
@@ -328,7 +328,7 @@ export default function Login({ status, canResetPassword }) {
 
                         {/* Footer */}
                         <p className="mt-8 text-center text-xs text-slate-400">
-                            © {new Date().getFullYear()} SIDesa — Sistem Informasi Desa
+                            © {new Date().getFullYear()} SIRAWE — Sistem Informasi RT-RW
                         </p>
                     </div>
                 </div>

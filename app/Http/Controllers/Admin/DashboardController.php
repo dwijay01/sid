@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Umkm;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 class DashboardController extends Controller
@@ -42,6 +43,7 @@ class DashboardController extends Controller
             'stats' => [
                 'total_penduduk' => $demographics['summary']['total_penduduk'],
                 'total_kk' => $demographics['summary']['total_kk'],
+                'total_umkm' => Umkm::where('status', 'aktif')->count(),
                 'surat_pending' => \App\Models\LetterRequest::where('status', 'menunggu_review_admin')->count(),
                 'surat_selesai' => \App\Models\LetterRequest::where('status', 'selesai')->count(),
             ],

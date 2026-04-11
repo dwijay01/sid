@@ -10,7 +10,8 @@ import {
     LogOut,
     Menu,
     Bell,
-    CreditCard
+    CreditCard,
+    Store
 } from 'lucide-react';
 import Dropdown from '@/Components/Dropdown';
 import ThemeToggle from '@/Components/ThemeToggle';
@@ -21,12 +22,10 @@ export default function RtLayout({ header, children }) {
 
     const navigation = [
         { name: 'Dashboard', href: route('rt.dashboard'), icon: Home, current: route().current('rt.dashboard') },
-        { name: 'Daftar Warga', href: route('rt.residents'), icon: Users, current: route().current('rt.residents') && !route().current('rt.residents.create') && !route().current('rt.residents.edit') },
-        { name: 'Input Data Penduduk', href: route('rt.residents.create'), icon: UserPlus, current: route().current('rt.residents.create') || route().current('rt.residents.edit') },
+        { name: 'Daftar Warga', href: route('rt.residents'), icon: Users, current: route().current('rt.residents*') },
         { name: 'Kartu Keluarga', href: route('rt.family-cards.index'), icon: CreditCard, current: route().current('rt.family-cards.*') },
         { name: 'Mutasi Penduduk', href: route('rt.mutations.index'), icon: ArrowUpDown, current: route().current('rt.mutations.*') },
-        { name: 'Rukun Kematian', href: route('rt.rukem.index'), icon: Heart, current: route().current('rt.rukem.*') },
-        { name: 'Persetujuan Surat', href: route('rt.letters.index'), icon: FileText, current: route().current('rt.letters.*') },
+        { name: 'Pendataan UMKM', href: route('rt.umkm.index'), icon: Store, current: route().current('rt.umkm.*') },
     ];
 
     return (

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class FamilyCard extends Model
 {
@@ -34,5 +35,10 @@ class FamilyCard extends Model
     public function getMemberCountAttribute(): int
     {
         return $this->anggotaKeluarga()->count();
+    }
+
+    public function rukemMember(): HasOne
+    {
+        return $this->hasOne(RukemMember::class, 'family_card_id');
     }
 }

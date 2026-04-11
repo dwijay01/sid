@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class RukemMember extends Model
 {
     protected $fillable = [
-        'resident_id',
+        'family_card_id',
         'nomor_anggota',
         'tanggal_gabung',
         'status_keanggotaan',
@@ -19,9 +19,9 @@ class RukemMember extends Model
         'tanggal_gabung' => 'date',
     ];
 
-    public function resident(): BelongsTo
+    public function familyCard(): BelongsTo
     {
-        return $this->belongsTo(Resident::class);
+        return $this->belongsTo(FamilyCard::class);
     }
 
     /**

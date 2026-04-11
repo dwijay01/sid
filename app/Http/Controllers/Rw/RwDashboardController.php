@@ -8,6 +8,7 @@ use App\Models\LetterRequest;
 use App\Models\PopulationMutation;
 use App\Models\Resident;
 use App\Models\RukemMember;
+use App\Models\Umkm;
 use App\Models\WilayahRtRw;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -30,7 +31,7 @@ class RwDashboardController extends Controller
             ->where('status_penduduk', 'aktif')->count();
 
         $totalRukem = RukemMember::where('status_keanggotaan', 'aktif')
-            ->whereHas('resident.familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+            ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
             ->count();
 
         $totalKK = FamilyCard::whereIn('wilayah_id', $wilayahIds)->where('status', 'aktif')->count();
@@ -43,18 +44,15 @@ class RwDashboardController extends Controller
             ->take(5)
             ->get();
 
-        $pendingLetters = LetterRequest::with(['resident', 'letterType'])
-            ->whereIn('wilayah_id', $wilayahIds)
-            ->where('status', 'diajukan')
-            ->count();
-
         return Inertia::render('Rw/Dashboard', [
             'stats' => [
                 'total_penduduk' => $totalPenduduk,
                 'total_rukem' => $totalRukem,
                 'total_kk' => $totalKK,
                 'total_rt' => $totalRT,
-                'pending_letters' => $pendingLetters,
+                'total_umkm' => Umkm::where('status', 'aktif')
+                    ->whereHas('resident.familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                    ->count(),
             ],
             'recentMutations' => $recentMutations,
         ]);
@@ -93,11 +91,12 @@ class RwDashboardController extends Controller
     {
         $wilayahIds = $this->getWilayahIds();
 
-        $members = RukemMember::with('resident.familyCard.wilayah')
-            ->whereHas('resident.familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+        $members = RukemMember::with('familyCard.kepalaKeluarga', 'familyCard.wilayah')
+            ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
             ->when($request->search, function ($q, $search) {
-                $q->whereHas('resident', fn($q2) => $q2->where('nama_lengkap', 'like', "%{$search}%")
-                    ->orWhere('nik', 'like', "%{$search}%"));
+                $q->whereHas('familyCard', fn($fc) => $fc->where('no_kk', 'like', "%{$search}%")
+                    ->orWhereHas('kepalaKeluarga', fn($k) => $k->where('nama_lengkap', 'like', "%{$search}%")
+                        ->orWhere('nik', 'like', "%{$search}%")));
             })
             ->when($request->status, function ($q, $status) {
                 $q->where('status_keanggotaan', $status);
@@ -109,6 +108,31 @@ class RwDashboardController extends Controller
         return Inertia::render('Rw/RukemMembers', [
             'members' => $members,
             'filters' => $request->only('search', 'status'),
+        ]);
+    }
+
+    public function umkm(Request $request)
+    {
+        $wilayahIds = $this->getWilayahIds();
+
+        $umkm = Umkm::with('resident.familyCard.wilayah')
+            ->whereHas('resident.familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+            ->when($request->search, function ($q, $search) {
+                $q->where('nama_usaha', 'like', "%{$search}%")
+                  ->orWhereHas('resident', fn($r) => $r->where('nama_lengkap', 'like', "%{$search}%"));
+            })
+            ->when($request->sektor, fn($q, $sektor) => $q->where('sektor_usaha', $sektor))
+            ->when($request->status, fn($q, $status) => $q->where('status', $status))
+            ->when($request->rt, function ($q, $rt) {
+                $q->whereHas('resident.familyCard.wilayah', fn($q2) => $q2->where('rt', $rt));
+            })
+            ->orderByDesc('created_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        return Inertia::render('Rw/Umkm', [
+            'umkm' => $umkm,
+            'filters' => $request->only('search', 'sektor', 'status', 'rt'),
         ]);
     }
 
@@ -128,8 +152,8 @@ class RwDashboardController extends Controller
                     ->get();
                 break;
             case 'rukem':
-                $data = RukemMember::with('resident.familyCard.wilayah')
-                    ->whereHas('resident.familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                $data = RukemMember::with('familyCard.kepalaKeluarga', 'familyCard.wilayah')
+                    ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
                     ->where('status_keanggotaan', 'aktif')
                     ->get();
                 break;

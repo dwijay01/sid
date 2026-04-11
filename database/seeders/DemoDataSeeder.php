@@ -10,6 +10,7 @@ use App\Models\WilayahRtRw;
 use App\Models\LetterRequest;
 use App\Models\LetterType;
 use App\Models\PopulationMutation;
+use App\Models\Umkm;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -21,46 +22,54 @@ class DemoDataSeeder extends Seeder
         $letterTypes = LetterType::all();
 
         // Create Admin Users
-        $kades = User::create([
-            'name' => 'H. Ahmad Subroto, S.Pd',
-            'email' => 'kades@sid.test',
-            'nik' => '3301012001010001',
-            'phone' => '081234567890',
-            'password' => Hash::make('password'),
-            'is_active' => true,
-        ]);
+        $kades = User::updateOrCreate(
+            ['email' => 'kades@sid.test'],
+            [
+                'name' => 'H. Ahmad Subroto, S.Pd',
+                'nik' => '3301012001010001',
+                'phone' => '081234567890',
+                'password' => Hash::make('password'),
+                'is_active' => true,
+            ]
+        );
         $kades->assignRole('kades');
 
-        $operator = User::create([
-            'name' => 'Siti Nurhaliza',
-            'email' => 'operator@sid.test',
-            'nik' => '3301012001010002',
-            'phone' => '081234567891',
-            'password' => Hash::make('password'),
-            'is_active' => true,
-        ]);
+        $operator = User::updateOrCreate(
+            ['email' => 'operator@sid.test'],
+            [
+                'name' => 'Siti Nurhaliza',
+                'nik' => '3301012001010002',
+                'phone' => '081234567891',
+                'password' => Hash::make('password'),
+                'is_active' => true,
+            ]
+        );
         $operator->assignRole('operator');
 
         // Create RW User (manages first RW grouping)
-        $rwUser = User::create([
-            'name' => 'H. Suroto, SE',
-            'email' => 'rw@sid.test',
-            'nik' => '3301012001010050',
-            'phone' => '081234567850',
-            'password' => Hash::make('password'),
-            'is_active' => true,
-        ]);
+        $rwUser = User::updateOrCreate(
+            ['email' => 'rw@sid.test'],
+            [
+                'name' => 'H. Suroto, SE',
+                'nik' => '3301012001010050',
+                'phone' => '081234567850',
+                'password' => Hash::make('password'),
+                'is_active' => true,
+            ]
+        );
         $rwUser->assignRole('rw');
 
         // Create Sie Rukem User
-        $sieRukemUser = User::create([
-            'name' => 'Endang Rahayu',
-            'email' => 'sierukem@sid.test',
-            'nik' => '3301012001010060',
-            'phone' => '081234567860',
-            'password' => Hash::make('password'),
-            'is_active' => true,
-        ]);
+        $sieRukemUser = User::updateOrCreate(
+            ['email' => 'sierukem@sid.test'],
+            [
+                'name' => 'Endang Rahayu',
+                'nik' => '3301012001010060',
+                'phone' => '081234567860',
+                'password' => Hash::make('password'),
+                'is_active' => true,
+            ]
+        );
         $sieRukemUser->assignRole('sie_rukem');
 
         // Create RT Users — one per wilayah
@@ -454,14 +463,49 @@ class DemoDataSeeder extends Seeder
         ]);
 
         // Create sample Rukun Kematian members
-        $activeResidents = Resident::where('status_penduduk', 'aktif')->take(5)->get();
-        foreach ($activeResidents as $i => $resident) {
+        $activeFamilyCards = FamilyCard::where('status', 'aktif')->take(5)->get();
+        $statuses = ['aktif', 'nonaktif', 'khusus', 'keluar', 'tidak_ikut'];
+
+        foreach ($activeFamilyCards as $i => $familyCard) {
             RukemMember::create([
-                'resident_id' => $resident->id,
+                'family_card_id' => $familyCard->id,
                 'nomor_anggota' => 'RKM-' . str_pad($i + 1, 5, '0', STR_PAD_LEFT),
                 'tanggal_gabung' => now()->subMonths(rand(1, 24)),
-                'status_keanggotaan' => $i < 4 ? 'aktif' : 'nonaktif',
+                'status_keanggotaan' => $statuses[$i % count($statuses)],
                 'keterangan' => $i === 0 ? 'Anggota pendiri' : null,
+            ]);
+        }
+        }
+
+        // Create sample UMKM
+        $umkmResidents = Resident::where('status_penduduk', 'aktif')
+            ->whereHas('familyCard')
+            ->inRandomOrder()
+            ->take(8)
+            ->get();
+
+        $sektorUsaha = ['kuliner', 'jasa', 'perdagangan', 'pertanian', 'kerajinan', 'teknologi', 'lainnya'];
+        $rentangOmzet = ['belum_ada', '<1jt', '1-5jt', '5-15jt', '15-50jt', '>50jt'];
+        $jumlahKaryawan = ['0', '1-4', '5-19', '20+'];
+
+        $namaUsahaPrefixes = ['Warung', 'Toko', 'Bengkel', 'Salon', 'Kerajinan', 'Layanan', 'Kebun', 'Konter'];
+
+        foreach ($umkmResidents as $i => $resident) {
+            $prefix = $namaUsahaPrefixes[array_rand($namaUsahaPrefixes)];
+            $sektor = $sektorUsaha[array_rand($sektorUsaha)];
+            
+            Umkm::create([
+                'resident_id' => $resident->id,
+                'nama_usaha' => $prefix . ' ' . explode(' ', $resident->nama_lengkap)[0],
+                'sektor_usaha' => $sektor,
+                'alamat_sama_domisili' => (bool)rand(0, 1),
+                'alamat_usaha' => 'Jl. Desa Cileles No. ' . rand(1, 100),
+                'memiliki_nib' => (bool)rand(0, 1),
+                'nomor_nib' => rand(0, 1) ? 'NIB' . str_pad((string)rand(1, 999999), 10, '0', STR_PAD_LEFT) : null,
+                'rentang_omzet' => $rentangOmzet[array_rand($rentangOmzet)],
+                'jumlah_karyawan' => $jumlahKaryawan[array_rand($jumlahKaryawan)],
+                'deskripsi' => 'Usaha ' . $sektor . ' yang didirikan oleh Bpk/Ibu ' . $resident->nama_lengkap,
+                'status' => 'aktif',
             ]);
         }
     }

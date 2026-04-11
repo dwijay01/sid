@@ -98,7 +98,7 @@ export default function Reports({ data, type }) {
                                 <tr>
                                     <th className="py-3 pl-6 pr-3 text-left text-xs font-bold text-slate-500 uppercase">No</th>
                                     <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">No. Anggota</th>
-                                    <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">Nama / NIK</th>
+                                    <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">Kepala Keluarga / KK</th>
                                     <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">RT/RW</th>
                                     <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">Tgl Gabung</th>
                                     <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">Status</th>
@@ -106,7 +106,19 @@ export default function Reports({ data, type }) {
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                                 {data.map((m, i) => (
-                                    <tr key={m.id}><td className="py-2 pl-6 pr-3">{i + 1}</td><td className="px-3 py-2 font-mono">{m.nomor_anggota}</td><td className="px-3 py-2"><div className="font-semibold">{m.resident?.nama_lengkap}</div><div className="text-xs text-slate-500 font-mono">{m.resident?.nik}</div></td><td className="px-3 py-2">{m.resident?.family_card?.wilayah ? `RT ${m.resident.family_card.wilayah.rt}/RW ${m.resident.family_card.wilayah.rw}` : '-'}</td><td className="px-3 py-2">{new Date(m.tanggal_gabung).toLocaleDateString('id-ID')}</td><td className="px-3 py-2 capitalize">{m.status_keanggotaan}</td></tr>
+                                    <tr key={m.id}>
+                                        <td className="py-2 pl-6 pr-3">{i + 1}</td>
+                                        <td className="px-3 py-2 font-mono">{m.nomor_anggota}</td>
+                                        <td className="px-3 py-2">
+                                            <div className="font-semibold">{m.family_card?.kepala_keluarga?.nama_lengkap || '-'}</div>
+                                            <div className="text-xs text-slate-500 font-mono">KK: {m.family_card?.no_kk || '-'}</div>
+                                        </td>
+                                        <td className="px-3 py-2">
+                                            {m.family_card?.wilayah ? `RT ${m.family_card.wilayah.rt}/RW ${m.family_card.wilayah.rw}` : '-'}
+                                        </td>
+                                        <td className="px-3 py-2">{new Date(m.tanggal_gabung).toLocaleDateString('id-ID')}</td>
+                                        <td className="px-3 py-2 capitalize">{m.status_keanggotaan}</td>
+                                    </tr>
                                 ))}
                             </tbody>
                         </table>

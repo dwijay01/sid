@@ -124,11 +124,75 @@ export const ROLE_LABELS = {
 export const RUKEM_STATUS = {
     aktif: 'Aktif',
     nonaktif: 'Nonaktif',
+    khusus: 'Khusus (Warga Kurang Mampu)',
     keluar: 'Keluar',
+    tidak_ikut: 'Tidak Ikut',
 };
 
 export const RUKEM_STATUS_COLORS = {
     aktif: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
     nonaktif: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+    khusus: 'bg-purple-50 text-purple-700 ring-purple-600/20',
     keluar: 'bg-red-50 text-red-700 ring-red-600/20',
+    tidak_ikut: 'bg-slate-50 text-slate-700 ring-slate-600/20',
+};
+
+/**
+ * UMKM Sector types
+ */
+export const SEKTOR_USAHA = {
+    kuliner: 'Kuliner',
+    jasa: 'Jasa',
+    perdagangan: 'Perdagangan',
+    pertanian: 'Pertanian',
+    kerajinan: 'Kerajinan',
+    teknologi: 'Teknologi',
+    lainnya: 'Lainnya',
+};
+
+export const SEKTOR_USAHA_COLORS = {
+    kuliner: 'bg-orange-50 text-orange-700 ring-orange-600/20',
+    jasa: 'bg-blue-50 text-blue-700 ring-blue-600/20',
+    perdagangan: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+    pertanian: 'bg-lime-50 text-lime-700 ring-lime-600/20',
+    kerajinan: 'bg-purple-50 text-purple-700 ring-purple-600/20',
+    teknologi: 'bg-cyan-50 text-cyan-700 ring-cyan-600/20',
+    lainnya: 'bg-slate-50 text-slate-700 ring-slate-600/20',
+};
+
+/**
+ * UMKM Revenue range
+ */
+export const RENTANG_OMZET = {
+    belum_ada: 'Belum Ada Omzet',
+    '<1jt': '< Rp 1 Juta/bln',
+    '1-5jt': 'Rp 1 - 5 Juta/bln',
+    '5-15jt': 'Rp 5 - 15 Juta/bln',
+    '15-50jt': 'Rp 15 - 50 Juta/bln',
+    '>50jt': '> Rp 50 Juta/bln',
+};
+
+/**
+ * UMKM Employee count
+ */
+export const JUMLAH_KARYAWAN = {
+    '0': 'Tidak Ada',
+    '1-4': '1 - 4 Orang',
+    '5-19': '5 - 19 Orang',
+    '20+': '20+ Orang',
+};
+
+/**
+ * UMKM Status
+ */
+export const UMKM_STATUS = {
+    aktif: 'Aktif',
+    nonaktif: 'Nonaktif',
+    tutup: 'Tutup',
+};
+
+export const UMKM_STATUS_COLORS = {
+    aktif: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+    nonaktif: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+    tutup: 'bg-red-50 text-red-700 ring-red-600/20',
 };

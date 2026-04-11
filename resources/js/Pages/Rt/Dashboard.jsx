@@ -1,10 +1,10 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import RtLayout from '@/Layouts/RtLayout';
-import { Users, CreditCard, Heart, FileText, ArrowUpDown, ChevronRight, Clock, UserPlus, Baby, Skull, ArrowRightLeft } from 'lucide-react';
+import { Users, CreditCard, Heart, FileText, ArrowUpDown, ChevronRight, Clock, UserPlus, Baby, Skull, ArrowRightLeft, Store } from 'lucide-react';
 import { MUTATION_TYPES } from '@/Helpers/constants';
 
-export default function Dashboard({ stats, recentMutations, pendingApprovals }) {
+export default function Dashboard({ stats, recentMutations }) {
     return (
         <RtLayout header="Dashboard Ketua RT">
             <Head title="Dashboard RT" />
@@ -26,7 +26,7 @@ export default function Dashboard({ stats, recentMutations, pendingApprovals }) 
                     { label: 'Total Penduduk', value: stats.total_penduduk, icon: Users, color: 'emerald' },
                     { label: 'Kartu Keluarga', value: stats.total_kk, icon: CreditCard, color: 'blue' },
                     { label: 'Anggota Rukem', value: stats.total_rukem, icon: Heart, color: 'rose' },
-                    { label: 'Surat Pending', value: stats.pending_letters, icon: FileText, color: 'amber' },
+                    { label: 'Unit UMKM', value: stats.total_umkm, icon: Store, color: 'amber' },
                 ].map((stat) => (
                     <div key={stat.label} className={`relative overflow-hidden rounded-xl bg-white dark:bg-slate-800 p-6 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 hover:shadow-md transition-all border-l-4 border-${stat.color}-500`}>
                         <dt className="flex items-center gap-x-3">
@@ -41,27 +41,32 @@ export default function Dashboard({ stats, recentMutations, pendingApprovals }) 
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Pending Letter Approvals */}
+                {/* Recent Mutations */}
                 <div className="lg:col-span-2 bg-white dark:bg-slate-800 shadow-sm rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
                     <div className="border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-6 py-4 flex justify-between items-center">
                         <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                            <Clock size={18} className="text-amber-500" /> Surat Menunggu Persetujuan
+                            <ArrowUpDown size={18} className="text-blue-500" /> Mutasi Penduduk Terbaru
                         </h3>
-                        <Link href={route('rt.letters.index')} className="text-sm font-semibold text-blue-600 hover:text-blue-500">Lihat Semua →</Link>
+                        <Link href={route('rt.mutations.index')} className="text-sm font-semibold text-blue-600 hover:text-blue-500">Lihat Semua →</Link>
                     </div>
                     <div className="divide-y divide-slate-100 dark:divide-slate-700">
-                        {pendingApprovals.length > 0 ? pendingApprovals.slice(0, 5).map((l) => (
-                            <div key={l.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                        {recentMutations.length > 0 ? recentMutations.map((m) => (
+                            <div key={m.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
                                 <div>
-                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{l.resident?.nama_lengkap}</p>
-                                    <p className="text-xs text-slate-500">{l.letter_type?.nama_surat} — {l.keperluan}</p>
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{m.resident?.nama_lengkap}</p>
+                                    <p className="text-xs text-slate-500">{MUTATION_TYPES[m.type] || m.type} — {new Date(m.tanggal_mutasi).toLocaleDateString('id-ID')}</p>
                                 </div>
-                                <Link href={route('rt.letters.show', l.id)} className="inline-flex items-center rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-500 transition-colors">
-                                    Review <ChevronRight size={14} className="ml-1" />
-                                </Link>
+                                <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ring-1 ring-inset ${
+                                    m.type === 'lahir' ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' :
+                                    m.type === 'mati' ? 'bg-red-50 text-red-700 ring-red-600/20' :
+                                    m.type === 'pindah_keluar' ? 'bg-amber-50 text-amber-700 ring-amber-600/20' :
+                                    'bg-blue-50 text-blue-700 ring-blue-600/20'
+                                }`}>
+                                    {MUTATION_TYPES[m.type] || m.type}
+                                </span>
                             </div>
                         )) : (
-                            <div className="px-6 py-12 text-center text-sm text-slate-500">Tidak ada surat menunggu persetujuan.</div>
+                            <div className="px-6 py-12 text-center text-sm text-slate-500">Tidak ada data mutasi terbaru.</div>
                         )}
                     </div>
                 </div>
@@ -79,6 +84,7 @@ export default function Dashboard({ stats, recentMutations, pendingApprovals }) 
                                 { label: 'Warga Pindah', href: route('rt.mutations.move-out'), icon: ArrowRightLeft, color: 'amber' },
                                 { label: 'Warga Masuk', href: route('rt.mutations.move-in'), icon: ArrowRightLeft, color: 'indigo' },
                                 { label: 'Input Anggota Rukem', href: route('rt.rukem.create'), icon: Heart, color: 'rose' },
+                                { label: 'Pendataan UMKM', href: route('rt.umkm.create'), icon: Store, color: 'amber' },
                             ].map((a) => (
                                 <Link key={a.label} href={a.href} className="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 group transition-all">
                                     <div className="flex items-center gap-3">

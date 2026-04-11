@@ -59,7 +59,7 @@ export default function Index({ members, filters = {} }) {
                         <thead className="bg-slate-50 dark:bg-slate-800/50">
                             <tr>
                                 <th className="py-3.5 pl-6 pr-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">No. Anggota</th>
-                                <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nama / NIK</th>
+                                <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Kepala Keluarga / KK</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tgl Gabung</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Keterangan</th>
@@ -71,8 +71,8 @@ export default function Index({ members, filters = {} }) {
                                 <tr key={m.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                                     <td className="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-mono font-bold text-rose-700 dark:text-rose-400">{m.nomor_anggota}</td>
                                     <td className="whitespace-nowrap px-3 py-4">
-                                        <div className="font-bold text-slate-900 dark:text-white text-sm">{m.resident?.nama_lengkap}</div>
-                                        <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">{m.resident?.nik}</div>
+                                        <div className="font-bold text-slate-900 dark:text-white text-sm">{m.family_card?.kepala_keluarga?.nama_lengkap || '-'}</div>
+                                        <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">KK: {m.family_card?.no_kk || '-'}</div>
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600 dark:text-slate-400">{new Date(m.tanggal_gabung).toLocaleDateString('id-ID')}</td>
                                     <td className="whitespace-nowrap px-3 py-4">

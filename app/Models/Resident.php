@@ -82,4 +82,9 @@ class Resident extends Model
     {
         return $this->hasOne(RukemMember::class);
     }
+
+    public function umkm(): HasMany
+    {
+        return $this->hasMany(Umkm::class);
+    }
 }
