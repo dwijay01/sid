@@ -15,7 +15,8 @@ import {
     FileType,
     FilePlus,
     PieChart,
-    UserCog
+    UserCog,
+    ClipboardList
 } from 'lucide-react';
 import Dropdown from '@/Components/Dropdown';
 import ThemeToggle from '@/Components/ThemeToggle';
@@ -30,11 +31,11 @@ export default function AdminLayout({ header, children }) {
         { name: 'Kartu Keluarga', href: route('admin.family-cards.index'), icon: CreditCard, current: route().current('admin.family-cards.*') },
         { name: 'Wilayah RT/RW', href: route('admin.wilayah.index'), icon: MapPin, current: route().current('admin.wilayah.*') },
         { name: 'Mutasi', href: route('admin.mutations.index'), icon: ArrowUpDown, current: route().current('admin.mutations.*') },
-        { name: 'Persuratan', href: route('admin.letters.queue'), icon: FileText, current: route().current('admin.letters.*') },
         { name: 'Jenis Surat', href: route('admin.letter-types.index'), icon: FileType, current: route().current('admin.letter-types.*') },
         { name: 'Template Surat', href: route('admin.letter-templates.index'), icon: FilePlus, current: route().current('admin.letter-templates.*') },
         { name: 'Manajemen User', href: route('admin.users.index'), icon: UserCog, current: route().current('admin.users.*') },
         { name: 'Laporan', href: route('admin.reports.demography'), icon: PieChart, current: route().current('admin.reports.*') },
+        { name: 'Log Import', href: route('admin.import-logs.index'), icon: ClipboardList, current: route().current('admin.import-logs.*') },
         { name: 'Pengaturan', href: route('admin.settings.index'), icon: Settings, current: route().current('admin.settings.*') },
     ];
 

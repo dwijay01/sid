@@ -33,7 +33,7 @@ class WilayahController extends Controller
 
     public function create()
     {
-        $rtRwUsers = User::role('rt')->get(['id', 'name']);
+        $rtRwUsers = User::role(['rt', 'rw'])->get(['id', 'name']);
 
         return Inertia::render('Admin/Wilayah/Form', [
             'rtRwUsers' => $rtRwUsers,
@@ -61,7 +61,7 @@ class WilayahController extends Controller
 
     public function edit(WilayahRtRw $wilayah)
     {
-        $rtRwUsers = User::role('rt')->get(['id', 'name']);
+        $rtRwUsers = User::role(['rt', 'rw'])->get(['id', 'name']);
 
         return Inertia::render('Admin/Wilayah/Form', [
             'wilayah' => $wilayah,

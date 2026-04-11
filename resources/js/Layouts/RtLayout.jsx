@@ -11,7 +11,8 @@ import {
     Menu,
     Bell,
     CreditCard,
-    Store
+    Store,
+    ClipboardList
 } from 'lucide-react';
 import Dropdown from '@/Components/Dropdown';
 import ThemeToggle from '@/Components/ThemeToggle';
@@ -25,7 +26,9 @@ export default function RtLayout({ header, children }) {
         { name: 'Daftar Warga', href: route('rt.residents'), icon: Users, current: route().current('rt.residents*') },
         { name: 'Kartu Keluarga', href: route('rt.family-cards.index'), icon: CreditCard, current: route().current('rt.family-cards.*') },
         { name: 'Mutasi Penduduk', href: route('rt.mutations.index'), icon: ArrowUpDown, current: route().current('rt.mutations.*') },
+        { name: 'Rukun Kematian', href: route('rt.rukem.index'), icon: Heart, current: route().current('rt.rukem.*') },
         { name: 'Pendataan UMKM', href: route('rt.umkm.index'), icon: Store, current: route().current('rt.umkm.*') },
+        { name: 'Log Import', href: route('rt.import-logs.index'), icon: ClipboardList, current: route().current('rt.import-logs.*') },
     ];
 
     return (

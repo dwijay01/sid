@@ -475,7 +475,6 @@ class DemoDataSeeder extends Seeder
                 'keterangan' => $i === 0 ? 'Anggota pendiri' : null,
             ]);
         }
-        }
 
         // Create sample UMKM
         $umkmResidents = Resident::where('status_penduduk', 'aktif')

@@ -32,6 +32,7 @@ class Resident extends Model
         'no_kitas',
         'alamat_sekarang',
         'status_penduduk',
+        'needs_update',
         'foto',
     ];
 

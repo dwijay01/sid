@@ -7,6 +7,9 @@ use App\Models\FamilyCard;
 use App\Models\Resident;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ResidentImport;
+use App\Models\WilayahRtRw;
 
 class RtResidentController extends Controller
 {
@@ -106,5 +109,56 @@ class RtResidentController extends Controller
 
         return redirect()->route('rt.residents')
             ->with('success', 'Data penduduk berhasil diperbarui.');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+
+        $wilayahId = $this->getWilayahId();
+        $wilayah = WilayahRtRw::find($wilayahId);
+        
+        if (!$wilayah) {
+            return back()->with('error', 'Wilayah RT tidak ditemukan.');
+        }
+
+        // Format sheet name: "RT. 01", "RT. 02", etc.
+        $sheetName = 'RT. ' . str_pad($wilayah->rt, 2, '0', STR_PAD_LEFT);
+        $import = new ResidentImport($wilayah->id, $sheetName);
+        
+        try {
+            Excel::import($import, $request->file('file'));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal mengimpor data: ' . $e->getMessage());
+        }
+
+        $successCount = $import->getSuccessCount();
+        $skipped = $import->getSkipped();
+        
+        $message = "Berhasil mengimpor $successCount data penduduk.";
+        if (count($skipped) > 0) {
+            $message .= " " . count($skipped) . " data dilewati (Duplikat).";
+        }
+
+        \App\Models\ImportLog::create([
+            'user_id' => auth()->id(),
+            'filename' => $request->file('file')->getClientOriginalName(),
+            'total_success' => $successCount,
+            'total_skipped' => count($skipped),
+            'details' => [
+                'skipped' => $skipped,
+            ],
+            'type' => 'resident_rt',
+        ]);
+
+        return back()->with([
+            'success' => $message,
+            'import_results' => [
+                'success_count' => $successCount,
+                'skipped' => $skipped
+            ]
+        ]);
     }
 }

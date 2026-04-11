@@ -86,6 +86,7 @@ Route::middleware('auth')->group(function () {
         // Master Data
         // Export Residents
         Route::get('/residents/export', [ResidentController::class, 'export'])->name('residents.export');
+        Route::post('/residents/import', [ResidentController::class, 'import'])->name('residents.import');
         
         Route::resource('residents', ResidentController::class);
         Route::resource('family-cards', FamilyCardController::class);
@@ -117,6 +118,10 @@ Route::middleware('auth')->group(function () {
         // Reports
         Route::get('/reports/demography', [AdminReportController::class, 'demography'])->name('reports.demography');
         Route::get('/reports/letters', [AdminReportController::class, 'letters'])->name('reports.letters');
+
+        // Import Logs
+        Route::get('/import-logs', [\App\Http\Controllers\ImportLogController::class, 'index'])->name('import-logs.index');
+        Route::get('/import-logs/{importLog}', [\App\Http\Controllers\ImportLogController::class, 'show'])->name('import-logs.show');
     });
 
     // -------------------------------------------------------------
@@ -154,6 +159,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/residents', [RtResidentController::class, 'store'])->name('residents.store');
         Route::get('/residents/{resident}/edit', [RtResidentController::class, 'edit'])->name('residents.edit');
         Route::put('/residents/{resident}', [RtResidentController::class, 'update'])->name('residents.update');
+        Route::post('/residents/import', [RtResidentController::class, 'import'])->name('residents.import');
 
         // Mutations
         Route::get('/mutations', [RtMutationController::class, 'index'])->name('mutations.index');
@@ -179,8 +185,12 @@ Route::middleware('auth')->group(function () {
         // Letters (approval)
         Route::get('/letters', [RtLetterController::class, 'index'])->name('letters.index');
         Route::get('/letters/{letterRequest}', [RtLetterController::class, 'show'])->name('letters.show');
-        Route::post('/letters/{letterRequest}/approve', [RtLetterController::class, 'approve'])->name('letters.approve');
+        Route::get('/letters/{letterRequest}/approve', [RtLetterController::class, 'approve'])->name('letters.approve');
         Route::post('/letters/{letterRequest}/reject', [RtLetterController::class, 'reject'])->name('letters.reject');
+
+        // Import Logs
+        Route::get('/import-logs', [\App\Http\Controllers\ImportLogController::class, 'index'])->name('import-logs.index');
+        Route::get('/import-logs/{importLog}', [\App\Http\Controllers\ImportLogController::class, 'show'])->name('import-logs.show');
     });
 
     // -------------------------------------------------------------

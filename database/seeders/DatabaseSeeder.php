@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
             VillageSettingSeeder::class,
             WilayahSeeder::class,
             LetterTypeSeeder::class,
-            DemoDataSeeder::class,
+            AdminUserSeeder::class,
+            // DemoDataSeeder::class, // Commented out to prevent seeding demo residents
         ]);
     }
 }

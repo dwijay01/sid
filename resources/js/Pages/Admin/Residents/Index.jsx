@@ -1,11 +1,25 @@
-import React, { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import React, { useState, useEffect } from 'react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Search, Plus, MoreVertical, Edit2, Trash2, Eye, Download } from 'lucide-react';
+import { Search, Plus, MoreVertical, Edit2, Trash2, Eye, Download, Upload, CheckCircle2, AlertCircle } from 'lucide-react';
 import Dropdown from '@/Components/Dropdown';
+import Modal from '@/Components/Modal';
+import SecondaryButton from '@/Components/SecondaryButton';
+import PrimaryButton from '@/Components/PrimaryButton';
 
 export default function Index({ residents, filters }) {
+    const { flash, import_results } = usePage().props;
     const [search, setSearch] = useState(filters.search || '');
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [importFile, setImportFile] = useState(null);
+    const [isImporting, setIsImporting] = useState(false);
+    const [showResultModal, setShowResultModal] = useState(false);
+
+    useEffect(() => {
+        if (import_results) {
+            setShowResultModal(true);
+        }
+    }, [import_results]);
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -18,6 +32,25 @@ export default function Index({ residents, filters }) {
         }
     };
 
+    const handleImport = (e) => {
+        e.preventDefault();
+        if (!importFile) return;
+
+        setIsImporting(true);
+        router.post(route('admin.residents.import'), {
+            file: importFile
+        }, {
+            onSuccess: () => {
+                setIsImportModalOpen(false);
+                setImportFile(null);
+                setIsImporting(false);
+            },
+            onError: () => {
+                setIsImporting(false);
+            }
+        });
+    };
+
     return (
         <AdminLayout header="Data Kependudukan">
             <Head title="Penduduk" />
@@ -28,7 +61,7 @@ export default function Index({ residents, filters }) {
                         Kelola data warga desa, tambah penduduk baru, atau ubah data.
                     </p>
                 </div>
-                <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex items-center gap-3">
+                <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex items-center gap-3 flex-wrap">
                     <a
                         href={route('admin.residents.export')}
                         target="_blank"
@@ -37,6 +70,13 @@ export default function Index({ residents, filters }) {
                         <Download size={16} />
                         Export Excel
                     </a>
+                    <button
+                        onClick={() => setIsImportModalOpen(true)}
+                        className="block rounded-lg bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 px-4 py-2 text-center text-sm font-semibold text-emerald-700 dark:text-emerald-400 shadow-sm hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors flex items-center gap-2"
+                    >
+                        <Upload size={16} />
+                        Import Excel
+                    </button>
                     <Link
                         href={route('admin.residents.create')}
                         className="block rounded-lg bg-emerald-600 px-4 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 transition-colors flex items-center gap-2"
@@ -101,16 +141,23 @@ export default function Index({ residents, filters }) {
                                 </tr>
                             ) : (
                                 residents.data.map((resident) => (
-                                    <tr key={resident.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                                    <tr key={resident.id} className={`${resident.needs_update ? 'bg-amber-50/50 dark:bg-amber-900/10' : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'} transition-colors`}>
                                         <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6">
-                                            <div className="text-sm font-medium text-slate-900 dark:text-white">{resident.nama_lengkap}</div>
+                                            <div className="flex items-center gap-2">
+                                                <div className="text-sm font-medium text-slate-900 dark:text-white">{resident.nama_lengkap}</div>
+                                                {resident.needs_update && (
+                                                    <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
+                                                        Update
+                                                    </span>
+                                                )}
+                                            </div>
                                             <div className="text-sm text-slate-500 dark:text-slate-400 font-mono tracking-wider">{resident.nik}</div>
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
                                             {resident.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
-                                            {new Date().getFullYear() - new Date(resident.tanggal_lahir).getFullYear()} Tahun
+                                            {resident.tanggal_lahir ? `${new Date().getFullYear() - new Date(resident.tanggal_lahir).getFullYear()} Tahun` : 'N/A'}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
                                             <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
@@ -195,6 +242,123 @@ export default function Index({ residents, filters }) {
                     </div>
                 )}
             </div>
+
+            {flash?.success && !import_results && (
+                <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl flex items-center gap-3">
+                    <CheckCircle2 size={20} />
+                    {flash.success}
+                </div>
+            )}
+
+            {flash?.error && (
+                <div className="mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl flex items-center gap-3">
+                    <AlertCircle size={20} />
+                    {flash.error}
+                </div>
+            )}
+            
+            <div className="glass bg-white dark:bg-slate-800 p-4 mb-6 shadow-sm rounded-xl">
+                {/* ... existing search form ... */}
+            </div>
+
+            {/* Import Modal */}
+            <Modal show={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} maxWidth="md">
+                <form onSubmit={handleImport} className="p-6">
+                    <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Import Data Warga dari Excel</h2>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                        Pilih file Excel yang berisi data warga. Sistem akan memproses setiap sheet RT dan memasukkan data penduduk serta KK secara otomatis.
+                    </p>
+
+                    <div className="mb-6">
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">File Excel (.xlsx, .xls)</label>
+                        <input 
+                            type="file" 
+                            accept=".xlsx, .xls, .csv"
+                            onChange={(e) => setImportFile(e.target.files[0])}
+                            className="block w-full text-sm text-slate-500 dark:text-slate-400
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-emerald-50 file:text-emerald-700
+                                hover:file:bg-emerald-100
+                                dark:file:bg-slate-700 dark:file:text-slate-300"
+                        />
+                    </div>
+
+                    <div className="flex justify-end gap-3">
+                        <SecondaryButton onClick={() => setIsImportModalOpen(false)}>Batal</SecondaryButton>
+                        <PrimaryButton 
+                            type="submit" 
+                            disabled={!importFile || isImporting}
+                            className={isImporting ? 'opacity-50 cursor-not-allowed' : ''}
+                        >
+                            {isImporting ? 'Mengimpor...' : 'Mulai Import'}
+                        </PrimaryButton>
+                    </div>
+                </form>
+            </Modal>
+
+            {/* Result Modal */}
+            <Modal show={showResultModal} onClose={() => setShowResultModal(false)} maxWidth="lg">
+                <div className="p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg text-emerald-600 dark:text-emerald-400">
+                            <CheckCircle2 size={24} />
+                        </div>
+                        <h2 className="text-lg font-bold text-slate-800 dark:text-white">Hasil Import Selesai</h2>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <div className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Berhasil</div>
+                            <div className="text-2xl font-bold text-emerald-600">{import_results?.total_success || 0}</div>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <div className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Dilewati</div>
+                            <div className="text-2xl font-bold text-amber-600">{import_results?.total_skipped || 0}</div>
+                        </div>
+                    </div>
+
+                    {import_results?.summary?.length > 0 && (
+                        <div className="mb-6">
+                            <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">Ringkasan per Sheet:</h3>
+                            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700 p-3">
+                                <ul className="text-xs space-y-1 text-slate-600 dark:text-slate-400">
+                                    {import_results.summary.map((line, i) => (
+                                        <li key={i}>{line}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    )}
+
+                    {import_results?.skipped_details?.length > 0 && (
+                        <div className="mb-6">
+                            <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+                                <AlertCircle size={16} /> Detail Duplikat (teratas):
+                            </h3>
+                            <div className="max-h-48 overflow-y-auto border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50">
+                                <ul className="divide-y divide-slate-200 dark:divide-slate-700">
+                                    {import_results.skipped_details.slice(0, 50).map((item, idx) => (
+                                        <li key={idx} className="p-3">
+                                            <div className="text-sm font-bold text-slate-800 dark:text-slate-200">{item.nama}</div>
+                                            <div className="text-xs text-slate-500 font-mono">{item.nik}</div>
+                                            <div className="text-xs text-rose-500 mt-1">{item.reason}</div>
+                                        </li>
+                                    ))}
+                                    {import_results.skipped_details.length > 50 && (
+                                        <li className="p-3 text-center text-xs text-slate-500 italic">...dan {import_results.skipped_details.length - 50} data lainnya</li>
+                                    )}
+                                </ul>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex justify-end">
+                        <PrimaryButton onClick={() => setShowResultModal(false)}>Tutup</PrimaryButton>
+                    </div>
+                </div>
+            </Modal>
         </AdminLayout>
     );
 }
