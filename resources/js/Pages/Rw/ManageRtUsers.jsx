@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Head, router, useForm } from '@inertiajs/react';
 import RwLayout from '@/Layouts/RwLayout';
-import { UserCog, ShieldCheck, ShieldOff, MapPin, Plus, X, Users } from 'lucide-react';
+import { UserCog, ShieldCheck, ShieldOff, MapPin, Plus, X, Users, CheckCircle } from 'lucide-react';
 
-export default function ManageRtUsers({ rtUsers, wilayahList, rukemUsers = [] }) {
+export default function ManageRtUsers({ rtUsers, pendingRtUsers = [], wilayahList, rukemUsers = [] }) {
     const [activeTab, setActiveTab] = useState('rt');
     const [showModal, setShowModal] = useState(false);
 
@@ -35,6 +35,18 @@ export default function ManageRtUsers({ rtUsers, wilayahList, rukemUsers = [] })
         }
     };
 
+    const handleApprove = (userId) => {
+        if (confirm('Setujui pendaftaran akun Ketua RT ini?')) {
+            router.post(route('rw.rt-users.approve', userId));
+        }
+    };
+
+    const handleReject = (userId) => {
+        if (confirm('Tolak dan hapus permohonan pendaftaran ini?')) {
+            router.post(route('rw.rt-users.reject', userId));
+        }
+    };
+
     const handleStoreUser = (e) => {
         e.preventDefault();
         post(route('rw.rt-users.store'), {
@@ -54,7 +66,7 @@ export default function ManageRtUsers({ rtUsers, wilayahList, rukemUsers = [] })
                                 <UserCog size={24} />
                             </div>
                             <div>
-                                <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Kelola Akses Pengguna</h2>
+                                <h2 className="text-lg font-bold text-slate-800 dark:text-white">Kelola Akses Pengguna</h2>
                                 <p className="text-sm text-slate-500 dark:text-slate-400">Kelola akun untuk Ketua RT dan Sie Rukun Kematian.</p>
                             </div>
                         </div>
@@ -64,6 +76,53 @@ export default function ManageRtUsers({ rtUsers, wilayahList, rukemUsers = [] })
                     </div>
                 </div>
             </div>
+
+            {/* Pending Requests Section */}
+            {activeTab === 'rt' && pendingRtUsers.length > 0 && (
+                <div className="mb-8 overflow-hidden rounded-2xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/30 dark:bg-amber-900/10 transition-all">
+                    <div className="bg-amber-100/50 dark:bg-amber-900/20 px-6 py-4 border-b border-amber-200 dark:border-amber-900/50 flex items-center gap-3">
+                        <ShieldCheck className="text-amber-600 dark:text-amber-400" size={20} />
+                        <h3 className="font-bold text-amber-900 dark:text-amber-100">Permohonan Aktivasi Akun RT Baru</h3>
+                        <span className="ml-auto bg-amber-200 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 px-2 py-0.5 rounded-full text-xs font-bold">
+                            {pendingRtUsers.length} Menunggu
+                        </span>
+                    </div>
+                    <div className="divide-y divide-amber-200/50 dark:divide-amber-900/30">
+                        {pendingRtUsers.map((user) => (
+                            <div key={user.id} className="px-6 py-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-amber-100/20 transition-colors">
+                                <div className="flex items-center gap-4">
+                                    <div className="h-12 w-12 rounded-full bg-amber-200 dark:bg-amber-800/50 flex items-center justify-center text-amber-700 dark:text-amber-200 font-bold text-lg">
+                                        {user.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <p className="font-bold text-slate-900 dark:text-white">{user.name}</p>
+                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold uppercase">
+                                                RT {user.pending_wilayah?.rt}
+                                            </span>
+                                        </div>
+                                        <p className="text-sm text-slate-500 dark:text-slate-400">{user.email}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <button 
+                                        onClick={() => handleReject(user.id)}
+                                        className="px-4 py-2 border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/10 rounded-xl text-sm font-bold transition-all"
+                                    >
+                                        Tolak
+                                    </button>
+                                    <button 
+                                        onClick={() => handleApprove(user.id)}
+                                        className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-bold shadow-sm shadow-emerald-600/20 transition-all flex items-center gap-2"
+                                    >
+                                        <CheckCircle size={16} /> Setujui & Aktifkan
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="mb-6">
                 <div className="flex border-b border-slate-200 dark:border-slate-700">

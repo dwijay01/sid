@@ -21,7 +21,10 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Auth/Register');
+        return Inertia::render('Auth/Register', [
+            'wilayahList' => \App\Models\WilayahRtRw::orderBy('rw')->orderBy('rt')->get(),
+            'status' => session('status'),
+        ]);
     }
 
     /**
@@ -35,18 +38,24 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'wilayah_id' => 'required|exists:wilayah_rt_rw,id',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'is_active' => false,
+            'pending_wilayah_id' => $request->wilayah_id,
         ]);
+
+        $user->assignRole('rt');
 
         event(new Registered($user));
 
-        Auth::login($user);
+        // We don't login the user because they are inactive
+        // Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('register'))->with('status', 'Pendaftaran akun berhasil, hubungi Ketua RW anda untuk aktivasi akun.');
     }
 }

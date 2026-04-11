@@ -62,6 +62,12 @@ class RtFamilyCardController extends Controller
             'kepala_keluarga_id' => 'nullable|exists:residents,id',
             'alamat' => 'required|string',
             'kode_pos' => 'nullable|string|max:10',
+            'status_kepemilikan_bangunan' => 'nullable|string|in:milik_sendiri,kontrak_sewa,bebas_sewa,rumah_dinas',
+            'jenis_lantai' => 'nullable|string|in:keramik,semen,tanah,kayu',
+            'jenis_dinding' => 'nullable|string|in:tembok,papan,anyaman_bambu',
+            'fasilitas_sanitasi' => 'nullable|string|in:milik_sendiri,mck_umum,tidak_punya',
+            'sumber_air_minum' => 'nullable|string|in:pdam,sumur_bor,sumur_gali,mata_air,sungai',
+            'alamat_domisili' => 'nullable|string',
         ]);
 
         $validated['wilayah_id'] = $this->getWilayahId();
@@ -128,6 +134,12 @@ class RtFamilyCardController extends Controller
             'kepala_keluarga_id' => 'nullable|exists:residents,id',
             'alamat' => 'required|string',
             'kode_pos' => 'nullable|string|max:10',
+            'status_kepemilikan_bangunan' => 'nullable|string|in:milik_sendiri,kontrak_sewa,bebas_sewa,rumah_dinas',
+            'jenis_lantai' => 'nullable|string|in:keramik,semen,tanah,kayu',
+            'jenis_dinding' => 'nullable|string|in:tembok,papan,anyaman_bambu',
+            'fasilitas_sanitasi' => 'nullable|string|in:milik_sendiri,mck_umum,tidak_punya',
+            'sumber_air_minum' => 'nullable|string|in:pdam,sumur_bor,sumur_gali,mata_air,sungai',
+            'alamat_domisili' => 'nullable|string',
             'status' => 'required|in:aktif,pecah_kk,pindah,hilang',
         ]);
 

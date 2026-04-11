@@ -9,6 +9,7 @@ import {
     ArrowLeft,
     Shield,
     CheckCircle,
+    ShieldCheck,
 } from 'lucide-react';
 
 export default function Login({ status, canResetPassword }) {
@@ -297,6 +298,20 @@ export default function Login({ status, canResetPassword }) {
                                     </span>
                                 )}
                             </button>
+
+                            {/* Register RT Button */}
+                            <div className="text-center">
+                                <Link
+                                    href={route('register')}
+                                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold text-sm hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-300"
+                                >
+                                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                                    Daftar Akun Ketua RT
+                                </Link>
+                                <p className="mt-2 text-[10px] text-slate-400 uppercase tracking-widest font-bold">
+                                    Diaktifkan oleh Ketua RW
+                                </p>
+                            </div>
                         </form>
 
                         {/* Divider */}

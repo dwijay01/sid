@@ -53,6 +53,16 @@ class RwDashboardController extends Controller
                 'total_umkm' => Umkm::where('status', 'aktif')
                     ->whereHas('resident.familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
                     ->count(),
+                'total_bebas_sewa' => FamilyCard::whereIn('wilayah_id', $wilayahIds)
+                    ->where('status_kepemilikan_bangunan', 'bebas_sewa')
+                    ->count(),
+                'total_tanpa_jamban' => FamilyCard::whereIn('wilayah_id', $wilayahIds)
+                    ->where('fasilitas_sanitasi', 'tidak_punya')
+                    ->count(),
+                'total_pendatang' => FamilyCard::whereIn('wilayah_id', $wilayahIds)
+                    ->whereNotNull('alamat_domisili')
+                    ->where('alamat_domisili', '!=', '')
+                    ->count(),
             ],
             'recentMutations' => $recentMutations,
         ]);

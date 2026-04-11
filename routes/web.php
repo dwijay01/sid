@@ -134,6 +134,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/rt-users', [RtUserController::class, 'index'])->name('rt-users.index');
         Route::post('/rt-users', [RtUserController::class, 'store'])->name('rt-users.store');
         Route::post('/rt-users/{user}/toggle', [RtUserController::class, 'toggleActive'])->name('rt-users.toggle');
+        Route::post('/rt-users/{user}/approve', [RtUserController::class, 'approve'])->name('rt-users.approve');
+        Route::post('/rt-users/{user}/reject', [RtUserController::class, 'reject'])->name('rt-users.reject');
     });
 
     // -------------------------------------------------------------

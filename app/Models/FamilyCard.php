@@ -14,6 +14,13 @@ class FamilyCard extends Model
         'kepala_keluarga_id',
         'wilayah_id',
         'alamat',
+        'kode_pos',
+        'status_kepemilikan_bangunan',
+        'jenis_lantai',
+        'jenis_dinding',
+        'fasilitas_sanitasi',
+        'sumber_air_minum',
+        'alamat_domisili',
         'status',
     ];
 

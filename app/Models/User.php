@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'resident_id',
         'is_active',
+        'pending_wilayah_id',
     ];
 
     protected $hidden = [
@@ -55,6 +56,11 @@ class User extends Authenticatable
     public function managedWilayah(): HasOne
     {
         return $this->hasOne(WilayahRtRw::class, 'ketua_user_id');
+    }
+
+    public function pendingWilayah(): BelongsTo
+    {
+        return $this->belongsTo(WilayahRtRw::class, 'pending_wilayah_id');
     }
 
     /**

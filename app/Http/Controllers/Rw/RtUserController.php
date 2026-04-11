@@ -34,10 +34,17 @@ class RtUserController extends Controller
             ->with('managedWilayah')
             ->get();
 
+        $pendingRtUsers = User::role('rt')
+            ->where('is_active', false)
+            ->whereHas('pendingWilayah', fn($q) => $q->where('rw', $rw))
+            ->with('pendingWilayah')
+            ->get();
+
         $rukemUsers = User::role('sie_rukem')->get();
 
         return Inertia::render('Rw/ManageRtUsers', [
             'rtUsers' => $rtUsers,
+            'pendingRtUsers' => $pendingRtUsers,
             'wilayahList' => $wilayahList,
             'rukemUsers' => $rukemUsers,
         ]);
@@ -88,5 +95,46 @@ class RtUserController extends Controller
         $user->update(['is_active' => !$user->is_active]);
 
         return back()->with('success', 'Status akses RT berhasil diperbarui.');
+    }
+
+    public function approve(User $user)
+    {
+        $rw = $this->getRw();
+        $pendingWilayah = $user->pendingWilayah;
+
+        if (!$pendingWilayah || $pendingWilayah->rw !== $rw) {
+            return back()->with('error', 'Permohonan tidak valid.');
+        }
+
+        // Update Wilayah
+        $pendingWilayah->update([
+            'ketua_user_id' => $user->id,
+            'nama_ketua' => $user->name,
+        ]);
+
+        // Update User
+        $user->update([
+            'is_active' => true,
+            'pending_wilayah_id' => null,
+        ]);
+
+        return back()->with('success', "Akun {$user->name} telah diaktifkan sebagai Ketua RT {$pendingWilayah->rt}.");
+    }
+
+    public function reject(User $user)
+    {
+        $rw = $this->getRw();
+        $pendingWilayah = $user->pendingWilayah;
+
+        if (!$pendingWilayah || $pendingWilayah->rw !== $rw) {
+            return back()->with('error', 'Permohonan tidak valid.');
+        }
+
+        // We delete the user account if rejected to allow them to re-register with same email?
+        // Or just clear the pending? User wants accounts to be activated.
+        // I'll delete the user to keep the database clean of failed registrations.
+        $user->delete();
+
+        return back()->with('success', 'Permohonan akun telah ditolak dan dihapus.');
     }
 }

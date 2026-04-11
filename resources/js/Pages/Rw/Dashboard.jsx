@@ -45,6 +45,27 @@ export default function Dashboard({ stats, recentMutations }) {
                 ))}
             </div>
 
+            <div className="mb-8 p-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                    <MapPin size={20} className="text-indigo-500" />
+                    Analisa Wilayah (Hunian & Sanitasi)
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="p-4 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800">
+                        <p className="text-sm font-medium text-indigo-800 dark:text-indigo-300 mb-1">KK Menumpang (Bebas Sewa)</p>
+                        <p className="text-2xl font-black text-indigo-900 dark:text-indigo-100">{stats.total_bebas_sewa || 0} <span className="text-xs font-normal">KK</span></p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800">
+                        <p className="text-sm font-medium text-orange-800 dark:text-orange-300 mb-1">Belum Punya Jamban Sendiri</p>
+                        <p className="text-2xl font-black text-orange-900 dark:text-orange-100">{stats.total_tanpa_jamban || 0} <span className="text-xs font-normal">KK</span></p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800">
+                        <p className="text-sm font-medium text-teal-800 dark:text-teal-300 mb-1">Warga Pendatang (Domisili)</p>
+                        <p className="text-2xl font-black text-teal-900 dark:text-teal-100">{stats.total_pendatang || 0} <span className="text-xs font-normal">KK</span></p>
+                    </div>
+                </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Recent Mutations */}
                 <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
