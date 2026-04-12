@@ -10,7 +10,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 export default function Index({ residents, filters }) {
     const { flash, import_results } = usePage().props;
     const [search, setSearch] = useState(filters.search || '');
-    const [sort, setSort] = useState(filters.sort || 'name');
+    const [sortBy, setSortBy] = useState(typeof filters?.sort === 'string' ? filters.sort : 'name');
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [importFile, setImportFile] = useState(null);
     const [isImporting, setIsImporting] = useState(false);
@@ -24,11 +24,11 @@ export default function Index({ residents, filters }) {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        router.get(route('admin.residents.index'), { search, sort }, { preserveState: true });
+        router.get(route('admin.residents.index'), { search, sort: sortBy }, { preserveState: true });
     };
 
     const handleSortChange = (newSort) => {
-        setSort(newSort);
+        setSortBy(newSort);
         router.get(route('admin.residents.index'), { search, sort: newSort }, { preserveState: true });
     };
 
@@ -110,7 +110,7 @@ export default function Index({ residents, filters }) {
                     
                     <div className="flex gap-2">
                         <select 
-                            value={sort} 
+                            value={sortBy} 
                             onChange={(e) => handleSortChange(e.target.value)}
                             className="rounded-lg border-0 py-2.5 text-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white"
                         >

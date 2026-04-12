@@ -10,7 +10,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 export default function Index({ residents, filters = {} }) {
     const { flash, import_results } = usePage().props;
     const [search, setSearch] = useState(filters.search || '');
-    const [sort, setSort] = useState(filters.sort || 'name');
+    const [sortBy, setSortBy] = useState(typeof filters?.sort === 'string' ? filters.sort : 'name');
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [importFile, setImportFile] = useState(null);
     const [isImporting, setIsImporting] = useState(false);
@@ -18,10 +18,10 @@ export default function Index({ residents, filters = {} }) {
 
     useEffect(() => {
         const timeout = setTimeout(() => {
-            router.get(route('rt.residents'), { search, sort }, { preserveState: true });
+            router.get(route('rt.residents'), { search, sort: sortBy }, { preserveState: true });
         }, 400);
         return () => clearTimeout(timeout);
-    }, [search, sort]);
+    }, [search, sortBy]);
 
     useEffect(() => {
         if (import_results) {
@@ -72,8 +72,8 @@ export default function Index({ residents, filters = {} }) {
                                     />
                                 </div>
                                 <select 
-                                    value={sort} 
-                                    onChange={(e) => setSort(e.target.value)}
+                                    value={sortBy} 
+                                    onChange={(e) => setSortBy(e.target.value)}
                                     className="rounded-lg border-0 py-2 text-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white"
                                 >
                                     <option value="name">Urutan: Nama</option>

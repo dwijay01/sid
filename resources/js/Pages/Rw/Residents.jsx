@@ -8,21 +8,21 @@ export default function Residents({ residents, filters = {}, wilayahList = [] })
     const [search, setSearch] = useState(filters.search || '');
     const [rtFilter, setRtFilter] = useState(filters.rt || '');
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
-    const [sort, setSort] = useState(filters.sort || 'name');
+    const [sortBy, setSortBy] = useState(typeof filters?.sort === 'string' ? filters.sort : 'name');
 
     useEffect(() => {
         const isChanged = search !== (filters.search || '') || 
                           rtFilter !== (filters.rt || '') || 
                           statusFilter !== (filters.status || '') ||
-                          sort !== (filters.sort || '');
+                          sortBy !== (filters.sort || '');
 
         if (isChanged) {
             const timeout = setTimeout(() => {
-                router.get(route('rw.residents'), { search, rt: rtFilter, status: statusFilter, sort }, { preserveState: true });
+                router.get(route('rw.residents'), { search, rt: rtFilter, status: statusFilter, sort: sortBy }, { preserveState: true });
             }, 400);
             return () => clearTimeout(timeout);
         }
-    }, [search, rtFilter, statusFilter, sort]);
+    }, [search, rtFilter, statusFilter, sortBy]);
 
     return (
         <RwLayout header="Data Penduduk">
@@ -63,7 +63,7 @@ export default function Residents({ residents, filters = {}, wilayahList = [] })
                                     <option key={k} value={k}>{v}</option>
                                 ))}
                             </select>
-                            <select value={sort} onChange={(e) => setSort(e.target.value)} className="rounded-lg border-0 py-2 text-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white">
+                            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="rounded-lg border-0 py-2 text-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white">
                                 <option value="name">Urutan: Nama</option>
                                 <option value="kk">Urutan: Kartu Keluarga</option>
                             </select>
