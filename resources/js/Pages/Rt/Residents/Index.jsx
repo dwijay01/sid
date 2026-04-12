@@ -17,10 +17,15 @@ export default function Index({ residents, filters = {} }) {
     const [showResultModal, setShowResultModal] = useState(false);
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            router.get(route('rt.residents'), { search, sort: sortBy }, { preserveState: true });
-        }, 400);
-        return () => clearTimeout(timeout);
+        const isChanged = search !== (filters.search || '') || 
+                          sortBy !== (filters.sort || '');
+
+        if (isChanged) {
+            const timeout = setTimeout(() => {
+                router.get(route('rt.residents'), { search, sort: sortBy }, { preserveState: true });
+            }, 400);
+            return () => clearTimeout(timeout);
+        }
     }, [search, sortBy]);
 
     useEffect(() => {

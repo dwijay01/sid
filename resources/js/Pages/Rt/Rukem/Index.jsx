@@ -9,10 +9,15 @@ export default function Index({ members, filters = {} }) {
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            router.get(route('rt.rukem.index'), { search, status: statusFilter }, { preserveState: true });
-        }, 400);
-        return () => clearTimeout(timeout);
+        const isChanged = search !== (filters.search || '') || 
+                          statusFilter !== (filters.status || '');
+
+        if (isChanged) {
+            const timeout = setTimeout(() => {
+                router.get(route('rt.rukem.index'), { search, status: statusFilter }, { preserveState: true });
+            }, 400);
+            return () => clearTimeout(timeout);
+        }
     }, [search, statusFilter]);
 
     return (
