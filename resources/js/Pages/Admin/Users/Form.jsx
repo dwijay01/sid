@@ -17,6 +17,7 @@ export default function Form({ user, roles = [], wilayah = [] }) {
         password_confirmation: '',
         role: user?.role_name || 'warga',
         is_active: user?.is_active ?? true,
+        wilayah_id: user?.wilayah_id || '',
     });
 
     const handleSubmit = (e) => {
@@ -81,6 +82,28 @@ export default function Form({ user, roles = [], wilayah = [] }) {
                             </select>
                             {errors.role && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.role}</p>}
                         </div>
+
+                        {(data.role === 'rt' || data.role === 'rw') && (
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Wilayah Kerja *</label>
+                                <select 
+                                    value={data.wilayah_id} 
+                                    onChange={(e) => setData('wilayah_id', e.target.value)} 
+                                    className="block w-full rounded-lg border-0 py-2.5 text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 focus:ring-2 focus:ring-inset focus:ring-emerald-600 sm:text-sm bg-slate-50 dark:bg-slate-800/50"
+                                >
+                                    <option value="">Pilih Wilayah</option>
+                                    {wilayah.map((w) => (
+                                        <option key={w.id} value={w.id}>
+                                            RT {w.rt} / RW {w.rw} {w.dusun ? `(${w.dusun})` : ''}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.wilayah_id && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.wilayah_id}</p>}
+                                <p className="mt-1 text-xs text-slate-500">
+                                    {data.role === 'rw' ? 'Untuk role RW, pilih salah satu RT di wilayah RW tersebut.' : 'Pilih unit RT spesifik.'}
+                                </p>
+                            </div>
+                        )}
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>

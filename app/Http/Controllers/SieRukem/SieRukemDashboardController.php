@@ -39,7 +39,7 @@ class SieRukemDashboardController extends Controller
 
     public function members(Request $request)
     {
-        $members = RukemMember::with('familyCard.kepalaKeluarga', 'familyCard.wilayah')
+        $members = RukemMember::with(['familyCard.kepalaKeluarga', 'familyCard.wilayah', 'familyCard.anggotaKeluarga'])
             ->when($request->search, function ($q, $search) {
                 $q->whereHas('familyCard', fn($fc) => $fc->where('no_kk', 'like', "%{$search}%")
                     ->orWhereHas('kepalaKeluarga', fn($k) => $k->where('nama_lengkap', 'like', "%{$search}%")

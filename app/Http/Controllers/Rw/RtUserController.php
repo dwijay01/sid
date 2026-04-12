@@ -30,8 +30,11 @@ class RtUserController extends Controller
             ->get();
 
         $rtUsers = User::role('rt')
-            ->whereHas('managedWilayah', fn($q) => $q->where('rw', $rw))
-            ->with('managedWilayah')
+            ->where(function($q) use ($rw) {
+                $q->whereHas('managedWilayah', fn($sq) => $sq->where('rw', $rw))
+                  ->orWhereHas('wilayah', fn($sq) => $sq->where('rw', $rw));
+            })
+            ->with(['managedWilayah', 'wilayah'])
             ->get();
 
         $pendingRtUsers = User::role('rt')
@@ -65,6 +68,7 @@ class RtUserController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'is_active' => true,
+            'wilayah_id' => $validated['role'] === 'rt' ? $validated['wilayah_id'] : null,
         ]);
 
         $user->assignRole($validated['role']);
@@ -115,6 +119,7 @@ class RtUserController extends Controller
         // Update User
         $user->update([
             'is_active' => true,
+            'wilayah_id' => $pendingWilayah->id,
             'pending_wilayah_id' => null,
         ]);
 

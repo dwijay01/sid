@@ -16,18 +16,29 @@ class ResidentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Resident::with('familyCard.wilayah')->orderBy('nama_lengkap');
+        $query = Resident::with('familyCard.wilayah');
+
+        if ($request->sort === 'kk') {
+            $query->leftJoin('family_cards', 'residents.family_card_id', '=', 'family_cards.id')
+                ->select('residents.*')
+                ->orderBy('family_cards.no_kk')
+                ->orderByRaw("FIELD(hubungan_keluarga, 'kepala', 'istri', 'anak', 'menantu', 'cucu', 'orang_tua', 'mertua', 'famili_lain', 'lainnya')");
+        } else {
+            $query->orderBy('nama_lengkap');
+        }
 
         if ($request->has('search')) {
-            $query->where('nama_lengkap', 'like', '%' . $request->search . '%')
-                  ->orWhere('nik', 'like', '%' . $request->search . '%');
+            $query->where(function($q) use ($request) {
+                $q->where('residents.nama_lengkap', 'like', '%' . $request->search . '%')
+                  ->orWhere('residents.nik', 'like', '%' . $request->search . '%');
+            });
         }
 
         $residents = $query->paginate(15)->withQueryString();
 
         return Inertia::render('Admin/Residents/Index', [
             'residents' => $residents,
-            'filters' => $request->only('search')
+            'filters' => $request->only('search', 'sort')
         ]);
     }
 

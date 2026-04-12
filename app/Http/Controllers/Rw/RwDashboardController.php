@@ -74,19 +74,30 @@ class RwDashboardController extends Controller
     {
         $wilayahIds = $this->getWilayahIds();
 
-        $residents = Resident::with('familyCard.wilayah')
-            ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
-            ->when($request->search, function ($q, $search) {
-                $q->where('nama_lengkap', 'like', "%{$search}%")
-                  ->orWhere('nik', 'like', "%{$search}%");
+        $query = Resident::with('familyCard.wilayah')
+            ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds));
+
+        if ($request->sort === 'kk') {
+            $query->leftJoin('family_cards', 'residents.family_card_id', '=', 'family_cards.id')
+                ->select('residents.*')
+                ->orderBy('family_cards.no_kk')
+                ->orderByRaw("FIELD(hubungan_keluarga, 'kepala', 'istri', 'anak', 'menantu', 'cucu', 'orang_tua', 'mertua', 'famili_lain', 'lainnya')");
+        } else {
+            $query->orderBy('nama_lengkap');
+        }
+
+        $residents = $query->when($request->search, function ($q, $search) {
+                $q->where(function($sq) use ($search) {
+                    $sq->where('residents.nama_lengkap', 'like', "%{$search}%")
+                      ->orWhere('residents.nik', 'like', "%{$search}%");
+                });
             })
             ->when($request->rt, function ($q, $rt) {
                 $q->whereHas('familyCard.wilayah', fn($q2) => $q2->where('rt', $rt));
             })
             ->when($request->status, function ($q, $status) {
-                $q->where('status_penduduk', $status);
+                $q->where('residents.status_penduduk', $status);
             })
-            ->orderBy('nama_lengkap')
             ->paginate(20)
             ->withQueryString();
 
@@ -94,7 +105,7 @@ class RwDashboardController extends Controller
 
         return Inertia::render('Rw/Residents', [
             'residents' => $residents,
-            'filters' => $request->only('search', 'rt', 'status'),
+            'filters' => $request->only('search', 'rt', 'status', 'sort'),
             'wilayahList' => $wilayahList,
         ]);
     }
@@ -103,7 +114,7 @@ class RwDashboardController extends Controller
     {
         $wilayahIds = $this->getWilayahIds();
 
-        $members = RukemMember::with('familyCard.kepalaKeluarga', 'familyCard.wilayah')
+        $members = RukemMember::with(['familyCard.kepalaKeluarga', 'familyCard.wilayah', 'familyCard.anggotaKeluarga'])
             ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
             ->when($request->search, function ($q, $search) {
                 $q->whereHas('familyCard', fn($fc) => $fc->where('no_kk', 'like', "%{$search}%")

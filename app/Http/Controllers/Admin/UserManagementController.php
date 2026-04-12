@@ -64,6 +64,7 @@ class UserManagementController extends Controller
             'phone' => 'nullable|string|max:20',
             'password' => ['required', 'confirmed', Password::defaults()],
             'role' => 'required|string|exists:roles,name',
+            'wilayah_id' => 'nullable|exists:wilayah_rt_rw,id',
         ]);
 
         $user = User::create([
@@ -74,6 +75,7 @@ class UserManagementController extends Controller
             'phone' => $validated['phone'] ?? null,
             'password' => Hash::make($validated['password']),
             'is_active' => true,
+            'wilayah_id' => $validated['wilayah_id'] ?? null,
         ]);
 
         $user->assignRole($validated['role']);
@@ -107,6 +109,7 @@ class UserManagementController extends Controller
             'password' => ['nullable', 'confirmed', Password::defaults()],
             'role' => 'required|string|exists:roles,name',
             'is_active' => 'boolean',
+            'wilayah_id' => 'nullable|exists:wilayah_rt_rw,id',
         ]);
 
         $updateData = [
@@ -116,6 +119,7 @@ class UserManagementController extends Controller
             'no_kk' => $validated['no_kk'] ?? null,
             'phone' => $validated['phone'] ?? null,
             'is_active' => $validated['is_active'] ?? true,
+            'wilayah_id' => $validated['wilayah_id'] ?? null,
         ];
 
         if (!empty($validated['password'])) {

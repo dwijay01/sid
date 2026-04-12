@@ -20,7 +20,7 @@ class RtRukemController extends Controller
     {
         $wilayahId = $this->getWilayahId();
 
-        $members = RukemMember::with('familyCard.kepalaKeluarga')
+        $members = RukemMember::with(['familyCard.kepalaKeluarga', 'familyCard.anggotaKeluarga'])
             ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
             ->when($request->search, function ($q, $search) {
                 $q->whereHas('familyCard', fn($fc) => $fc->where('no_kk', 'like', "%{$search}%")

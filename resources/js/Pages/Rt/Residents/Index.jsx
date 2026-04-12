@@ -10,6 +10,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 export default function Index({ residents, filters = {} }) {
     const { flash, import_results } = usePage().props;
     const [search, setSearch] = useState(filters.search || '');
+    const [sort, setSort] = useState(filters.sort || 'name');
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [importFile, setImportFile] = useState(null);
     const [isImporting, setIsImporting] = useState(false);
@@ -17,10 +18,10 @@ export default function Index({ residents, filters = {} }) {
 
     useEffect(() => {
         const timeout = setTimeout(() => {
-            router.get(route('rt.residents'), { search }, { preserveState: true });
+            router.get(route('rt.residents'), { search, sort }, { preserveState: true });
         }, 400);
         return () => clearTimeout(timeout);
-    }, [search]);
+    }, [search, sort]);
 
     useEffect(() => {
         if (import_results) {
@@ -62,12 +63,22 @@ export default function Index({ residents, filters = {} }) {
                             </div>
                         </div>
                         <div className="flex flex-wrap gap-3">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-                                    className="block w-full rounded-lg border-0 py-2 pl-10 pr-3 text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-600 sm:text-sm bg-slate-50 dark:bg-slate-800/50"
-                                    placeholder="Cari NIK/Nama..."
-                                />
+                            <div className="flex gap-2">
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+                                        className="block w-full rounded-lg border-0 py-2 pl-10 pr-3 text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-600 sm:text-sm bg-slate-50 dark:bg-slate-800/50"
+                                        placeholder="Cari NIK/Nama..."
+                                    />
+                                </div>
+                                <select 
+                                    value={sort} 
+                                    onChange={(e) => setSort(e.target.value)}
+                                    className="rounded-lg border-0 py-2 text-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white"
+                                >
+                                    <option value="name">Urutan: Nama</option>
+                                    <option value="kk">Urutan: Kartu Keluarga</option>
+                                </select>
                             </div>
                             <button 
                                 onClick={() => setIsImportModalOpen(true)}
@@ -105,6 +116,7 @@ export default function Index({ residents, filters = {} }) {
                                 <th className="py-3.5 pl-6 pr-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Nama / NIK</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">No. KK</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">JK / Usia</th>
+                                <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Hub. Keluarga</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
                                 <th className="py-3.5 pl-3 pr-6 text-right text-xs font-bold text-slate-500 uppercase">Aksi</th>
                             </tr>
@@ -131,6 +143,9 @@ export default function Index({ residents, filters = {} }) {
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600 dark:text-slate-400 font-mono">{r.family_card?.no_kk || '-'}</td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600 dark:text-slate-400">
                                         {GENDER_LABELS[r.jenis_kelamin]} / {r.tanggal_lahir ? `${new Date().getFullYear() - new Date(r.tanggal_lahir).getFullYear()} thn` : 'N/A'}
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600 dark:text-slate-400 capitalize">
+                                        {r.hubungan_keluarga ? r.hubungan_keluarga.replace('_', ' ') : '-'}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4">
                                         <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ring-1 ring-inset ${RESIDENT_STATUS_COLORS[r.status_penduduk] || ''}`}>

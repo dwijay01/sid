@@ -71,9 +71,21 @@ export default function RukemMembers({ members, filters = {} }) {
                             {members.data.length > 0 ? members.data.map((m) => (
                                 <tr key={m.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                                     <td className="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-mono font-bold text-teal-700 dark:text-teal-400">{m.nomor_anggota}</td>
-                                    <td className="whitespace-nowrap px-3 py-4">
-                                        <div className="font-bold text-slate-900 dark:text-white text-sm">{m.family_card?.kepala_keluarga?.nama_lengkap || '-'}</div>
-                                        <div className="text-xs text-slate-500 font-mono">KK: {m.family_card?.no_kk || '-'}</div>
+                                    <td className="px-3 py-4 align-top">
+                                        <div className="font-bold text-slate-900 dark:text-white text-sm mb-1">{m.family_card?.kepala_keluarga?.nama_lengkap || '-'}</div>
+                                        <div className="text-xs text-slate-500 font-mono mb-2">KK: {m.family_card?.no_kk || '-'}</div>
+                                        {m.family_card?.anggota_keluarga && m.family_card.anggota_keluarga.length > 0 && (
+                                            <div className="text-xs text-slate-600 dark:text-slate-400">
+                                                <div className="font-semibold mb-1">Anggota Keluarga:</div>
+                                                <ul className="list-disc pl-4 space-y-0.5">
+                                                    {m.family_card.anggota_keluarga.filter(r => r.id !== m.family_card.kepala_keluarga_id).map((r) => (
+                                                        <li key={r.id}>
+                                                            {r.nama_lengkap} <span className="text-slate-400 capitalize">({r.hubungan_keluarga ? r.hubungan_keluarga.replace('_', ' ') : '-'})</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600 dark:text-slate-400">
                                         {m.family_card?.wilayah ? `RT ${m.family_card.wilayah.rt} / RW ${m.family_card.wilayah.rw}` : '-'}

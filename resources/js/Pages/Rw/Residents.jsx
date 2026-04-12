@@ -8,19 +8,21 @@ export default function Residents({ residents, filters = {}, wilayahList = [] })
     const [search, setSearch] = useState(filters.search || '');
     const [rtFilter, setRtFilter] = useState(filters.rt || '');
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
+    const [sort, setSort] = useState(filters.sort || 'name');
 
     useEffect(() => {
         const isChanged = search !== (filters.search || '') || 
                           rtFilter !== (filters.rt || '') || 
-                          statusFilter !== (filters.status || '');
+                          statusFilter !== (filters.status || '') ||
+                          sort !== (filters.sort || '');
 
         if (isChanged) {
             const timeout = setTimeout(() => {
-                router.get(route('rw.residents'), { search, rt: rtFilter, status: statusFilter }, { preserveState: true });
+                router.get(route('rw.residents'), { search, rt: rtFilter, status: statusFilter, sort }, { preserveState: true });
             }, 400);
             return () => clearTimeout(timeout);
         }
-    }, [search, rtFilter, statusFilter]);
+    }, [search, rtFilter, statusFilter, sort]);
 
     return (
         <RwLayout header="Data Penduduk">
@@ -61,6 +63,10 @@ export default function Residents({ residents, filters = {}, wilayahList = [] })
                                     <option key={k} value={k}>{v}</option>
                                 ))}
                             </select>
+                            <select value={sort} onChange={(e) => setSort(e.target.value)} className="rounded-lg border-0 py-2 text-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white">
+                                <option value="name">Urutan: Nama</option>
+                                <option value="kk">Urutan: Kartu Keluarga</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -75,6 +81,7 @@ export default function Residents({ residents, filters = {}, wilayahList = [] })
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">No. KK</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">RT/RW</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">JK / Usia</th>
+                                <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Hub. Keluarga</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
                             </tr>
                         </thead>
@@ -98,6 +105,9 @@ export default function Residents({ residents, filters = {}, wilayahList = [] })
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600 dark:text-slate-400">
                                         {GENDER_LABELS[r.jenis_kelamin]} / {new Date().getFullYear() - new Date(r.tanggal_lahir).getFullYear()} thn
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600 dark:text-slate-400 capitalize">
+                                        {r.hubungan_keluarga ? r.hubungan_keluarga.replace('_', ' ') : '-'}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">
                                         <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ring-1 ring-inset ${RESIDENT_STATUS_COLORS[r.status_penduduk] || ''}`}>

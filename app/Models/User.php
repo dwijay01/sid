@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'resident_id',
         'is_active',
+        'wilayah_id',
         'pending_wilayah_id',
     ];
 
@@ -56,6 +57,11 @@ class User extends Authenticatable
     public function managedWilayah(): HasOne
     {
         return $this->hasOne(WilayahRtRw::class, 'ketua_user_id');
+    }
+
+    public function wilayah(): BelongsTo
+    {
+        return $this->belongsTo(WilayahRtRw::class, 'wilayah_id');
     }
 
     public function pendingWilayah(): BelongsTo
@@ -146,7 +152,9 @@ class User extends Authenticatable
      */
     public function getManagedWilayahIds(): array
     {
-        $wilayah = $this->managedWilayah;
+        // Try to get wilayah from new wilayah_id column first
+        $wilayah = $this->wilayah_id ? $this->wilayah : $this->managedWilayah;
+        
         if (!$wilayah) return [];
 
         // If user is RW, get all wilayah in same RW

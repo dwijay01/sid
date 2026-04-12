@@ -10,6 +10,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 export default function Index({ residents, filters }) {
     const { flash, import_results } = usePage().props;
     const [search, setSearch] = useState(filters.search || '');
+    const [sort, setSort] = useState(filters.sort || 'name');
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [importFile, setImportFile] = useState(null);
     const [isImporting, setIsImporting] = useState(false);
@@ -23,7 +24,12 @@ export default function Index({ residents, filters }) {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        router.get(route('admin.residents.index'), { search }, { preserveState: true });
+        router.get(route('admin.residents.index'), { search, sort }, { preserveState: true });
+    };
+
+    const handleSortChange = (newSort) => {
+        setSort(newSort);
+        router.get(route('admin.residents.index'), { search, sort: newSort }, { preserveState: true });
     };
 
     const handleDelete = (id) => {
@@ -88,7 +94,7 @@ export default function Index({ residents, filters }) {
             </div>
 
             <div className="glass bg-white dark:bg-slate-800 p-4 mb-6 shadow-sm rounded-xl">
-                <form onSubmit={handleSearch} className="flex gap-4">
+                <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4">
                     <div className="relative flex-1 max-w-md">
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                             <Search className="h-5 w-5 text-slate-400" aria-hidden="true" />
@@ -101,12 +107,24 @@ export default function Index({ residents, filters }) {
                             placeholder="Cari NIK atau Nama..."
                         />
                     </div>
-                    <button
-                        type="submit"
-                        className="rounded-lg bg-slate-100 dark:bg-slate-700 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-                    >
-                        Cari
-                    </button>
+                    
+                    <div className="flex gap-2">
+                        <select 
+                            value={sort} 
+                            onChange={(e) => handleSortChange(e.target.value)}
+                            className="rounded-lg border-0 py-2.5 text-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white"
+                        >
+                            <option value="name">Urutkan: Nama</option>
+                            <option value="kk">Urutkan: Kartu Keluarga</option>
+                        </select>
+                        
+                        <button
+                            type="submit"
+                            className="rounded-lg bg-emerald-600 px-6 py-2 text-sm font-semibold text-white hover:bg-emerald-500 transition-colors shadow-sm"
+                        >
+                            Cari
+                        </button>
+                    </div>
                 </form>
             </div>
 
@@ -123,6 +141,9 @@ export default function Index({ residents, filters }) {
                                 </th>
                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-slate-900 dark:text-white">
                                     Usia
+                                </th>
+                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-slate-900 dark:text-white">
+                                    Hub. Keluarga
                                 </th>
                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-slate-900 dark:text-white">
                                     Status
@@ -158,6 +179,11 @@ export default function Index({ residents, filters }) {
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
                                             {resident.tanggal_lahir ? `${new Date().getFullYear() - new Date(resident.tanggal_lahir).getFullYear()} Tahun` : 'N/A'}
+                                        </td>
+                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                            <span className="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 ring-blue-600/20 capitalize">
+                                                {resident.hubungan_keluarga ? resident.hubungan_keluarga.replace('_', ' ') : '-'}
+                                            </span>
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
                                             <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
