@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import RtLayout from '@/Layouts/RtLayout';
-import { CreditCard, Search, Plus, Edit, Trash2, UserPlus } from 'lucide-react';
-import { STATUS_COLORS } from '@/Helpers/constants'; // Optional, or define locally
+import { CreditCard, Search, Plus, Edit, Trash2, UserPlus, Users, Layers, ShieldCheck, Bath, Droplets } from 'lucide-react';
+import { STATUS_COLORS } from '@/Helpers/constants'; 
 
 export default function Index({ familyCards, filters }) {
     const [search, setSearch] = useState(filters.search || '');
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            router.get(route('rt.family-cards.index'), { search }, { preserveState: true });
-        }, 400);
-        return () => clearTimeout(timeout);
+        const isChanged = search !== (filters.search || '');
+        if (isChanged) {
+            const timeout = setTimeout(() => {
+                router.get(route('rt.family-cards.index'), { search }, { preserveState: true });
+            }, 400);
+            return () => clearTimeout(timeout);
+        }
     }, [search]);
 
     const handleDelete = (id) => {
@@ -58,10 +61,10 @@ export default function Index({ familyCards, filters }) {
                     <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
                         <thead className="bg-slate-50 dark:bg-slate-800/50">
                             <tr>
-                                <th className="py-3.5 pl-6 pr-3 text-left text-xs font-bold text-slate-500 uppercase">No. KK</th>
-                                <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase">Kepala Keluarga</th>
-                                <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase">Alamat</th>
-                                <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase">Status</th>
+                                <th className="py-3.5 pl-6 pr-3 text-left text-xs font-bold text-slate-500 uppercase">No. KK / Kepala Keluarga</th>
+                                <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase text-center">Anggota</th>
+                                <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase">Indikator Rumah</th>
+                                <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase text-center">Status</th>
                                 <th className="relative py-3.5 pl-3 pr-6 text-right"><span className="sr-only">Aksi</span></th>
                             </tr>
                         </thead>
@@ -71,15 +74,36 @@ export default function Index({ familyCards, filters }) {
                             ) : (
                                 familyCards.data.map((kk) => (
                                     <tr key={kk.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                                        <td className="whitespace-nowrap py-4 pl-6 pr-3 font-mono text-sm font-bold text-slate-900 dark:text-white">{kk.no_kk}</td>
-                                        <td className="whitespace-nowrap px-3 py-4">
-                                            <div className="font-semibold text-slate-900 dark:text-white">{kk.kepala_keluarga?.nama_lengkap || '-'}</div>
-                                            <div className="text-xs text-slate-500">{kk.kepala_keluarga?.nik || ''}</div>
+                                        <td className="whitespace-nowrap py-4 pl-6 pr-3">
+                                            <div className="font-mono text-sm font-bold text-slate-900 dark:text-white">{kk.no_kk}</div>
+                                            <div className="font-semibold text-slate-700 dark:text-slate-300 text-xs mt-1">{kk.kepala_keluarga?.nama_lengkap || '-'}</div>
                                         </td>
-                                        <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-400 max-w-xs truncate">{kk.alamat}</td>
-                                        <td className="whitespace-nowrap px-3 py-4">
-                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ring-1 ring-inset ${kk.status === 'aktif' ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' : 'bg-slate-50 text-slate-700 ring-slate-600/20'}`}>
-                                                {kk.status}
+                                        <td className="whitespace-nowrap px-3 py-4 text-center">
+                                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs">
+                                                <Users size={12} className="text-blue-500" />
+                                                {kk.anggota_keluarga_count || 0}
+                                            </span>
+                                        </td>
+                                        <td className="px-3 py-4 text-sm">
+                                            <div className="flex gap-2">
+                                                <div title={`Lantai: ${kk.jenis_lantai || '?'}`} className={`p-1 rounded ${kk.jenis_lantai ? 'bg-blue-50 text-blue-600' : 'bg-slate-100 text-slate-400'}`}>
+                                                    <Layers size={14} />
+                                                </div>
+                                                <div title={`Dinding: ${kk.jenis_dinding || '?'}`} className={`p-1 rounded ${kk.jenis_dinding ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-400'}`}>
+                                                    <ShieldCheck size={14} />
+                                                </div>
+                                                <div title={`Sanitasi: ${kk.fasilitas_sanitasi || '?'}`} className={`p-1 rounded ${kk.fasilitas_sanitasi === 'milik_sendiri' ? 'bg-emerald-50 text-emerald-600' : (kk.fasilitas_sanitasi ? 'bg-amber-50 text-amber-600' : 'bg-slate-100 text-slate-400')}`}>
+                                                    <Bath size={14} />
+                                                </div>
+                                                <div title={`Air Minum: ${kk.sumber_air_minum || '?'}`} className={`p-1 rounded ${kk.sumber_air_minum ? 'bg-teal-50 text-teal-600' : 'bg-slate-100 text-slate-400'}`}>
+                                                    <Droplets size={14} />
+                                                </div>
+                                            </div>
+                                            <div className="text-[10px] text-slate-400 mt-1 truncate max-w-[120px]">{kk.alamat}</div>
+                                        </td>
+                                        <td className="whitespace-nowrap px-3 py-4 text-center">
+                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-[10px] font-bold ring-1 ring-inset ${kk.status === 'aktif' ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' : 'bg-slate-50 text-slate-700 ring-slate-600/20'}`}>
+                                                {kk.status.toUpperCase()}
                                             </span>
                                         </td>
                                         <td className="whitespace-nowrap py-4 pl-3 pr-6 text-right text-sm font-medium flex justify-end gap-2">

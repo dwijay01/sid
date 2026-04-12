@@ -12,7 +12,8 @@ import {
     Bell,
     CreditCard,
     Store,
-    ClipboardList
+    ClipboardList,
+    Printer
 } from 'lucide-react';
 import Dropdown from '@/Components/Dropdown';
 import ThemeToggle from '@/Components/ThemeToggle';
@@ -29,6 +30,7 @@ export default function RtLayout({ header, children }) {
         { name: 'Rukun Kematian', href: route('rt.rukem.index'), icon: Heart, current: route().current('rt.rukem.*') },
         { name: 'Pendataan UMKM', href: route('rt.umkm.index'), icon: Store, current: route().current('rt.umkm.*') },
         { name: 'Log Import', href: route('rt.import-logs.index'), icon: ClipboardList, current: route().current('rt.import-logs.*') },
+        { name: 'Report & Cetak', href: route('rt.reports'), icon: Printer, current: route().current('rt.reports') },
     ];
 
     return (

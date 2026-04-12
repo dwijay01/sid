@@ -130,6 +130,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['role:rw'])->prefix('rw')->name('rw.')->group(function () {
         Route::get('/dashboard', [RwDashboardController::class, 'index'])->name('dashboard');
         Route::get('/residents', [RwDashboardController::class, 'residents'])->name('residents');
+        Route::get('/family-cards', [RwDashboardController::class, 'familyCards'])->name('family-cards');
         Route::get('/rukem', [RwDashboardController::class, 'rukemMembers'])->name('rukem');
         Route::get('/umkm', [RwDashboardController::class, 'umkm'])->name('umkm');
         Route::get('/reports', [RwDashboardController::class, 'reports'])->name('reports');
@@ -149,6 +150,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['role:rt'])->prefix('rt')->name('rt.')->group(function () {
         Route::get('/dashboard', [RtDashboardController::class, 'index'])->name('dashboard');
         Route::get('/residents', [RtDashboardController::class, 'residents'])->name('residents');
+        Route::get('/reports', [RtDashboardController::class, 'reports'])->name('reports');
         
         // Family Cards
         Route::post('/family-cards/quick-store', [RtFamilyCardController::class, 'quickStore'])->name('family-cards.quick-store');

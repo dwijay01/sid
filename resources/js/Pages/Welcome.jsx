@@ -116,12 +116,7 @@ export default function Welcome({ auth, desa, landing, statistik }) {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const [aboutRef, aboutVisible] = useScrollAnimation();
     const [statsRef, statsVisible] = useScrollAnimation();
-    const [visiRef, visiVisible] = useScrollAnimation();
-    const [sambutanRef, sambutanVisible] = useScrollAnimation();
-    const [sejarahRef, sejarahVisible] = useScrollAnimation();
-    const [layananRef, layananVisible] = useScrollAnimation();
 
     return (
         <>
@@ -130,22 +125,20 @@ export default function Welcome({ auth, desa, landing, statistik }) {
             <div className="min-h-screen bg-white dark:bg-slate-800 font-sans antialiased">
                 {/* ───── NAVBAR ───── */}
                 <nav
-                    className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-                        scrolled
+                    className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
                             ? 'bg-white dark:bg-slate-800/95 backdrop-blur-lg shadow-lg shadow-emerald-900/5 border-b border-emerald-100'
                             : 'bg-transparent'
-                    }`}
+                        }`}
                 >
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center justify-between h-16 lg:h-20">
                             {/* Logo */}
                             <div className="flex items-center gap-3">
                                 <div
-                                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 ${
-                                        scrolled
+                                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 ${scrolled
                                             ? 'bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-lg shadow-emerald-500/30'
                                             : 'bg-white dark:bg-slate-800/20 backdrop-blur-sm border border-white/30'
-                                    }`}
+                                        }`}
                                 >
                                     <Building2
                                         className={`w-5 h-5 ${scrolled ? 'text-white' : 'text-white'}`}
@@ -153,16 +146,14 @@ export default function Welcome({ auth, desa, landing, statistik }) {
                                 </div>
                                 <div>
                                     <h1
-                                        className={`text-lg font-bold tracking-tight transition-colors duration-500 ${
-                                            scrolled ? 'text-slate-900 dark:text-white' : 'text-white'
-                                        }`}
+                                        className={`text-lg font-bold tracking-tight transition-colors duration-500 ${scrolled ? 'text-slate-900 dark:text-white' : 'text-white'
+                                            }`}
                                     >
                                         SIRAWE
                                     </h1>
                                     <p
-                                        className={`text-[10px] font-medium -mt-0.5 tracking-wider uppercase transition-colors duration-500 ${
-                                            scrolled ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-300'
-                                        }`}
+                                        className={`text-[10px] font-medium -mt-0.5 tracking-wider uppercase transition-colors duration-500 ${scrolled ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-300'
+                                            }`}
                                     >
                                         {namaDesa}
                                     </p>
@@ -176,11 +167,10 @@ export default function Welcome({ auth, desa, landing, statistik }) {
                                         <a
                                             key={item}
                                             href={`#${item.toLowerCase().replace(' ', '-')}`}
-                                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                                                scrolled
+                                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${scrolled
                                                     ? 'text-slate-600 dark:text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 dark:bg-emerald-900/30'
                                                     : 'text-white/80 hover:text-white hover:bg-white dark:bg-slate-800/10'
-                                            }`}
+                                                }`}
                                         >
                                             {item}
                                         </a>
@@ -335,13 +325,6 @@ export default function Welcome({ auth, desa, landing, statistik }) {
                                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                     </Link>
                                 )}
-                                <a
-                                    href="#profil"
-                                    className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-white dark:bg-slate-800/10 backdrop-blur-sm border border-white/20 text-white font-semibold text-base hover:bg-white dark:bg-slate-800/20 hover:-translate-y-1 transition-all duration-300"
-                                >
-                                    Profil Desa
-                                    <ChevronDown className="w-5 h-5" />
-                                </a>
                             </div>
                         </div>
                     </div>
@@ -357,9 +340,8 @@ export default function Welcome({ auth, desa, landing, statistik }) {
                 <section id="statistik" ref={statsRef} className="relative -mt-20 z-10">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div
-                            className={`grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 transition-all duration-1000 ${
-                                statsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                            }`}
+                            className={`grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 transition-all duration-1000 ${statsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                                }`}
                         >
                             {[
                                 {
@@ -415,279 +397,7 @@ export default function Welcome({ auth, desa, landing, statistik }) {
                     </div>
                 </section>
 
-                {/* ───── SAMBUTAN KEPALA DESA ───── */}
-                {sambutan && (
-                    <section
-                        id="profil"
-                        ref={sambutanRef}
-                        className="py-24 lg:py-32 bg-gradient-to-b from-white to-slate-50"
-                    >
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div
-                                className={`grid lg:grid-cols-5 gap-12 lg:gap-16 items-center transition-all duration-1000 ${
-                                    sambutanVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                                }`}
-                            >
-                                {/* Photo */}
-                                <div className="lg:col-span-2 flex justify-center">
-                                    <div className="relative">
-                                        <div className="absolute -inset-4 bg-gradient-to-br from-emerald-200 to-teal-200 rounded-3xl rotate-3 opacity-50" />
-                                        <div className="relative w-64 h-80 lg:w-72 lg:h-96 rounded-2xl overflow-hidden shadow-2xl">
-                                            {fotoKades ? (
-                                                <img
-                                                    src={fotoKades}
-                                                    alt={namaKades}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center">
-                                                    <div className="text-center">
-                                                        <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center mb-4">
-                                                            <Users className="w-12 h-12 text-white" />
-                                                        </div>
-                                                        <p className="text-emerald-700 font-medium text-sm">Foto Kepala Desa</p>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                        {/* Name badge */}
-                                        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-white dark:bg-slate-800 rounded-2xl shadow-xl px-6 py-3 border border-slate-100 dark:border-slate-700 min-w-max">
-                                            <p className="font-bold text-slate-900 dark:text-white text-center">{namaKades}</p>
-                                            <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium text-center">Kepala Desa {namaDesa}</p>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                {/* Text */}
-                                <div className="lg:col-span-3">
-                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 mb-6">
-                                        <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                                        <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
-                                            Sambutan Kepala Desa
-                                        </span>
-                                    </div>
-                                    <h2 className="text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white mb-6 leading-tight">
-                                        Pesan dari{' '}
-                                        <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                                            Kepala Desa
-                                        </span>
-                                    </h2>
-                                    <div className="relative">
-                                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-500 to-teal-500 rounded-full" />
-                                        <p className="pl-6 text-slate-600 dark:text-slate-400 text-lg leading-relaxed whitespace-pre-line">
-                                            {sambutan}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                )}
-
-                {/* ───── VISI & MISI ───── */}
-                {(visi || misiList.length > 0) && (
-                    <section
-                        id="visi-misi"
-                        ref={visiRef}
-                        className="py-24 lg:py-32 bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 relative overflow-hidden"
-                    >
-                        {/* Decorative */}
-                        <div className="absolute inset-0 opacity-[0.05]" style={{
-                            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")`,
-                        }} />
-                        <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-emerald-500/10 blur-3xl" />
-                        <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-teal-500/10 blur-3xl" />
-
-                        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div
-                                className={`text-center mb-16 transition-all duration-1000 ${
-                                    visiVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                                }`}
-                            >
-                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-slate-800/10 border border-white/20 mb-6">
-                                    <Target className="w-4 h-4 text-emerald-300" />
-                                    <span className="text-xs font-semibold text-emerald-200 uppercase tracking-wider">
-                                        Visi & Misi
-                                    </span>
-                                </div>
-                                <h2 className="text-3xl lg:text-4xl font-extrabold text-white mb-4">
-                                    Arah & Tujuan Pembangunan Desa
-                                </h2>
-                            </div>
-
-                            <div className="grid lg:grid-cols-2 gap-8">
-                                {/* Visi */}
-                                {visi && (
-                                    <div
-                                        className={`bg-white dark:bg-slate-800/10 backdrop-blur-sm rounded-3xl p-8 lg:p-10 border border-white/10 hover:bg-white dark:bg-slate-800/15 transition-all duration-500 ${
-                                            visiVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
-                                        }`}
-                                    >
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-400 flex items-center justify-center">
-                                                <Eye className="w-6 h-6 text-white" />
-                                            </div>
-                                            <h3 className="text-2xl font-bold text-white">Visi</h3>
-                                        </div>
-                                        <p className="text-emerald-100 text-lg leading-relaxed italic">
-                                            "{visi}"
-                                        </p>
-                                    </div>
-                                )}
-
-                                {/* Misi */}
-                                {misiList.length > 0 && (
-                                    <div
-                                        className={`bg-white dark:bg-slate-800/10 backdrop-blur-sm rounded-3xl p-8 lg:p-10 border border-white/10 hover:bg-white dark:bg-slate-800/15 transition-all duration-500 ${
-                                            visiVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
-                                        }`}
-                                    >
-                                        <div className="flex items-center gap-3 mb-6">
-                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-400 to-emerald-400 flex items-center justify-center">
-                                                <Target className="w-6 h-6 text-white" />
-                                            </div>
-                                            <h3 className="text-2xl font-bold text-white">Misi</h3>
-                                        </div>
-                                        <ul className="space-y-4">
-                                            {misiList.map((item, idx) => (
-                                                <li key={idx} className="flex items-start gap-3">
-                                                    <div className="mt-1 flex-shrink-0 w-6 h-6 rounded-full bg-emerald-400/20 flex items-center justify-center">
-                                                        <CheckCircle2 className="w-4 h-4 text-emerald-300" />
-                                                    </div>
-                                                    <span className="text-emerald-100 leading-relaxed">{item}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </section>
-                )}
-
-                {/* ───── SEJARAH DESA ───── */}
-                {sejarah && (
-                    <section
-                        ref={sejarahRef}
-                        className="py-24 lg:py-32 bg-gradient-to-b from-slate-50 to-white"
-                    >
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div
-                                className={`max-w-4xl mx-auto transition-all duration-1000 ${
-                                    sejarahVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                                }`}
-                            >
-                                <div className="text-center mb-12">
-                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 dark:bg-amber-900/30 border border-amber-200 mb-6">
-                                        <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                                        <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
-                                            Sejarah Desa
-                                        </span>
-                                    </div>
-                                    <h2 className="text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white">
-                                        Mengenal Lebih Dekat{' '}
-                                        <span className="bg-gradient-to-r from-amber-600 to-amber-500 bg-clip-text text-transparent">
-                                            {namaDesa}
-                                        </span>
-                                    </h2>
-                                </div>
-
-                                <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 lg:p-12 shadow-xl shadow-slate-200/50 border border-slate-100 dark:border-slate-700">
-                                    <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed whitespace-pre-line">
-                                        {sejarah}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                )}
-
-                {/* ───── LAYANAN ───── */}
-                <section
-                    id="layanan"
-                    ref={layananRef}
-                    className="py-24 lg:py-32 bg-white dark:bg-slate-800"
-                >
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div
-                            className={`text-center mb-16 transition-all duration-1000 ${
-                                layananVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                            }`}
-                        >
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 mb-6">
-                                <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                                <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
-                                    Layanan Kami
-                                </span>
-                            </div>
-                            <h2 className="text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white mb-4">
-                                Layanan Sistem Informasi RT-RW
-                            </h2>
-                            <p className="text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
-                                Berbagai layanan administrasi desa yang dapat diakses secara digital
-                            </p>
-                        </div>
-
-                        <div
-                            className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-1000 ${
-                                layananVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                            }`}
-                        >
-                            {[
-                                {
-                                    icon: FileText,
-                                    title: 'Persuratan Online',
-                                    desc: 'Ajukan surat keterangan, pengantar, dan dokumen resmi desa secara online tanpa perlu antri.',
-                                    color: 'from-emerald-500 to-emerald-600',
-                                },
-                                {
-                                    icon: Users,
-                                    title: 'Data Kependudukan',
-                                    desc: 'Pengelolaan data penduduk, kartu keluarga, dan mutasi kependudukan secara digital.',
-                                    color: 'from-blue-500 to-blue-600',
-                                },
-                                {
-                                    icon: Shield,
-                                    title: 'Verifikasi QR Code',
-                                    desc: 'Setiap surat dilengkapi QR Code untuk verifikasi keaslian dokumen secara instan.',
-                                    color: 'from-violet-500 to-violet-600',
-                                },
-                                {
-                                    icon: Clock,
-                                    title: 'Tracking Real-time',
-                                    desc: 'Pantau status permohonan surat Anda secara real-time dari pengajuan hingga selesai.',
-                                    color: 'from-amber-500 to-amber-600',
-                                },
-                                {
-                                    icon: MapPin,
-                                    title: 'Manajemen Wilayah',
-                                    desc: 'Pengelolaan data RT/RW dan wilayah administrasi desa yang terintegrasi.',
-                                    color: 'from-rose-500 to-rose-600',
-                                },
-                                {
-                                    icon: Award,
-                                    title: 'Laporan & Statistik',
-                                    desc: 'Dashboard analitik dan laporan komprehensif untuk mendukung pengambilan keputusan.',
-                                    color: 'from-teal-500 to-teal-600',
-                                },
-                            ].map((service, idx) => (
-                                <div
-                                    key={service.title}
-                                    className="group relative bg-white dark:bg-slate-800 rounded-2xl p-8 border border-slate-100 dark:border-slate-700 hover:border-emerald-200 shadow-sm hover:shadow-xl hover:shadow-emerald-100/50 hover:-translate-y-2 transition-all duration-500"
-                                    style={{ transitionDelay: `${idx * 100}ms` }}
-                                >
-                                    <div
-                                        className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center shadow-lg mb-6 group-hover:scale-110 transition-transform duration-300`}
-                                    >
-                                        <service.icon className="w-7 h-7 text-white" />
-                                    </div>
-                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{service.title}</h3>
-                                    <p className="text-slate-500 dark:text-slate-400 leading-relaxed">{service.desc}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
 
                 {/* ───── CTA ───── */}
                 {!auth?.user && (
@@ -697,7 +407,7 @@ export default function Welcome({ auth, desa, landing, statistik }) {
                         }} />
                         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                             <h2 className="text-3xl lg:text-4xl font-extrabold text-white mb-6">
-                                Siap Menggunakan Layanan Digital Desa?
+                                Siap Menggunakan Layanan Digital RT-RW?
                             </h2>
                             <p className="text-emerald-100 text-lg mb-10 max-w-2xl mx-auto">
                                 Login dengan NIK atau email terdaftar untuk mengakses layanan persuratan dan informasi kependudukan.

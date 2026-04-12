@@ -12,6 +12,8 @@ use App\Models\Umkm;
 use App\Models\WilayahRtRw;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Exports\ReportExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RwDashboardController extends Controller
 {
@@ -150,56 +152,95 @@ class RwDashboardController extends Controller
     {
         $wilayahIds = $this->getWilayahIds();
         $type = $request->input('type', 'penduduk');
+        $rt = $request->input('rt');
 
         $data = [];
 
         switch ($type) {
             case 'penduduk':
                 $data = Resident::with('familyCard.wilayah')
-                    ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                    ->whereHas('familyCard', function($q) use ($wilayahIds, $rt) {
+                        $q->whereIn('wilayah_id', $wilayahIds);
+                        if ($rt) {
+                            $q->whereHas('wilayah', fn($q2) => $q2->where('rt', $rt));
+                        }
+                    })
                     ->where('status_penduduk', 'aktif')
                     ->orderBy('nama_lengkap')
                     ->get();
                 break;
             case 'rukem':
                 $data = RukemMember::with('familyCard.kepalaKeluarga', 'familyCard.wilayah')
-                    ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                    ->whereHas('familyCard', function($q) use ($wilayahIds, $rt) {
+                        $q->whereIn('wilayah_id', $wilayahIds);
+                        if ($rt) {
+                            $q->whereHas('wilayah', fn($q2) => $q2->where('rt', $rt));
+                        }
+                    })
                     ->where('status_keanggotaan', 'aktif')
                     ->get();
                 break;
             case 'pindah':
                 $data = PopulationMutation::with('resident.familyCard.wilayah')
-                    ->whereHas('resident.familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                    ->whereHas('resident.familyCard', function($q) use ($wilayahIds, $rt) {
+                        $q->whereIn('wilayah_id', $wilayahIds);
+                        if ($rt) {
+                            $q->whereHas('wilayah', fn($q2) => $q2->where('rt', $rt));
+                        }
+                    })
                     ->where('type', 'pindah_keluar')
                     ->orderByDesc('tanggal_mutasi')
                     ->get();
                 break;
             case 'masuk':
                 $data = PopulationMutation::with('resident.familyCard.wilayah')
-                    ->whereHas('resident.familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                    ->whereHas('resident.familyCard', function($q) use ($wilayahIds, $rt) {
+                        $q->whereIn('wilayah_id', $wilayahIds);
+                        if ($rt) {
+                            $q->whereHas('wilayah', fn($q2) => $q2->where('rt', $rt));
+                        }
+                    })
                     ->whereIn('type', ['pindah_masuk', 'datang'])
                     ->orderByDesc('tanggal_mutasi')
                     ->get();
                 break;
             case 'meninggal':
                 $data = PopulationMutation::with('resident.familyCard.wilayah')
-                    ->whereHas('resident.familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                    ->whereHas('resident.familyCard', function($q) use ($wilayahIds, $rt) {
+                        $q->whereIn('wilayah_id', $wilayahIds);
+                        if ($rt) {
+                            $q->whereHas('wilayah', fn($q2) => $q2->where('rt', $rt));
+                        }
+                    })
                     ->where('type', 'mati')
                     ->orderByDesc('tanggal_mutasi')
                     ->get();
                 break;
             case 'lahir':
                 $data = PopulationMutation::with('resident.familyCard.wilayah')
-                    ->whereHas('resident.familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                    ->whereHas('resident.familyCard', function($q) use ($wilayahIds, $rt) {
+                        $q->whereIn('wilayah_id', $wilayahIds);
+                        if ($rt) {
+                            $q->whereHas('wilayah', fn($q2) => $q2->where('rt', $rt));
+                        }
+                    })
                     ->where('type', 'lahir')
                     ->orderByDesc('tanggal_mutasi')
                     ->get();
                 break;
         }
 
+        if ($request->input('export') === 'excel') {
+            return Excel::download(new ReportExport($data, $type), 'Report_' . ucfirst($type) . '_' . date('Ymd') . '.xlsx');
+        }
+
+        $wilayahList = WilayahRtRw::whereIn('id', $wilayahIds)->get(['id', 'rt', 'rw']);
+
         return Inertia::render('Rw/Reports', [
             'data' => $data,
             'type' => $type,
+            'wilayahList' => $wilayahList,
+            'filters' => $request->only('type', 'rt'),
         ]);
     }
 
@@ -217,6 +258,31 @@ class RwDashboardController extends Controller
         return Inertia::render('Rw/Letters', [
             'letters' => $letters,
             'filters' => $request->only('status'),
+        ]);
+    }
+    public function familyCards(Request $request)
+    {
+        $wilayahIds = $this->getWilayahIds();
+
+        $query = FamilyCard::with(['kepalaKeluarga', 'wilayah'])
+            ->withCount('anggotaKeluarga')
+            ->whereIn('wilayah_id', $wilayahIds)
+            ->orderBy('no_kk');
+
+        if ($request->has('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('no_kk', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('kepalaKeluarga', function($subQ) use ($request) {
+                      $subQ->where('nama_lengkap', 'like', '%' . $request->search . '%');
+                  });
+            });
+        }
+
+        $familyCards = $query->paginate(20)->withQueryString();
+
+        return Inertia::render('Rw/FamilyCards', [
+            'familyCards' => $familyCards,
+            'filters' => $request->only('search')
         ]);
     }
 }

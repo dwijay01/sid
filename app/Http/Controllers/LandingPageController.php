@@ -17,8 +17,8 @@ class LandingPageController extends Controller
 
         // Population statistics
         $totalPenduduk = Resident::count();
-        $lakiLaki = Resident::where('jenis_kelamin', 'Laki-laki')->count();
-        $perempuan = Resident::where('jenis_kelamin', 'Perempuan')->count();
+        $lakiLaki = Resident::where('jenis_kelamin', 'L')->count();
+        $perempuan = Resident::where('jenis_kelamin', 'P')->count();
         $totalKK = FamilyCard::count();
 
         return Inertia::render('Welcome', [

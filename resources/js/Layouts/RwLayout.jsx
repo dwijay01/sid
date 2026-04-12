@@ -10,7 +10,8 @@ import {
     LogOut,
     Menu,
     Bell,
-    Store
+    Store,
+    CreditCard
 } from 'lucide-react';
 import Dropdown from '@/Components/Dropdown';
 import ThemeToggle from '@/Components/ThemeToggle';
@@ -21,6 +22,7 @@ export default function RwLayout({ header, children }) {
 
     const navigation = [
         { name: 'Dashboard', href: route('rw.dashboard'), icon: Home, current: route().current('rw.dashboard') },
+        { name: 'Data Kartu Keluarga', href: route('rw.family-cards'), icon: CreditCard, current: route().current('rw.family-cards') },
         { name: 'Data Penduduk', href: route('rw.residents'), icon: Users, current: route().current('rw.residents') },
         { name: 'Data UMKM', href: route('rw.umkm'), icon: Store, current: route().current('rw.umkm') },
         { name: 'Data Rukun Kematian', href: route('rw.rukem'), icon: Heart, current: route().current('rw.rukem') },

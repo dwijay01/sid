@@ -1,5 +1,4 @@
-import React from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import RwLayout from '@/Layouts/RwLayout';
 import { FileText, Search } from 'lucide-react';
 import { STATUS_LABELS, STATUS_COLORS } from '@/Helpers/constants';
@@ -57,6 +56,21 @@ export default function Letters({ letters, filters = {} }) {
                         </tbody>
                     </table>
                 </div>
+
+                {letters.links && letters.links.length > 3 && (
+                    <div className="border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-6 py-4 flex items-center justify-center">
+                        <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm">
+                            {letters.links.map((link, i) => (
+                                <Link 
+                                    key={i} 
+                                    href={link.url || '#'} 
+                                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${link.active ? 'z-10 bg-teal-600 text-white' : 'text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50'} ${i === 0 ? 'rounded-l-md' : ''} ${i === letters.links.length - 1 ? 'rounded-r-md' : ''}`} 
+                                    dangerouslySetInnerHTML={{ __html: link.label }} 
+                                />
+                            ))}
+                        </nav>
+                    </div>
+                )}
             </div>
         </RwLayout>
     );

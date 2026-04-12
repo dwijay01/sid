@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Search, Plus, MoreVertical, Edit2, Trash2, Eye, Users } from 'lucide-react';
@@ -7,10 +7,15 @@ import Dropdown from '@/Components/Dropdown';
 export default function Index({ familyCards, filters }) {
     const [search, setSearch] = useState(filters.search || '');
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        router.get(route('admin.family-cards.index'), { search }, { preserveState: true });
-    };
+    useEffect(() => {
+        const isChanged = search !== (filters.search || '');
+        if (isChanged) {
+            const timeout = setTimeout(() => {
+                router.get(route('admin.family-cards.index'), { search }, { preserveState: true });
+            }, 400);
+            return () => clearTimeout(timeout);
+        }
+    }, [search]);
 
     const handleDelete = (id) => {
         if (confirm('Apakah Anda yakin ingin menghapus data Kartu Keluarga ini? Anak dan Istri harus dikeluarkan terlebih dahulu atau secara otomatis terhapus status KK-nya.')) {
@@ -40,7 +45,7 @@ export default function Index({ familyCards, filters }) {
             </div>
 
             <div className="glass bg-white dark:bg-slate-800 p-4 mb-6 shadow-sm rounded-xl">
-                <form onSubmit={handleSearch} className="flex gap-4">
+                <div className="flex gap-4">
                     <div className="relative flex-1 max-w-md">
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                             <Search className="h-5 w-5 text-slate-400" aria-hidden="true" />
@@ -53,13 +58,7 @@ export default function Index({ familyCards, filters }) {
                             placeholder="Cari Nomor KK / Nama Kepala Keluarga..."
                         />
                     </div>
-                    <button
-                        type="submit"
-                        className="rounded-lg bg-slate-100 dark:bg-slate-700 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-                    >
-                        Cari
-                    </button>
-                </form>
+                </div>
             </div>
 
             <div className="glass bg-white dark:bg-slate-800 overflow-hidden shadow-sm rounded-xl">
@@ -73,8 +72,8 @@ export default function Index({ familyCards, filters }) {
                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-slate-900 dark:text-white">
                                     Wilayah
                                 </th>
-                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-slate-900 dark:text-white">
-                                    Alamat
+                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-slate-900 dark:text-white text-center">
+                                    Anggota
                                 </th>
                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-slate-900 dark:text-white">
                                     Status
@@ -104,8 +103,11 @@ export default function Index({ familyCards, filters }) {
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
                                             {kk.wilayah ? `RT ${kk.wilayah.rt} / RW ${kk.wilayah.rw}` : '-'}
                                         </td>
-                                        <td className="px-3 py-4 text-sm text-slate-500 dark:text-slate-400 max-w-xs truncate">
-                                            {kk.alamat}
+                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-center">
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold">
+                                                <Users size={14} className="text-emerald-500" />
+                                                {kk.anggota_keluarga_count || 0}
+                                            </span>
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
                                             <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
@@ -113,7 +115,7 @@ export default function Index({ familyCards, filters }) {
                                                 kk.status === 'pindah' ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 ring-amber-600/20' : 
                                                 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 ring-slate-600/20'
                                             }`}>
-                                                {kk.status.replace('_', ' ').toUpperCase()}
+                                                {(kk.status || 'aktif').replace('_', ' ').toUpperCase()}
                                             </span>
                                         </td>
                                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
@@ -152,10 +154,22 @@ export default function Index({ familyCards, filters }) {
                     </table>
                 </div>
 
-                {/* Pagination */}
                 {familyCards.links && familyCards.links.length > 3 && (
-                    <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 sm:px-6 flex items-center justify-between">
-                        {/* Mobile and Desktop Pagination Implementation */}
+                    <div className="border-t border-slate-200 dark:border-slate-700 bg-white dark:dark:bg-slate-800 px-4 py-3 sm:px-6 flex items-center justify-center">
+                        <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                            {familyCards.links.map((link, index) => (
+                                <Link
+                                    key={index}
+                                    href={link.url || '#'}
+                                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
+                                        link.active 
+                                            ? 'z-10 bg-emerald-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600' 
+                                            : 'text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 focus:z-20 focus:outline-offset-0 disabled:opacity-50'
+                                    } ${index === 0 ? 'rounded-l-md' : ''} ${index === familyCards.links.length - 1 ? 'rounded-r-md' : ''}`}
+                                    dangerouslySetInnerHTML={{ __html: link.label }}
+                                />
+                            ))}
+                        </nav>
                     </div>
                 )}
             </div>

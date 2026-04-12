@@ -13,7 +13,9 @@ class FamilyCardController extends Controller
 {
     public function index(Request $request)
     {
-        $query = FamilyCard::with(['kepalaKeluarga', 'wilayah'])->orderBy('no_kk');
+        $query = FamilyCard::with(['kepalaKeluarga', 'wilayah'])
+            ->withCount('anggotaKeluarga')
+            ->orderBy('no_kk');
 
         if ($request->has('search')) {
             $query->where('no_kk', 'like', '%' . $request->search . '%')

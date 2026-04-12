@@ -11,6 +11,8 @@ use App\Models\RukemMember;
 use App\Models\Umkm;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Exports\ReportExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RtDashboardController extends Controller
 {
@@ -75,6 +77,67 @@ class RtDashboardController extends Controller
         return Inertia::render('Rt/Residents/Index', [
             'residents' => $residents,
             'filters' => $request->only('search', 'status'),
+        ]);
+    }
+
+    public function reports(Request $request)
+    {
+        $wilayahId = $this->getWilayahId();
+        $type = $request->input('type', 'penduduk');
+
+        $data = [];
+
+        switch ($type) {
+            case 'penduduk':
+                $data = Resident::with('familyCard.wilayah')
+                    ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+                    ->where('status_penduduk', 'aktif')
+                    ->orderBy('nama_lengkap')
+                    ->get();
+                break;
+            case 'rukem':
+                $data = RukemMember::with('familyCard.kepalaKeluarga', 'familyCard.wilayah')
+                    ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+                    ->where('status_keanggotaan', 'aktif')
+                    ->get();
+                break;
+            case 'pindah':
+                $data = PopulationMutation::with('resident.familyCard.wilayah')
+                    ->whereHas('resident.familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+                    ->where('type', 'pindah_keluar')
+                    ->orderByDesc('tanggal_mutasi')
+                    ->get();
+                break;
+            case 'masuk':
+                $data = PopulationMutation::with('resident.familyCard.wilayah')
+                    ->whereHas('resident.familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+                    ->whereIn('type', ['pindah_masuk', 'datang'])
+                    ->orderByDesc('tanggal_mutasi')
+                    ->get();
+                break;
+            case 'meninggal':
+                $data = PopulationMutation::with('resident.familyCard.wilayah')
+                    ->whereHas('resident.familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+                    ->where('type', 'mati')
+                    ->orderByDesc('tanggal_mutasi')
+                    ->get();
+                break;
+            case 'lahir':
+                $data = PopulationMutation::with('resident.familyCard.wilayah')
+                    ->whereHas('resident.familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+                    ->where('type', 'lahir')
+                    ->orderByDesc('tanggal_mutasi')
+                    ->get();
+                break;
+        }
+
+        if ($request->input('export') === 'excel') {
+            return Excel::download(new ReportExport($data, $type), 'Report_RT_' . ucfirst($type) . '_' . date('Ymd') . '.xlsx');
+        }
+
+        return Inertia::render('Rt/Reports', [
+            'data' => $data,
+            'type' => $type,
         ]);
     }
 }

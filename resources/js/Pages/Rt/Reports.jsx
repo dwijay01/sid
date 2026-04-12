@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
-import RwLayout from '@/Layouts/RwLayout';
+import RtLayout from '@/Layouts/RtLayout';
 import { FileBarChart, Printer, Users, Heart, ArrowRightLeft, ArrowDownToLine, Skull, Baby, FileSpreadsheet } from 'lucide-react';
 
 const reportTypes = [
@@ -12,19 +12,12 @@ const reportTypes = [
     { key: 'lahir', label: 'Data Kelahiran', icon: Baby, color: 'pink' },
 ];
 
-export default function Reports({ data, type, wilayahList = [], filters = {} }) {
+export default function Reports({ data, type }) {
     const [activeType, setActiveType] = useState(type || 'penduduk');
-    const [selectedRt, setSelectedRt] = useState(filters.rt || '');
 
     const handleSwitch = (newType) => {
         setActiveType(newType);
-        router.get(route('rw.reports'), { type: newType, rt: selectedRt }, { preserveState: true });
-    };
-
-    const handleRtChange = (e) => {
-        const rt = e.target.value;
-        setSelectedRt(rt);
-        router.get(route('rw.reports'), { type: activeType, rt }, { preserveState: true });
+        router.get(route('rt.reports'), { type: newType }, { preserveState: true });
     };
 
     const handlePrint = () => {
@@ -32,14 +25,14 @@ export default function Reports({ data, type, wilayahList = [], filters = {} }) 
     };
 
     const handleExportExcel = () => {
-        window.location.href = route('rw.reports', { type: activeType, rt: selectedRt, export: 'excel' });
+        window.location.href = route('rt.reports', { type: activeType, export: 'excel' });
     };
 
     const activeReport = reportTypes.find(r => r.key === activeType);
 
     return (
-        <RwLayout header="Report & Cetak">
-            <Head title="Report - RW" />
+        <RtLayout header="Report & Cetak">
+            <Head title="Report - RT" />
 
             <div className="mb-6">
                 <div className="rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
@@ -52,16 +45,6 @@ export default function Reports({ data, type, wilayahList = [], filters = {} }) 
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <select
-                                value={selectedRt}
-                                onChange={handleRtChange}
-                                className="border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm focus:ring-teal-500 focus:border-teal-500 print:hidden"
-                            >
-                                <option value="">Semua RT</option>
-                                {wilayahList.map((w) => (
-                                    <option key={w.id} value={w.rt}>RT {w.rt}</option>
-                                ))}
-                            </select>
                             <button onClick={handleExportExcel} className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-bold shadow-sm transition-colors print:hidden">
                                 <FileSpreadsheet size={16} /> Export Excel
                             </button>
@@ -174,6 +157,6 @@ export default function Reports({ data, type, wilayahList = [], filters = {} }) 
                     )}
                 </div>
             </div>
-        </RwLayout>
+        </RtLayout>
     );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, Link } from '@inertiajs/react';
 import RwLayout from '@/Layouts/RwLayout';
 import { Heart, Search } from 'lucide-react';
 import { RUKEM_STATUS, RUKEM_STATUS_COLORS } from '@/Helpers/constants';
@@ -9,10 +9,15 @@ export default function RukemMembers({ members, filters = {} }) {
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            router.get(route('rw.rukem'), { search, status: statusFilter }, { preserveState: true });
-        }, 400);
-        return () => clearTimeout(timeout);
+        const isChanged = search !== (filters.search || '') || 
+                          statusFilter !== (filters.status || '');
+
+        if (isChanged) {
+            const timeout = setTimeout(() => {
+                router.get(route('rw.rukem'), { search, status: statusFilter }, { preserveState: true });
+            }, 400);
+            return () => clearTimeout(timeout);
+        }
     }, [search, statusFilter]);
 
     return (
@@ -91,7 +96,12 @@ export default function RukemMembers({ members, filters = {} }) {
                     <div className="border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-6 py-4 flex items-center justify-center">
                         <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm">
                             {members.links.map((link, i) => (
-                                <a key={i} href={link.url || '#'} className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${link.active ? 'z-10 bg-teal-600 text-white' : 'text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50'} ${i === 0 ? 'rounded-l-md' : ''} ${i === members.links.length - 1 ? 'rounded-r-md' : ''}`} dangerouslySetInnerHTML={{ __html: link.label }} />
+                                <Link 
+                                    key={i} 
+                                    href={link.url || '#'} 
+                                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${link.active ? 'z-10 bg-teal-600 text-white' : 'text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50'} ${i === 0 ? 'rounded-l-md' : ''} ${i === members.links.length - 1 ? 'rounded-r-md' : ''}`} 
+                                    dangerouslySetInnerHTML={{ __html: link.label }} 
+                                />
                             ))}
                         </nav>
                     </div>

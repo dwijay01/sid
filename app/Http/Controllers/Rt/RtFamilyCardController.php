@@ -20,6 +20,7 @@ class RtFamilyCardController extends Controller
         $wilayahId = $this->getWilayahId();
 
         $query = FamilyCard::with(['kepalaKeluarga'])
+            ->withCount('anggotaKeluarga')
             ->where('wilayah_id', $wilayahId)
             ->orderBy('no_kk');
 
