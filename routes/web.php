@@ -39,6 +39,13 @@ use App\Http\Controllers\Rt\RtUmkmController;
 // Sie Rukem Controllers
 use App\Http\Controllers\SieRukem\SieRukemDashboardController;
 
+// Sie Pemberdayaan Controllers
+use App\Http\Controllers\SiePemberdayaan\DashboardController as SiePemberdayaanDashboardController;
+use App\Http\Controllers\SiePemberdayaan\InternetController;
+use App\Http\Controllers\SiePemberdayaan\SkillController;
+use App\Http\Controllers\SiePemberdayaan\BansosController;
+use App\Http\Controllers\SiePemberdayaan\WasteController;
+
 // Warga Controllers
 use App\Http\Controllers\Warga\DashboardController as WargaDashboardController;
 use App\Http\Controllers\Warga\LetterRequestController as WargaLetterRequestController;
@@ -201,6 +208,31 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['role:sie_rukem'])->prefix('sie-rukem')->name('sie-rukem.')->group(function () {
         Route::get('/dashboard', [SieRukemDashboardController::class, 'index'])->name('dashboard');
         Route::get('/members', [SieRukemDashboardController::class, 'members'])->name('members');
+    });
+
+    // -------------------------------------------------------------
+    // SIE PEMBERDAYAAN ROUTES
+    // -------------------------------------------------------------
+    Route::middleware(['role:sie_pemberdayaan'])->prefix('sie-pemberdayaan')->name('sie-pemberdayaan.')->group(function () {
+        Route::get('/dashboard', [SiePemberdayaanDashboardController::class, 'index'])->name('dashboard');
+        
+        // Internet management
+        Route::get('/internet', [InternetController::class, 'index'])->name('internet.index');
+        Route::get('/internet/create', [InternetController::class, 'create'])->name('internet.create');
+        Route::post('/internet', [InternetController::class, 'store'])->name('internet.store');
+        Route::get('/internet/{internetSubscription}/edit', [InternetController::class, 'edit'])->name('internet.edit');
+        Route::put('/internet/{internetSubscription}', [InternetController::class, 'update'])->name('internet.update');
+        Route::get('/internet/{internetSubscription}/payments', [InternetController::class, 'payments'])->name('internet.payments');
+        Route::post('/internet/{internetSubscription}/toggle-payment', [InternetController::class, 'togglePayment'])->name('internet.toggle-payment');
+
+        // Skills database
+        Route::resource('skills', SkillController::class);
+
+        // Bansos recommendations
+        Route::get('/bansos', [BansosController::class, 'index'])->name('bansos.index');
+
+        // Waste management
+        Route::resource('waste', WasteController::class);
     });
 
     // -------------------------------------------------------------

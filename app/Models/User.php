@@ -119,6 +119,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user is Sie Pemberdayaan.
+     */
+    public function isSiePemberdayaan(): bool
+    {
+        return $this->hasRole('sie_pemberdayaan');
+    }
+
+    /**
      * Check if user is operator desa.
      */
     public function isOperator(): bool
@@ -144,6 +152,7 @@ class User extends Authenticatable
         if ($this->isRw()) return 'rw.dashboard';
         if ($this->isRt()) return 'rt.dashboard';
         if ($this->isSieRukem()) return 'sie-rukem.dashboard';
+        if ($this->isSiePemberdayaan()) return 'sie-pemberdayaan.dashboard';
         return 'warga.dashboard';
     }
 
@@ -157,8 +166,8 @@ class User extends Authenticatable
         
         if (!$wilayah) return [];
 
-        // If user is RW, get all wilayah in same RW
-        if ($this->isRw()) {
+        // If user is RW or Sie Pemberdayaan, get all wilayah in same RW
+        if ($this->isRw() || $this->isSiePemberdayaan()) {
             return WilayahRtRw::where('rw', $wilayah->rw)->pluck('id')->toArray();
         }
 

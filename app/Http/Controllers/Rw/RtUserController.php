@@ -43,13 +43,22 @@ class RtUserController extends Controller
             ->with('pendingWilayah')
             ->get();
 
-        $rukemUsers = User::role('sie_rukem')->get();
+        $rukemUsers = User::role('sie_rukem')
+            ->whereHas('wilayah', fn($sq) => $sq->where('rw', $rw))
+            ->with('wilayah')
+            ->get();
+
+        $pemberdayaanUsers = User::role('sie_pemberdayaan')
+            ->whereHas('wilayah', fn($sq) => $sq->where('rw', $rw))
+            ->with('wilayah')
+            ->get();
 
         return Inertia::render('Rw/ManageRtUsers', [
             'rtUsers' => $rtUsers,
             'pendingRtUsers' => $pendingRtUsers,
             'wilayahList' => $wilayahList,
             'rukemUsers' => $rukemUsers,
+            'pemberdayaanUsers' => $pemberdayaanUsers,
         ]);
     }
 
@@ -59,16 +68,19 @@ class RtUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => ['required', 'confirmed', Password::defaults()],
-            'role' => 'required|in:rt,sie_rukem',
+            'role' => 'required|in:rt,sie_rukem,sie_pemberdayaan',
             'wilayah_id' => 'required_if:role,rt|nullable|exists:wilayah_rt_rw,id',
         ]);
+
+        $rwWilayah = auth()->user()->managedWilayah ?: auth()->user()->wilayah;
+        $targetWilayahId = $validated['role'] === 'rt' ? $validated['wilayah_id'] : $rwWilayah?->id;
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'is_active' => true,
-            'wilayah_id' => $validated['role'] === 'rt' ? $validated['wilayah_id'] : null,
+            'wilayah_id' => $targetWilayahId,
         ]);
 
         $user->assignRole($validated['role']);
@@ -83,7 +95,7 @@ class RtUserController extends Controller
             }
         }
 
-        return back()->with('success', 'Akun ' . ($validated['role'] === 'rt' ? 'Ketua RT' : 'Sie Rukem') . ' berhasil dibuat.');
+        return back()->with('success', 'Akun ' . ($validated['role'] === 'rt' ? 'Ketua RT' : ($validated['role'] === 'sie_rukem' ? 'Sie Rukem' : 'Sie Pemberdayaan')) . ' berhasil dibuat.');
     }
 
     public function toggleActive(User $user)
