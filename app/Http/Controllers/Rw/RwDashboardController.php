@@ -89,7 +89,11 @@ class RwDashboardController extends Controller
         $residents = $query->when($request->search, function ($q, $search) {
                 $q->where(function($sq) use ($search) {
                     $sq->where('residents.nama_lengkap', 'like', "%{$search}%")
-                      ->orWhere('residents.nik', 'like', "%{$search}%");
+                      ->orWhere('residents.nik', 'like', "%{$search}%")
+                      ->orWhere('residents.alamat_sekarang', 'like', "%{$search}%")
+                      ->orWhereHas('familyCard', function($fc) use ($search) {
+                          $fc->where('alamat', 'like', "%{$search}%");
+                      });
                 });
             })
             ->when($request->rt, function ($q, $rt) {

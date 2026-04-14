@@ -13,6 +13,7 @@ export default function Index({ residents, filters = {} }) {
     const [sortBy, setSortBy] = useState(typeof filters?.sort === 'string' ? filters.sort : 'name');
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [importFile, setImportFile] = useState(null);
+    const [duplicateAction, setDuplicateAction] = useState('skip');
     const [isImporting, setIsImporting] = useState(false);
     const [showResultModal, setShowResultModal] = useState(false);
 
@@ -40,7 +41,8 @@ export default function Index({ residents, filters = {} }) {
 
         setIsImporting(true);
         router.post(route('rt.residents.import'), {
-            file: importFile
+            file: importFile,
+            duplicate_action: duplicateAction
         }, {
             onSuccess: () => {
                 setIsImportModalOpen(false);
@@ -73,7 +75,7 @@ export default function Index({ residents, filters = {} }) {
                                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                                     <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
                                         className="block w-full rounded-lg border-0 py-2 pl-10 pr-3 text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-600 sm:text-sm bg-slate-50 dark:bg-slate-800/50"
-                                        placeholder="Cari NIK/Nama..."
+                                        placeholder="Cari NIK/Nama/Alamat..."
                                     />
                                 </div>
                                 <select 
@@ -123,6 +125,7 @@ export default function Index({ residents, filters = {} }) {
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">JK / Usia</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Hub. Keluarga</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                                <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Alamat</th>
                                 <th className="py-3.5 pl-3 pr-6 text-right text-xs font-bold text-slate-500 uppercase">Aksi</th>
                             </tr>
                         </thead>
@@ -151,6 +154,9 @@ export default function Index({ residents, filters = {} }) {
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600 dark:text-slate-400 capitalize">
                                         {r.hubungan_keluarga ? r.hubungan_keluarga.replace('_', ' ') : '-'}
+                                    </td>
+                                    <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-400 max-w-xs truncate">
+                                        {r.alamat_sekarang || r.family_card?.alamat || '-'}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4">
                                         <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ring-1 ring-inset ${RESIDENT_STATUS_COLORS[r.status_penduduk] || ''}`}>
@@ -203,6 +209,34 @@ export default function Index({ residents, filters = {} }) {
                                 hover:file:bg-blue-100
                                 dark:file:bg-slate-700 dark:file:text-slate-300"
                         />
+                    </div>
+
+                    <div className="mb-6">
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Jika NIK sudah ada:</label>
+                        <div className="flex gap-4">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input 
+                                    type="radio" 
+                                    name="duplicate_action" 
+                                    value="skip" 
+                                    checked={duplicateAction === 'skip'}
+                                    onChange={(e) => setDuplicateAction(e.target.value)}
+                                    className="text-blue-600 focus:ring-blue-500 border-slate-300 dark:bg-slate-700 dark:border-slate-600"
+                                />
+                                <span className="text-sm text-slate-600 dark:text-slate-400">Lewati (Skip)</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input 
+                                    type="radio" 
+                                    name="duplicate_action" 
+                                    value="update" 
+                                    checked={duplicateAction === 'update'}
+                                    onChange={(e) => setDuplicateAction(e.target.value)}
+                                    className="text-blue-600 focus:ring-blue-500 border-slate-300 dark:bg-slate-700 dark:border-slate-600"
+                                />
+                                <span className="text-sm text-slate-600 dark:text-slate-400">Update Data</span>
+                            </label>
+                        </div>
                     </div>
 
                     <div className="flex justify-end gap-3">

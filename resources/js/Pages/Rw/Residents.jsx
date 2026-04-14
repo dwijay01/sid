@@ -48,7 +48,7 @@ export default function Residents({ residents, filters = {}, wilayahList = [] })
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     className="block w-full rounded-lg border-0 py-2 pl-10 pr-3 text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-teal-600 sm:text-sm bg-slate-50 dark:bg-slate-800/50"
-                                    placeholder="Cari NIK/Nama..."
+                                    placeholder="Cari NIK/Nama/Alamat..."
                                 />
                             </div>
                             <select value={rtFilter} onChange={(e) => setRtFilter(e.target.value)} className="rounded-lg border-0 py-2 text-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white">
@@ -82,6 +82,7 @@ export default function Residents({ residents, filters = {}, wilayahList = [] })
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">RT/RW</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">JK / Usia</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Hub. Keluarga</th>
+                                <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Alamat</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
                             </tr>
                         </thead>
@@ -108,6 +109,9 @@ export default function Residents({ residents, filters = {}, wilayahList = [] })
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600 dark:text-slate-400 capitalize">
                                         {r.hubungan_keluarga ? r.hubungan_keluarga.replace('_', ' ') : '-'}
+                                    </td>
+                                    <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-400 max-w-xs truncate">
+                                        {r.alamat_sekarang || r.family_card?.alamat || '-'}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">
                                         <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ring-1 ring-inset ${RESIDENT_STATUS_COLORS[r.status_penduduk] || ''}`}>

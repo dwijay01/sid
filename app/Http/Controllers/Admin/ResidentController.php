@@ -30,7 +30,11 @@ class ResidentController extends Controller
         if ($request->has('search')) {
             $query->where(function($q) use ($request) {
                 $q->where('residents.nama_lengkap', 'like', '%' . $request->search . '%')
-                  ->orWhere('residents.nik', 'like', '%' . $request->search . '%');
+                  ->orWhere('residents.nik', 'like', '%' . $request->search . '%')
+                  ->orWhere('residents.alamat_sekarang', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('familyCard', function($fc) use ($request) {
+                      $fc->where('alamat', 'like', '%' . $request->search . '%');
+                  });
             });
         }
 
@@ -130,6 +134,7 @@ class ResidentController extends Controller
     {
         $request->validate([
             'file' => 'required|mimes:xlsx,xls,csv',
+            'duplicate_action' => 'nullable|in:skip,update',
         ]);
 
         $file = $request->file('file');
@@ -154,7 +159,7 @@ class ResidentController extends Controller
                         ['is_active' => true]
                     );
 
-                    $import = new ResidentImport($wilayah->id, $sheetName);
+                    $import = new ResidentImport($wilayah->id, $sheetName, $request->duplicate_action ?? 'skip');
                     Excel::import($import, $file);
 
                     $successCount = $import->getSuccessCount();

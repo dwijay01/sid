@@ -17,11 +17,13 @@ class ResidentImport implements ToCollection, WithStartRow, WithMultipleSheets
     private $sheetName;
     private $skipped = [];
     private $successCount = 0;
+    private $duplicateAction; // 'skip' or 'update'
 
-    public function __construct($wilayahId = null, $sheetName = null)
+    public function __construct($wilayahId = null, $sheetName = null, $duplicateAction = 'skip')
     {
         $this->wilayahId = $wilayahId;
         $this->sheetName = $sheetName;
+        $this->duplicateAction = $duplicateAction;
     }
 
     public function sheets(): array
@@ -58,16 +60,6 @@ class ResidentImport implements ToCollection, WithStartRow, WithMultipleSheets
             $nama = trim((string)$row[2]);
             $hubungan = trim((string)$row[3]);
 
-            // Check if resident already exists
-            if (Resident::where('nik', $nik)->exists()) {
-                $this->skipped[] = [
-                    'nama' => $nama,
-                    'nik' => $nik,
-                    'reason' => 'NIK sudah terdaftar di sistem.'
-                ];
-                continue;
-            }
-
             // If it's Head of Family (KK), create or find Family Card
             if ($hubungan === 'KK' || $hubungan === 'Kepala Keluarga') {
                 $currentFamilyCard = FamilyCard::updateOrCreate(
@@ -92,7 +84,7 @@ class ResidentImport implements ToCollection, WithStartRow, WithMultipleSheets
                 $gender = 'P';
             }
 
-            Resident::create([
+            $data = [
                 'family_card_id' => $currentFamilyCard?->id,
                 'nik' => $nik,
                 'nama_lengkap' => $nama,
@@ -106,12 +98,29 @@ class ResidentImport implements ToCollection, WithStartRow, WithMultipleSheets
                 'pekerjaan' => $row[12] ?? '-',
                 'status_penduduk' => 'aktif',
                 'needs_update' => $needsUpdate,
-            ]);
+            ];
+
+            // Check duplicate NIK
+            $existing = Resident::where('nik', $nik)->first();
+            if ($existing) {
+                if ($this->duplicateAction === 'update') {
+                    $existing->update($data);
+                    $resident = $existing;
+                } else {
+                    $this->skipped[] = [
+                        'nama' => $nama,
+                        'nik' => $nik,
+                        'reason' => 'NIK sudah terdaftar di sistem.'
+                    ];
+                    continue;
+                }
+            } else {
+                $resident = Resident::create($data);
+            }
 
             // Update Family Card's head if not set
             if ($hubungan === 'KK' && $currentFamilyCard) {
-                $resident = Resident::where('nik', $nik)->first();
-                $currentFamilyCard->update(['kepala_keluarga_id' => $resident->id]);
+                $currentFamilyCard->update(['kepala_keluarga_id' => $resident->id ?? null]);
             }
 
             $this->successCount++;
