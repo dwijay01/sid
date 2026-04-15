@@ -15,7 +15,7 @@ class UserManagementController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::with('roles')
+        $users = User::with(['roles', 'wilayah'])
             ->when($request->search, function ($q, $search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")

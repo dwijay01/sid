@@ -83,7 +83,7 @@ export default function Form({ user, roles = [], wilayah = [] }) {
                             {errors.role && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.role}</p>}
                         </div>
 
-                        {(data.role === 'rt' || data.role === 'rw') && (
+                        {(data.role === 'rt' || data.role === 'rw' || data.role === 'sie_rukem' || data.role === 'sie_pemberdayaan') && (
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Wilayah Kerja *</label>
                                 <select 
@@ -99,8 +99,8 @@ export default function Form({ user, roles = [], wilayah = [] }) {
                                     ))}
                                 </select>
                                 {errors.wilayah_id && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.wilayah_id}</p>}
-                                <p className="mt-1 text-xs text-slate-500">
-                                    {data.role === 'rw' ? 'Untuk role RW, pilih salah satu RT di wilayah RW tersebut.' : 'Pilih unit RT spesifik.'}
+                                <p className="mt-1 text-xs text-slate-500 italic">
+                                    {data.role === 'rt' ? 'Pilih unit RT spesifik.' : 'Pilih salah satu RT di wilayah RW yang bersangkutan untuk menautkan akun.'}
                                 </p>
                             </div>
                         )}

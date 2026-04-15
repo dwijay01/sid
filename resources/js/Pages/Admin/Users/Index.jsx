@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Search, Plus, Edit2, Trash2, Shield } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, Shield, MapPin } from 'lucide-react';
 import { ROLE_LABELS } from '@/Helpers/constants';
 import { formatDateTime } from '@/Helpers/formatters';
 
@@ -95,6 +95,12 @@ export default function Index({ users, roles, filters }) {
                                                 <Shield size={10} />
                                                 {ROLE_LABELS[u.role_name] || u.role_name}
                                             </span>
+                                            {u.wilayah && (
+                                                <div className="mt-1 flex items-center gap-1 text-[10px] text-slate-500 font-medium">
+                                                    <MapPin size={10} className="text-slate-400" />
+                                                    RT {u.wilayah.rt} / RW {u.wilayah.rw}
+                                                </div>
+                                            )}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4">
                                             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${u.is_active !== false ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
