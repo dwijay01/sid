@@ -3,7 +3,7 @@ import { Head, router, useForm } from '@inertiajs/react';
 import RwLayout from '@/Layouts/RwLayout';
 import { UserCog, ShieldCheck, ShieldOff, MapPin, Plus, X, Users, CheckCircle } from 'lucide-react';
 
-export default function ManageRtUsers({ rtUsers, pendingRtUsers = [], wilayahList, rukemUsers = [] }) {
+export default function ManageRtUsers({ rtUsers, pendingRtUsers = [], wilayahList, rukemUsers = [], pemberdayaanUsers = [] }) {
     const [activeTab, setActiveTab] = useState('rt');
     const [showModal, setShowModal] = useState(false);
 
@@ -54,8 +54,14 @@ export default function ManageRtUsers({ rtUsers, pendingRtUsers = [], wilayahLis
         });
     };
 
+    const getTabName = () => {
+        if (activeTab === 'rt') return 'RT';
+        if (activeTab === 'rukem') return 'Sie Rukem';
+        return 'Sie Pemberdayaan';
+    };
+
     return (
-        <RwLayout header={`Kelola Akses ${activeTab === 'rt' ? 'RT' : 'Sie Rukem'}`}>
+        <RwLayout header={`Kelola Akses ${getTabName()}`}>
             <Head title="Kelola Akses - RW" />
 
             <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -67,7 +73,7 @@ export default function ManageRtUsers({ rtUsers, pendingRtUsers = [], wilayahLis
                             </div>
                             <div>
                                 <h2 className="text-lg font-bold text-slate-800 dark:text-white">Kelola Akses Pengguna</h2>
-                                <p className="text-sm text-slate-500 dark:text-slate-400">Kelola akun untuk Ketua RT dan Sie Rukun Kematian.</p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">Kelola akun untuk Ketua RT, Sie Rukun Kematian, dan Sie Pemberdayaan.</p>
                             </div>
                         </div>
                         <button onClick={() => openModal(activeTab)} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold shadow-sm transition-colors flex items-center gap-2">
@@ -145,6 +151,16 @@ export default function ManageRtUsers({ rtUsers, pendingRtUsers = [], wilayahLis
                         }`}
                     >
                         Sie Rukun Kematian
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('pemberdayaan')}
+                        className={`px-6 py-3 font-semibold text-sm border-b-2 transition-colors ${
+                            activeTab === 'pemberdayaan'
+                                ? 'border-blue-600 text-blue-600 dark:text-blue-400'
+                                : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                        }`}
+                    >
+                        Sie Pemberdayaan
                     </button>
                 </div>
             </div>
@@ -261,6 +277,58 @@ export default function ManageRtUsers({ rtUsers, pendingRtUsers = [], wilayahLis
                 </div>
             )}
 
+            {activeTab === 'pemberdayaan' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {pemberdayaanUsers.length === 0 ? (
+                        <div className="col-span-full bg-white dark:bg-slate-800 p-8 rounded-xl border border-slate-200 dark:border-slate-700 text-center">
+                            <Users size={48} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Belum Ada Akun Sie Pemberdayaan</h3>
+                            <p className="text-slate-500 dark:text-slate-400 mb-4">Silakan buat akun Sie Pemberdayaan untuk mengelola program RW.</p>
+                            <button onClick={() => openModal('sie_pemberdayaan')} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold shadow-sm transition-colors mx-auto flex items-center gap-2">
+                                <Plus size={16} /> Tambah Akun
+                            </button>
+                        </div>
+                    ) : (
+                        pemberdayaanUsers.map((user) => (
+                            <div key={user.id} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm px-6 py-5">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="h-12 w-12 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-700 dark:text-indigo-400 font-bold text-lg">
+                                        {user.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-slate-900 dark:text-white">{user.name}</p>
+                                        <p className="text-xs text-slate-500">{user.email}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 mb-4 text-xs text-slate-500 bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg">
+                                    <MapPin size={14} className="text-indigo-500" />
+                                    <span>Terkoneksi ke: RT {user.wilayah?.rt}/RW {user.wilayah?.rw}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
+                                        user.is_active 
+                                            ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' 
+                                            : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                                    }`}>
+                                        {user.is_active ? <><ShieldCheck size={14} /> Aktif</> : <><ShieldOff size={14} /> Nonaktif</>}
+                                    </span>
+                                    <button
+                                        onClick={() => handleToggle(user.id)}
+                                        className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors ${
+                                            user.is_active
+                                                ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 hover:bg-red-100'
+                                                : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100'
+                                        }`}
+                                    >
+                                        {user.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                                    </button>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            )}
+
             {showModal && (
                 <div className="fixed inset-0 z-50 overflow-y-auto">
                     <div className="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
@@ -269,7 +337,7 @@ export default function ManageRtUsers({ rtUsers, pendingRtUsers = [], wilayahLis
                         <div className="relative transform overflow-hidden rounded-xl bg-white dark:bg-slate-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-200 dark:border-slate-700">
                             <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                                    Tambah Akun {data.role === 'rt' ? 'Ketua RT' : 'Sie Rukun Kematian'}
+                                    Tambah Akun {getTabName()}
                                 </h3>
                                 <button onClick={closeModal} className="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
                                     <X size={20} />
@@ -277,9 +345,11 @@ export default function ManageRtUsers({ rtUsers, pendingRtUsers = [], wilayahLis
                             </div>
                             <form onSubmit={handleStoreUser}>
                                 <div className="px-6 py-5 space-y-4">
-                                    {data.role === 'rt' && (
+                                    {(data.role === 'rt' || data.role === 'sie_pemberdayaan' || data.role === 'sie_rukem') && (
                                         <div>
-                                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Wilayah RT *</label>
+                                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                                {data.role === 'rt' ? 'Wilayah RT *' : 'Koneksikan ke Wilayah (RT/RW) *'}
+                                            </label>
                                             <select 
                                                 value={data.wilayah_id} 
                                                 onChange={(e) => setData('wilayah_id', e.target.value)}
@@ -290,6 +360,9 @@ export default function ManageRtUsers({ rtUsers, pendingRtUsers = [], wilayahLis
                                                     <option key={w.id} value={w.id}>RT {w.rt} / RW {w.rw}</option>
                                                 ))}
                                             </select>
+                                            <p className="mt-1 text-[10px] text-slate-500 italic">
+                                                {data.role !== 'rt' && 'Pilih salah satu unit wilayah untuk menautkan akun ini ke lingkup RW Anda.'}
+                                            </p>
                                             {errors.wilayah_id && <p className="mt-1 text-sm text-red-600">{errors.wilayah_id}</p>}
                                         </div>
                                     )}
