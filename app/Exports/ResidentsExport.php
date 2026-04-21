@@ -35,7 +35,8 @@ class ResidentsExport implements FromCollection, WithHeadings, WithMapping, Shou
             'Status Kawin',
             'Pekerjaan',
             'Golongan Darah',
-            'Alamat Sekarang',
+            'Alamat Tetap (KK)',
+            'Alamat Domisili',
             'Status Penduduk',
             'Didaftarkan Pada'
         ];
@@ -56,7 +57,8 @@ class ResidentsExport implements FromCollection, WithHeadings, WithMapping, Shou
             $resident->status_kawin,
             $resident->pekerjaan,
             $resident->golongan_darah,
-            $resident->alamat_sekarang ?? ($resident->familyCard->alamat ?? '-'),
+            $resident->familyCard->alamat ?? '-',
+            $resident->familyCard->alamat_domisili ?? '-',
             $resident->status_penduduk,
             $resident->created_at->format('Y-m-d H:i:s'),
         ];
