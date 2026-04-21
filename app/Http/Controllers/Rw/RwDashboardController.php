@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Rw;
 
 use App\Http\Controllers\Controller;
+use App\Models\Complaint;
 use App\Models\FamilyCard;
 use App\Models\LetterRequest;
 use App\Models\PopulationMutation;
@@ -46,6 +47,14 @@ class RwDashboardController extends Controller
             ->take(5)
             ->get();
 
+        $escalatedComplaintsCount = Complaint::whereIn('wilayah_id', $wilayahIds)
+            ->where('status', 'diteruskan_rw')
+            ->count();
+            
+        $activeComplaintsCount = Complaint::whereIn('wilayah_id', $wilayahIds)
+            ->whereNotIn('status', ['selesai', 'ditolak'])
+            ->count();
+
         return Inertia::render('Rw/Dashboard', [
             'stats' => [
                 'total_penduduk' => $totalPenduduk,
@@ -65,6 +74,8 @@ class RwDashboardController extends Controller
                     ->whereNotNull('alamat_domisili')
                     ->where('alamat_domisili', '!=', '')
                     ->count(),
+                'active_complaints' => $activeComplaintsCount,
+                'escalated_complaints' => $escalatedComplaintsCount,
             ],
             'recentMutations' => $recentMutations,
         ]);

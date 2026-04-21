@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import RwLayout from '@/Layouts/RwLayout';
-import { Users, Heart, CreditCard, MapPin, FileText, ArrowUpDown, ChevronRight, Store } from 'lucide-react';
+import { Users, Heart, CreditCard, MapPin, FileText, ArrowUpDown, ChevronRight, Store, MessageSquareWarning, AlertTriangle, Zap } from 'lucide-react';
 import { MUTATION_TYPES } from '@/Helpers/constants';
 
 export default function Dashboard({ stats, recentMutations }) {
@@ -63,6 +63,18 @@ export default function Dashboard({ stats, recentMutations }) {
                         <p className="text-sm font-medium text-teal-800 dark:text-teal-300 mb-1">Warga Pendatang (Domisili)</p>
                         <p className="text-2xl font-black text-teal-900 dark:text-teal-100">{stats.total_pendatang || 0} <span className="text-xs font-normal">KK</span></p>
                     </div>
+                    <div className={`p-4 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 relative group cursor-pointer hover:shadow-md transition-all`}>
+                        <Link href={route('rw.complaints.index', { status: 'diteruskan_rw' })} className="absolute inset-0 z-10" />
+                        <p className="text-sm font-medium text-indigo-800 dark:text-indigo-300 mb-1 flex items-center gap-1.5">
+                            <Zap size={14} className="text-amber-500 fill-amber-500" /> Pengaduan Penting (Eskalasi)
+                        </p>
+                        <p className="text-2xl font-black text-indigo-900 dark:text-indigo-100">{stats.escalated_complaints || 0} <span className="text-xs font-normal">Laporan</span></p>
+                    </div>
+                    <div className={`col-span-1 md:col-span-2 p-4 rounded-lg bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 relative group cursor-pointer hover:shadow-md transition-all`}>
+                        <Link href={route('rw.complaints.index')} className="absolute inset-0 z-10" />
+                        <p className="text-sm font-medium text-slate-700 dark:text-slate-400 mb-1">Total Pengaduan Aktif (Seluruh RT)</p>
+                        <p className="text-2xl font-black text-slate-900 dark:text-white">{stats.active_complaints || 0} <span className="text-xs font-normal">Laporan Terbuka</span></p>
+                    </div>
                 </div>
             </div>
 
@@ -115,6 +127,7 @@ export default function Dashboard({ stats, recentMutations }) {
                                 { label: 'Lihat Data Penduduk', href: route('rw.residents'), color: 'emerald' },
                                 { label: 'Data Rukun Kematian', href: route('rw.rukem'), color: 'rose' },
                                 { label: 'Data UMKM', href: route('rw.umkm'), color: 'amber' },
+                                { label: 'Monitor Pengaduan', href: route('rw.complaints.index'), color: 'indigo' },
                                 { label: 'Report & Cetak', href: route('rw.reports'), color: 'blue' },
                                 { label: 'Kelola Akses RT', href: route('rw.rt-users.index'), color: 'violet' },
                             ].map((action) => (

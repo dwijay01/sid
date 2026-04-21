@@ -11,7 +11,8 @@ import {
     Menu,
     Bell,
     Store,
-    CreditCard
+    CreditCard,
+    MessageSquareWarning
 } from 'lucide-react';
 import Dropdown from '@/Components/Dropdown';
 import ThemeToggle from '@/Components/ThemeToggle';
@@ -26,6 +27,7 @@ export default function RwLayout({ header, children }) {
         { name: 'Data Penduduk', href: route('rw.residents'), icon: Users, current: route().current('rw.residents') },
         { name: 'Data UMKM', href: route('rw.umkm'), icon: Store, current: route().current('rw.umkm') },
         { name: 'Data Rukun Kematian', href: route('rw.rukem'), icon: Heart, current: route().current('rw.rukem') },
+        { name: 'Pengaduan Warga', href: route('rw.complaints.index'), icon: MessageSquareWarning, current: route().current('rw.complaints.*') },
         { name: 'Report & Cetak', href: route('rw.reports'), icon: FileBarChart, current: route().current('rw.reports') },
         { name: 'Kelola Akses RT', href: route('rw.rt-users.index'), icon: UserCog, current: route().current('rw.rt-users.*') },
     ];

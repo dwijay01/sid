@@ -149,6 +149,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/rt-users/{user}/toggle', [RtUserController::class, 'toggleActive'])->name('rt-users.toggle');
         Route::post('/rt-users/{user}/approve', [RtUserController::class, 'approve'])->name('rt-users.approve');
         Route::post('/rt-users/{user}/reject', [RtUserController::class, 'reject'])->name('rt-users.reject');
+
+        // Pengaduan Warga
+        Route::get('/pengaduan', [\App\Http\Controllers\Rw\ComplaintController::class, 'index'])->name('complaints.index');
+        Route::get('/pengaduan/{complaint}', [\App\Http\Controllers\Rw\ComplaintController::class, 'show'])->name('complaints.show');
+        Route::post('/pengaduan/{complaint}/status', [\App\Http\Controllers\Rw\ComplaintController::class, 'updateStatus'])->name('complaints.updateStatus');
     });
 
     // -------------------------------------------------------------
@@ -196,10 +201,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/letters/{letterRequest}', [RtLetterController::class, 'show'])->name('letters.show');
         Route::get('/letters/{letterRequest}/approve', [RtLetterController::class, 'approve'])->name('letters.approve');
         Route::post('/letters/{letterRequest}/reject', [RtLetterController::class, 'reject'])->name('letters.reject');
-
         // Import Logs
         Route::get('/import-logs', [\App\Http\Controllers\ImportLogController::class, 'index'])->name('import-logs.index');
         Route::get('/import-logs/{importLog}', [\App\Http\Controllers\ImportLogController::class, 'show'])->name('import-logs.show');
+
+        // Pengaduan Warga
+        Route::get('/pengaduan', [\App\Http\Controllers\Rt\ComplaintController::class, 'index'])->name('complaints.index');
+        Route::get('/pengaduan/{complaint}', [\App\Http\Controllers\Rt\ComplaintController::class, 'show'])->name('complaints.show');
+        Route::post('/pengaduan/{complaint}/status', [\App\Http\Controllers\Rt\ComplaintController::class, 'updateStatus'])->name('complaints.updateStatus');
     });
 
     // -------------------------------------------------------------
@@ -241,11 +250,21 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['role:warga|kepala_kk'])->prefix('warga')->name('warga.')->group(function () {
         Route::get('/dashboard', [WargaDashboardController::class, 'index'])->name('dashboard');
         
+        // Surat Routes
         Route::get('/letters/create', [WargaLetterRequestController::class, 'create'])->name('letters.create');
         Route::post('/letters', [WargaLetterRequestController::class, 'store'])->name('letters.store');
         Route::get('/letters/{letterRequest}/track', [WargaLetterRequestController::class, 'track'])->name('letters.track');
         Route::get('/letters/{letterRequest}/download', [WargaLetterRequestController::class, 'downloadPdf'])->name('letters.download');
         Route::get('/history', [WargaLetterRequestController::class, 'history'])->name('history');
+        
+        // Keluarga Routes
+        Route::get('/keluarga', [\App\Http\Controllers\Warga\FamilyController::class, 'index'])->name('keluarga');
+
+        // Pengaduan Routes
+        Route::get('/pengaduan', [\App\Http\Controllers\Warga\ComplaintController::class, 'index'])->name('complaints.index');
+        Route::get('/pengaduan/create', [\App\Http\Controllers\Warga\ComplaintController::class, 'create'])->name('complaints.create');
+        Route::post('/pengaduan', [\App\Http\Controllers\Warga\ComplaintController::class, 'store'])->name('complaints.store');
+        Route::get('/pengaduan/{complaint}', [\App\Http\Controllers\Warga\ComplaintController::class, 'show'])->name('complaints.show');
     });
 
 });

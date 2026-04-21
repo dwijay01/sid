@@ -13,7 +13,8 @@ import {
     CreditCard,
     Store,
     ClipboardList,
-    Printer
+    Printer,
+    MessageSquareWarning
 } from 'lucide-react';
 import Dropdown from '@/Components/Dropdown';
 import ThemeToggle from '@/Components/ThemeToggle';
@@ -29,6 +30,7 @@ export default function RtLayout({ header, children }) {
         { name: 'Mutasi Penduduk', href: route('rt.mutations.index'), icon: ArrowUpDown, current: route().current('rt.mutations.*') },
         { name: 'Rukun Kematian', href: route('rt.rukem.index'), icon: Heart, current: route().current('rt.rukem.*') },
         { name: 'Pendataan UMKM', href: route('rt.umkm.index'), icon: Store, current: route().current('rt.umkm.*') },
+        { name: 'Pengaduan Warga', href: route('rt.complaints.index'), icon: MessageSquareWarning, current: route().current('rt.complaints.*') },
         { name: 'Log Import', href: route('rt.import-logs.index'), icon: ClipboardList, current: route().current('rt.import-logs.*') },
         { name: 'Report & Cetak', href: route('rt.reports'), icon: Printer, current: route().current('rt.reports') },
     ];

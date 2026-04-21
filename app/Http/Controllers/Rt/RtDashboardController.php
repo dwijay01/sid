@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Rt;
 
 use App\Http\Controllers\Controller;
+use App\Models\Complaint;
 use App\Models\FamilyCard;
 use App\Models\LetterRequest;
 use App\Models\PopulationMutation;
@@ -44,6 +45,10 @@ class RtDashboardController extends Controller
             ->take(5)
             ->get();
 
+        $activeComplaintsCount = Complaint::where('wilayah_id', $wilayahId)
+            ->whereNotIn('status', ['selesai', 'ditolak'])
+            ->count();
+
         return Inertia::render('Rt/Dashboard', [
             'stats' => [
                 'total_penduduk' => $totalPenduduk,
@@ -52,6 +57,7 @@ class RtDashboardController extends Controller
                 'total_umkm' => Umkm::where('status', 'aktif')
                     ->whereHas('resident.familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
                     ->count(),
+                'active_complaints' => $activeComplaintsCount,
             ],
             'recentMutations' => $recentMutations,
         ]);

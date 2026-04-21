@@ -38,6 +38,11 @@ class WilayahRtRw extends Model
         return $this->hasMany(LetterRequest::class, 'wilayah_id');
     }
 
+    public function complaints(): HasMany
+    {
+        return $this->hasMany(Complaint::class, 'wilayah_id');
+    }
+
     public function getFullNameAttribute(): string
     {
         return "RT {$this->rt} / RW {$this->rw}" . ($this->dusun ? " - {$this->dusun}" : '');

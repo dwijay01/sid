@@ -125,16 +125,16 @@ export const RUKEM_STATUS = {
     aktif: 'Aktif',
     nonaktif: 'Nonaktif',
     khusus: 'Khusus (Warga Kurang Mampu)',
-    keluar: 'Keluar',
-    tidak_ikut: 'Tidak Ikut',
+    //keluar: 'Keluar',
+    //tidak_ikut: 'Tidak Ikut',
 };
 
 export const RUKEM_STATUS_COLORS = {
     aktif: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
     nonaktif: 'bg-amber-50 text-amber-700 ring-amber-600/20',
     khusus: 'bg-purple-50 text-purple-700 ring-purple-600/20',
-    keluar: 'bg-red-50 text-red-700 ring-red-600/20',
-    tidak_ikut: 'bg-slate-50 text-slate-700 ring-slate-600/20',
+    //keluar: 'bg-red-50 text-red-700 ring-red-600/20',
+    //tidak_ikut: 'bg-slate-50 text-slate-700 ring-slate-600/20',
 };
 
 /**

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import RtLayout from '@/Layouts/RtLayout';
-import { Users, CreditCard, Heart, FileText, ArrowUpDown, ChevronRight, Clock, UserPlus, Baby, Skull, ArrowRightLeft, Store } from 'lucide-react';
+import { Users, CreditCard, Heart, FileText, ArrowUpDown, ChevronRight, Clock, UserPlus, Baby, Skull, ArrowRightLeft, Store, MessageSquareWarning } from 'lucide-react';
 import { MUTATION_TYPES } from '@/Helpers/constants';
 
 export default function Dashboard({ stats, recentMutations }) {
@@ -27,13 +27,15 @@ export default function Dashboard({ stats, recentMutations }) {
                     { label: 'Kartu Keluarga', value: stats.total_kk, icon: CreditCard, color: 'blue' },
                     { label: 'Anggota Rukem', value: stats.total_rukem, icon: Heart, color: 'rose' },
                     { label: 'Unit UMKM', value: stats.total_umkm, icon: Store, color: 'amber' },
+                    { label: 'Pengaduan Aktif', value: stats.active_complaints, icon: MessageSquareWarning, color: 'indigo', link: route('rt.complaints.index') },
                 ].map((stat) => (
-                    <div key={stat.label} className={`relative overflow-hidden rounded-xl bg-white dark:bg-slate-800 p-6 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 hover:shadow-md transition-all border-l-4 border-${stat.color}-500`}>
+                    <div key={stat.label} className={`relative overflow-hidden rounded-xl bg-white dark:bg-slate-800 p-6 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 hover:shadow-md transition-all border-l-4 border-${stat.color}-500 group`}>
+                        {stat.link && <Link href={stat.link} className="absolute inset-0 z-10" />}
                         <dt className="flex items-center gap-x-3">
                             <div className={`p-2.5 bg-${stat.color}-100 dark:bg-${stat.color}-900/30 rounded-lg text-${stat.color}-600`}>
                                 <stat.icon size={20} />
                             </div>
-                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{stat.label}</div>
+                            <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{stat.label}</div>
                         </dt>
                         <dd className="mt-4 text-3xl font-black text-slate-900 dark:text-white">{stat.value?.toLocaleString('id-ID') || 0}</dd>
                     </div>
@@ -85,6 +87,7 @@ export default function Dashboard({ stats, recentMutations }) {
                                 { label: 'Warga Masuk', href: route('rt.mutations.move-in'), icon: ArrowRightLeft, color: 'indigo' },
                                 { label: 'Input Anggota Rukem', href: route('rt.rukem.create'), icon: Heart, color: 'rose' },
                                 { label: 'Pendataan UMKM', href: route('rt.umkm.create'), icon: Store, color: 'amber' },
+                                { label: 'Tinjau Pengaduan', href: route('rt.complaints.index'), icon: MessageSquareWarning, color: 'indigo' },
                             ].map((a) => (
                                 <Link key={a.label} href={a.href} className="flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 group transition-all">
                                     <div className="flex items-center gap-3">

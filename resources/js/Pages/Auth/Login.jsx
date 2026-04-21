@@ -299,18 +299,33 @@ export default function Login({ status, canResetPassword }) {
                                 )}
                             </button>
 
-                            {/* Register RT Button */}
-                            <div className="text-center">
-                                <Link
-                                    href={route('register')}
-                                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold text-sm hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-300"
-                                >
-                                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                                    Daftar Akun Ketua RT
-                                </Link>
-                                <p className="mt-2 text-[10px] text-slate-400 uppercase tracking-widest font-bold">
-                                    Diaktifkan oleh Ketua RW
-                                </p>
+                            {/* Register RT & Warga Buttons */}
+                            <div className="flex flex-col gap-4">
+                                <div className="text-center">
+                                    <Link
+                                        href={route('register')}
+                                        className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold text-sm hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-300 group"
+                                    >
+                                        <ShieldCheck className="w-5 h-5 text-emerald-500 group-hover:scale-110 transition-transform" />
+                                        Daftar Akun Ketua RT
+                                    </Link>
+                                    <p className="mt-2 text-[10px] text-slate-400 uppercase tracking-widest font-bold">
+                                        Validasi oleh Ketua RW
+                                    </p>
+                                </div>
+
+                                <div className="text-center">
+                                    <Link
+                                        href={route('register.warga')}
+                                        className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 border-2 border-transparent text-slate-600 dark:text-slate-300 font-bold text-sm hover:border-teal-500 hover:text-teal-600 dark:hover:text-teal-400 transition-all duration-300 group shadow-sm"
+                                    >
+                                        <User className="w-5 h-5 text-teal-500 group-hover:scale-110 transition-transform" />
+                                        Daftar Akun Warga
+                                    </Link>
+                                    <p className="mt-2 text-[10px] text-slate-400 uppercase tracking-widest font-bold">
+                                        Aktivasi Mandiri (NIK & Tgl Lahir)
+                                    </p>
+                                </div>
                             </div>
                         </form>
 

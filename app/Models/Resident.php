@@ -88,4 +88,9 @@ class Resident extends Model
     {
         return $this->hasMany(Umkm::class);
     }
+
+    public function complaints(): HasMany
+    {
+        return $this->hasMany(Complaint::class);
+    }
 }
