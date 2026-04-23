@@ -13,16 +13,8 @@ export default defineConfig({
     build: {
         rollupOptions: {
             output: {
-                manualChunks(id) {
-                    // Gabungkan semua icon lucide menjadi satu file
-                    if (id.includes('node_modules/lucide-react')) {
-                        return 'lucide-icons';
-                    }
-                    // Gabungkan library pihak ketiga lainnya (React, dll) ke file vendor
-                    if (id.includes('node_modules')) {
-                        return 'vendor';
-                    }
-                }
+                manualChunks: undefined,
+                inlineDynamicImports: true,
             }
         }
     }
