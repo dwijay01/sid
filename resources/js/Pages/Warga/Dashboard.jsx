@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import WargaLayout from '@/Layouts/WargaLayout';
+import InstallPWA from '@/Components/InstallPWA';
 import { 
     FileText, 
     Wifi, 
@@ -39,6 +40,9 @@ export default function Dashboard({ activeRequests, activeComplaintsCount, inter
     return (
         <WargaLayout header="Beranda">
             <Head title="Beranda Warga" />
+
+            {/* PWA Install Prompt */}
+            <InstallPWA />
 
             {/* Quick Actions (Jalan Pintas) */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

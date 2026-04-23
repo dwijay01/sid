@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import Dropdown from '@/Components/Dropdown';
 import ThemeToggle from '@/Components/ThemeToggle';
+import NetworkStatus from '@/Components/NetworkStatus';
 
 export default function WargaLayout({ header, children }) {
     const user = usePage().props.auth.user;
@@ -51,6 +52,8 @@ export default function WargaLayout({ header, children }) {
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200 pb-16 lg:pb-0">
+            {/* PWA Network Status Indicator */}
+            <NetworkStatus />
             {/* Mobile Bottom Navigation Bar */}
             <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-safe">
                 <nav className="flex justify-around items-center h-16">

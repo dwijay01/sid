@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#059669">
+    <title>Offline - SIRAWE</title>
+    <link rel="icon" href="/icons/icon-72x72.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #f8fafc 50%, #ecfdf5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Animated WiFi-Off Icon */
+        .icon-wrapper {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-bg {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            animation: pulse-ring 2.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-ring {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.15); opacity: 0.3; }
+        }
+
+        .wifi-icon {
+            position: relative;
+            z-index: 1;
+            width: 56px;
+            height: 56px;
+        }
+
+        .wifi-icon svg {
+            width: 100%;
+            height: 100%;
+            color: #059669;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+            border: 1px solid #e2e8f0;
+        }
+
+        h1 {
+            font-size: 1.375rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.01em;
+        }
+
+        p {
+            font-size: 0.9rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .tips {
+            background: #f8fafc;
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            text-align: left;
+            margin-bottom: 1.5rem;
+            border: 1px solid #f1f5f9;
+        }
+
+        .tips h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.625rem;
+        }
+
+        .tips ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tips li {
+            font-size: 0.8rem;
+            color: #475569;
+            padding: 0.25rem 0;
+            padding-left: 1.25rem;
+            position: relative;
+        }
+
+        .tips li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #059669;
+            font-weight: bold;
+        }
+
+        .btn-retry {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.75rem;
+            border-radius: 0.75rem;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+        }
+
+        .btn-retry:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(5, 150, 105, 0.4);
+        }
+
+        .btn-retry:active {
+            transform: translateY(0);
+        }
+
+        .btn-retry svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-retry:hover svg {
+            transform: rotate(180deg);
+        }
+
+        .footer {
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .footer-logo {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .footer-text {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        /* Online detection — auto redirect */
+        .online-banner {
+            display: none;
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #059669;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(5, 150, 105, 0.4);
+            animation: slideUp 0.4s ease;
+            z-index: 100;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100%); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        .online-banner.show {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Animated Icon -->
+        <div class="icon-wrapper">
+            <div class="icon-bg"></div>
+            <div class="wifi-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="2" y1="2" x2="22" y2="22"></line>
+                    <path d="M8.5 16.5a5 5 0 0 1 7 0"></path>
+                    <path d="M2 8.82a15 15 0 0 1 4.17-2.65"></path>
+                    <path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76"></path>
+                    <path d="M16.85 11.25a10 10 0 0 1 2.22 1.68"></path>
+                    <path d="M5 12.86a10 10 0 0 1 5.58-2.79"></path>
+                    <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Card -->
+        <div class="card">
+            <h1>Koneksi Terputus</h1>
+            <p>Sepertinya perangkat Anda sedang tidak terhubung ke internet. Jangan khawatir, data terakhir Anda tetap aman.</p>
+
+            <div class="tips">
+                <h3>Yang bisa Anda coba</h3>
+                <ul>
+                    <li>Periksa koneksi WiFi atau Data Seluler</li>
+                    <li>Coba pindah ke area dengan sinyal lebih kuat</li>
+                    <li>Aktifkan Mode Pesawat, lalu matikan kembali</li>
+                </ul>
+            </div>
+
+            <button class="btn-retry" onclick="window.location.reload()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                Coba Lagi
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <img src="/icons/icon-72x72.png" alt="SIRAWE" class="footer-logo">
+            <span class="footer-text">SIRAWE — Portal Desa Digital</span>
+        </div>
+    </div>
+
+    <!-- Auto-reconnect banner -->
+    <div class="online-banner" id="onlineBanner">
+        ✅ Koneksi kembali! Memuat ulang...
+    </div>
+
+    <script>
+        // Deteksi otomatis saat koneksi kembali
+        window.addEventListener('online', () => {
+            const banner = document.getElementById('onlineBanner');
+            banner.classList.add('show');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
