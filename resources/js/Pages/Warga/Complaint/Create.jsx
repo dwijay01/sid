@@ -20,24 +20,8 @@ export default function Create() {
         title: '',
         category: '',
         description: '',
-        attachment: null,
         is_secret: false,
     });
-
-    const [previewUrl, setPreviewUrl] = useState(null);
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setData('attachment', file);
-            setPreviewUrl(URL.createObjectURL(file));
-        }
-    };
-
-    const removeFile = () => {
-        setData('attachment', null);
-        setPreviewUrl(null);
-    };
 
     const submit = (e) => {
         e.preventDefault();
@@ -117,36 +101,6 @@ export default function Create() {
                             <InputError message={errors.description} className="mt-2" />
                         </div>
 
-                        <div>
-                            <InputLabel value="Foto Bukti (Opsional)" />
-                            
-                            {!previewUrl ? (
-                                <label className="mt-2 flex justify-center w-full min-h-[160px] px-4 py-6 border-2 border-slate-200 dark:border-slate-700 border-dashed rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/50 hover:border-amber-400 dark:hover:border-amber-500 transition-colors group">
-                                    <div className="space-y-2 text-center flex flex-col items-center justify-center">
-                                        <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 group-hover:text-amber-500 group-hover:bg-amber-50 dark:group-hover:bg-amber-900/30 transition-colors">
-                                            <Upload className="h-5 w-5" />
-                                        </div>
-                                        <div className="text-sm text-slate-600 dark:text-slate-400">
-                                            <span className="font-semibold text-amber-600 dark:text-amber-400">Pilih foto</span> atau tarik dan lepas
-                                        </div>
-                                        <p className="text-xs text-slate-500">PNG, JPG up to 2MB</p>
-                                    </div>
-                                    <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
-                                </label>
-                            ) : (
-                                <div className="mt-2 relative rounded-xl border border-slate-200 dark:border-slate-700 p-2 bg-slate-50 dark:bg-slate-900 flex justify-center">
-                                    <img src={previewUrl} alt="Preview" className="max-h-64 rounded-lg object-contain" />
-                                    <button 
-                                        type="button" 
-                                        onClick={removeFile}
-                                        className="absolute top-4 right-4 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 shadow-sm"
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            )}
-                            <InputError message={errors.attachment} className="mt-2" />
-                        </div>
 
                         <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50 p-4 rounded-xl flex items-start gap-4">
                             <div className="flex items-center h-5 mt-0.5">

@@ -4,7 +4,7 @@ import RtLayout from '@/Layouts/RtLayout';
 import { Heart, Search, Plus, Edit } from 'lucide-react';
 import { RUKEM_STATUS, RUKEM_STATUS_COLORS } from '@/Helpers/constants';
 
-export default function Index({ members, filters = {} }) {
+export default function Index({ members, filters = {}, rukemStats = {} }) {
     const [search, setSearch] = useState(filters.search || '');
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
 
@@ -57,6 +57,38 @@ export default function Index({ members, filters = {} }) {
                     </div>
                 </div>
             </div>
+
+            {rukemStats && Object.keys(rukemStats).length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 flex items-center gap-4 shadow-sm">
+                        <div className="bg-emerald-100 dark:bg-emerald-900/40 p-3 rounded-lg text-emerald-600 dark:text-emerald-400">
+                            <Heart size={20} />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Rukem Aktif</p>
+                            <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{rukemStats.aktif || 0}</p>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 flex items-center gap-4 shadow-sm">
+                        <div className="bg-purple-100 dark:bg-purple-900/40 p-3 rounded-lg text-purple-600 dark:text-purple-400">
+                            <Heart size={20} />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Warga Khusus (Kurang Mampu)</p>
+                            <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{rukemStats.khusus || 0}</p>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 flex items-center gap-4 shadow-sm">
+                        <div className="bg-amber-100 dark:bg-amber-900/40 p-3 rounded-lg text-amber-600 dark:text-amber-400">
+                            <Heart size={20} />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Rukem Nonaktif</p>
+                            <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{rukemStats.nonaktif || 0}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
                 <div className="overflow-x-auto">

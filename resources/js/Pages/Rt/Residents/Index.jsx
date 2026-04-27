@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import RtLayout from '@/Layouts/RtLayout';
-import { Users, Search, Plus, Edit, Upload, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { GENDER_LABELS, RESIDENT_STATUS, RESIDENT_STATUS_COLORS } from '@/Helpers/constants';
+import { Users, Search, Plus, Edit, Upload, AlertCircle, CheckCircle2, Heart, ArrowRightLeft } from 'lucide-react';
+import { GENDER_LABELS, RESIDENT_STATUS, RESIDENT_STATUS_COLORS, RUKEM_STATUS, RUKEM_STATUS_COLORS } from '@/Helpers/constants';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import PrimaryButton from '@/Components/PrimaryButton';
 
-export default function Index({ residents, filters = {} }) {
+export default function Index({ residents, filters = {}, rukemStats = {} }) {
     const { flash, import_results } = usePage().props;
     const [search, setSearch] = useState(filters.search || '');
     const [sortBy, setSortBy] = useState(typeof filters?.sort === 'string' ? filters.sort : 'name');
@@ -115,6 +115,38 @@ export default function Index({ residents, filters = {} }) {
                 </div>
             )}
 
+            {rukemStats && Object.keys(rukemStats).length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 flex items-center gap-4 shadow-sm">
+                        <div className="bg-emerald-100 dark:bg-emerald-900/40 p-3 rounded-lg text-emerald-600 dark:text-emerald-400">
+                            <Heart size={20} />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Rukem Aktif</p>
+                            <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{rukemStats.aktif || 0}</p>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 flex items-center gap-4 shadow-sm">
+                        <div className="bg-purple-100 dark:bg-purple-900/40 p-3 rounded-lg text-purple-600 dark:text-purple-400">
+                            <Heart size={20} />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Warga Khusus (Kurang Mampu)</p>
+                            <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{rukemStats.khusus || 0}</p>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 flex items-center gap-4 shadow-sm">
+                        <div className="bg-amber-100 dark:bg-amber-900/40 p-3 rounded-lg text-amber-600 dark:text-amber-400">
+                            <Heart size={20} />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Rukem Nonaktif</p>
+                            <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{rukemStats.nonaktif || 0}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
@@ -155,18 +187,36 @@ export default function Index({ residents, filters = {} }) {
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-600 dark:text-slate-400 capitalize">
                                         {r.hubungan_keluarga ? r.hubungan_keluarga.replace('_', ' ') : '-'}
                                     </td>
+                                    <td className="whitespace-nowrap px-3 py-4">
+                                        <div className="flex flex-col gap-1">
+                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ring-1 ring-inset w-fit ${RESIDENT_STATUS_COLORS[r.status_penduduk] || ''}`}>
+                                                {RESIDENT_STATUS[r.status_penduduk] || r.status_penduduk}
+                                            </span>
+                                            {r.family_card?.rukem_member && (
+                                                <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ring-1 ring-inset w-fit ${RUKEM_STATUS_COLORS[r.family_card.rukem_member.status_keanggotaan] || ''}`}>
+                                                    Rukem: {RUKEM_STATUS[r.family_card.rukem_member.status_keanggotaan] || r.family_card.rukem_member.status_keanggotaan}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </td>
                                     <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-400 max-w-xs truncate">
                                         {r.alamat_sekarang || r.family_card?.alamat || '-'}
                                     </td>
-                                    <td className="whitespace-nowrap px-3 py-4">
-                                        <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold ring-1 ring-inset ${RESIDENT_STATUS_COLORS[r.status_penduduk] || ''}`}>
-                                            {RESIDENT_STATUS[r.status_penduduk] || r.status_penduduk}
-                                        </span>
-                                    </td>
                                     <td className="whitespace-nowrap py-4 pl-3 pr-6 text-right">
-                                        <Link href={route('rt.residents.edit', r.id)} className="text-blue-600 dark:text-blue-400 hover:text-blue-900 inline-flex items-center gap-1 text-sm font-semibold">
-                                            <Edit size={14} /> Edit
-                                        </Link>
+                                        <div className="flex justify-end gap-3 items-center">
+                                            <Link href={route('rt.residents.edit', r.id)} className="text-blue-600 dark:text-blue-400 hover:text-blue-900 inline-flex items-center gap-1 text-sm font-semibold">
+                                                <Edit size={14} /> Edit
+                                            </Link>
+                                            <div className="relative group">
+                                                <button className="text-amber-600 dark:text-amber-400 hover:text-amber-900 inline-flex items-center gap-1 text-sm font-semibold cursor-pointer">
+                                                    <ArrowRightLeft size={14} /> Mutasi
+                                                </button>
+                                                <div className="absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 flex flex-col py-1">
+                                                    <Link href={route('rt.mutations.move-out', { resident_id: r.id })} className="px-3 py-2 text-sm text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300">Pindah Keluar</Link>
+                                                    <Link href={route('rt.mutations.death', { resident_id: r.id })} className="px-3 py-2 text-sm text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300">Meninggal</Link>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             )) : (

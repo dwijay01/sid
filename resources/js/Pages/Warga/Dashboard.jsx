@@ -116,7 +116,7 @@ export default function Dashboard({ activeRequests, activeComplaintsCount, inter
                     ) : (
                         <div className="flex-1 flex flex-col justify-end">
                             <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Keluarga Anda belum berlangganan layanan Internet RT/RW.</p>
-                            <button className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 self-start">Info Langganan</button>
+                            <a href="https://wa.me/6285712399909" target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 self-start">Info Langganan</a>
                         </div>
                     )}
                 </div>

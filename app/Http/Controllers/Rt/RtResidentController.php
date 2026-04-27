@@ -21,7 +21,7 @@ class RtResidentController extends Controller
     public function create(Request $request)
     {
         $wilayahId = $this->getWilayahId();
-        $familyCards = FamilyCard::where('wilayah_id', $wilayahId)
+        $familyCards = FamilyCard::with('kepalaKeluarga:id,family_card_id,nama_lengkap')->where('wilayah_id', $wilayahId)
             ->select('id', 'no_kk')
             ->get();
 
@@ -71,7 +71,7 @@ class RtResidentController extends Controller
             abort(403, 'Warga bukan anggota wilayah Anda.');
         }
 
-        $familyCards = FamilyCard::where('wilayah_id', $wilayahId)
+        $familyCards = FamilyCard::with('kepalaKeluarga:id,family_card_id,nama_lengkap')->where('wilayah_id', $wilayahId)
             ->select('id', 'no_kk')
             ->get();
 

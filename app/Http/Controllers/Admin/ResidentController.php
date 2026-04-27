@@ -16,7 +16,7 @@ class ResidentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Resident::with('familyCard.wilayah');
+        $query = Resident::with(['familyCard.wilayah', 'familyCard.rukemMember']);
 
         if ($request->sort === 'kk') {
             $query->leftJoin('family_cards', 'residents.family_card_id', '=', 'family_cards.id')
@@ -40,16 +40,23 @@ class ResidentController extends Controller
 
         $residents = $query->paginate(15)->withQueryString();
 
+        $rukemStats = [
+            'aktif' => Resident::whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'aktif'))->count(),
+            'khusus' => Resident::whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'khusus'))->count(),
+            'nonaktif' => Resident::whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'nonaktif'))->count(),
+        ];
+
         return Inertia::render('Admin/Residents/Index', [
             'residents' => $residents,
-            'filters' => $request->only('search', 'sort')
+            'filters' => $request->only('search', 'sort'),
+            'rukemStats' => $rukemStats,
         ]);
     }
 
     public function create()
     {
         return Inertia::render('Admin/Residents/Form', [
-            'familyCards' => FamilyCard::select('id', 'no_kk')->get(),
+            'familyCards' => FamilyCard::with('kepalaKeluarga:id,family_card_id,nama_lengkap')->select('id', 'no_kk')->get(),
         ]);
     }
 
@@ -88,7 +95,7 @@ class ResidentController extends Controller
     {
         return Inertia::render('Admin/Residents/Form', [
             'resident' => $resident,
-            'familyCards' => FamilyCard::select('id', 'no_kk')->get(),
+            'familyCards' => FamilyCard::with('kepalaKeluarga:id,family_card_id,nama_lengkap')->select('id', 'no_kk')->get(),
         ]);
     }
 

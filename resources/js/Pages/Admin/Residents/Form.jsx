@@ -248,7 +248,9 @@ export default function Form({ resident, familyCards }) {
                                         >
                                             <option value="">- Belum Terdaftar di KK -</option>
                                             {familyCards.map(kk => (
-                                                <option key={kk.id} value={kk.id}>{kk.no_kk}</option>
+                                                <option key={kk.id} value={kk.id}>
+                                                    {kk.no_kk} {kk.kepala_keluarga ? `- ${kk.kepala_keluarga.nama_lengkap}` : ''}
+                                                </option>
                                             ))}
                                         </select>
                                     </div>

@@ -85,7 +85,7 @@ class RwDashboardController extends Controller
     {
         $wilayahIds = $this->getWilayahIds();
 
-        $query = Resident::with('familyCard.wilayah')
+        $query = Resident::with(['familyCard.wilayah', 'familyCard.rukemMember'])
             ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds));
 
         if ($request->sort === 'kk') {
@@ -118,10 +118,23 @@ class RwDashboardController extends Controller
 
         $wilayahList = WilayahRtRw::whereIn('id', $wilayahIds)->get(['id', 'rt', 'rw']);
 
+        $rukemStats = [
+            'aktif' => Resident::whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'aktif'))
+                ->count(),
+            'khusus' => Resident::whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'khusus'))
+                ->count(),
+            'nonaktif' => Resident::whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'nonaktif'))
+                ->count(),
+        ];
+
         return Inertia::render('Rw/Residents', [
             'residents' => $residents,
             'filters' => $request->only('search', 'rt', 'status', 'sort'),
             'wilayahList' => $wilayahList,
+            'rukemStats' => $rukemStats,
         ]);
     }
 
@@ -252,6 +265,17 @@ class RwDashboardController extends Controller
                     })
                     ->where('type', 'lahir')
                     ->orderByDesc('tanggal_mutasi')
+                    ->get();
+                break;
+            case 'umkm':
+                $data = Umkm::with('resident.familyCard.wilayah')
+                    ->whereHas('resident.familyCard', function($q) use ($wilayahIds, $rt) {
+                        $q->whereIn('wilayah_id', $wilayahIds);
+                        if ($rt) {
+                            $q->whereHas('wilayah', fn($q2) => $q2->where('rt', $rt));
+                        }
+                    })
+                    ->orderByDesc('created_at')
                     ->get();
                 break;
         }

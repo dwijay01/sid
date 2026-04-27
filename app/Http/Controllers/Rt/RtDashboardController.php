@@ -67,7 +67,7 @@ class RtDashboardController extends Controller
     {
         $wilayahId = $this->getWilayahId();
 
-        $query = Resident::with('familyCard.wilayah')
+        $query = Resident::with(['familyCard.wilayah', 'familyCard.rukemMember'])
             ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId));
 
         if ($request->sort === 'kk') {
@@ -95,9 +95,22 @@ class RtDashboardController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        $rukemStats = [
+            'aktif' => Resident::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'aktif'))
+                ->count(),
+            'khusus' => Resident::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'khusus'))
+                ->count(),
+            'nonaktif' => Resident::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'nonaktif'))
+                ->count(),
+        ];
+
         return Inertia::render('Rt/Residents/Index', [
             'residents' => $residents,
             'filters' => $request->only('search', 'status', 'sort'),
+            'rukemStats' => $rukemStats,
         ]);
     }
 

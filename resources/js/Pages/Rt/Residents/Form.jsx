@@ -139,7 +139,11 @@ export default function Form({ resident, familyCards = [], defaultFamilyCardId =
                                 <div className="flex gap-2">
                                     <select value={data.family_card_id} onChange={(e) => setData('family_card_id', e.target.value)} className={inputClass}>
                                         <option value="">-- Pilih KK --</option>
-                                        {localFamilyCards.map((fc) => <option key={fc.id} value={fc.id}>{fc.no_kk}</option>)}
+                                        {localFamilyCards.map((fc) => (
+                                            <option key={fc.id} value={fc.id}>
+                                                {fc.no_kk} {fc.kepala_keluarga ? `- ${fc.kepala_keluarga.nama_lengkap}` : ''}
+                                            </option>
+                                        ))}
                                     </select>
                                     <button 
                                         type="button" 

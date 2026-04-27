@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import RwLayout from '@/Layouts/RwLayout';
-import { FileBarChart, Printer, Users, Heart, ArrowRightLeft, ArrowDownToLine, Skull, Baby, FileSpreadsheet } from 'lucide-react';
+import { FileBarChart, Printer, Users, Heart, ArrowRightLeft, ArrowDownToLine, Skull, Baby, FileSpreadsheet, Store } from 'lucide-react';
 
 const reportTypes = [
     { key: 'penduduk', label: 'Data Penduduk', icon: Users, color: 'emerald' },
     { key: 'rukem', label: 'Rukun Kematian', icon: Heart, color: 'rose' },
+    { key: 'umkm', label: 'Data UMKM', icon: Store, color: 'purple' },
     { key: 'pindah', label: 'Warga Pindah', icon: ArrowRightLeft, color: 'amber' },
     { key: 'masuk', label: 'Warga Masuk', icon: ArrowDownToLine, color: 'blue' },
     { key: 'meninggal', label: 'Warga Meninggal', icon: Skull, color: 'red' },
@@ -43,7 +44,7 @@ export default function Reports({ data, type, wilayahList = [], filters = {} }) 
 
             <div className="mb-6">
                 <div className="rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
                         <div className="flex items-center gap-3">
                             <div className="bg-blue-100 dark:bg-blue-900/40 p-3 rounded-xl text-blue-600 dark:text-blue-400"><FileBarChart size={24} /></div>
                             <div>
@@ -51,23 +52,25 @@ export default function Reports({ data, type, wilayahList = [], filters = {} }) 
                                 <p className="text-sm text-slate-500 dark:text-slate-400">Pilih jenis report untuk ditampilkan dan dicetak.</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
                             <select
                                 value={selectedRt}
                                 onChange={handleRtChange}
-                                className="border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm focus:ring-teal-500 focus:border-teal-500 print:hidden"
+                                className="w-full sm:w-auto border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm focus:ring-teal-500 focus:border-teal-500 print:hidden"
                             >
                                 <option value="">Semua RT</option>
                                 {wilayahList.map((w) => (
                                     <option key={w.id} value={w.rt}>RT {w.rt}</option>
                                 ))}
                             </select>
-                            <button onClick={handleExportExcel} className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-bold shadow-sm transition-colors print:hidden">
-                                <FileSpreadsheet size={16} /> Export Excel
-                            </button>
-                            <button onClick={handlePrint} className="inline-flex items-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-sm font-bold shadow-sm transition-colors print:hidden">
-                                <Printer size={16} /> Cetak
-                            </button>
+                            <div className="flex gap-2 w-full sm:w-auto">
+                                <button onClick={handleExportExcel} className="flex-1 sm:flex-none justify-center inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-bold shadow-sm transition-colors print:hidden">
+                                    <FileSpreadsheet size={16} /> Export
+                                </button>
+                                <button onClick={handlePrint} className="flex-1 sm:flex-none justify-center inline-flex items-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-sm font-bold shadow-sm transition-colors print:hidden">
+                                    <Printer size={16} /> Cetak
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -164,6 +167,38 @@ export default function Reports({ data, type, wilayahList = [], filters = {} }) 
                             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                                 {data.map((m, i) => (
                                     <tr key={m.id}><td className="py-2 pl-6 pr-3">{i + 1}</td><td className="px-3 py-2"><div className="font-semibold">{m.resident?.nama_lengkap}</div><div className="text-xs text-slate-500 font-mono">{m.resident?.nik}</div></td><td className="px-3 py-2">{new Date(m.tanggal_mutasi).toLocaleDateString('id-ID')}</td><td className="px-3 py-2">{m.asal_tujuan || '-'}</td><td className="px-3 py-2">{m.keterangan || '-'}</td></tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+
+                    {activeType === 'umkm' && (
+                        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-sm">
+                            <thead className="bg-slate-50 dark:bg-slate-800/50">
+                                <tr>
+                                    <th className="py-3 pl-6 pr-3 text-left text-xs font-bold text-slate-500 uppercase">No</th>
+                                    <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">Nama Usaha / Bidang</th>
+                                    <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">Pemilik (Warga)</th>
+                                    <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">RT/RW</th>
+                                    <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">Omzet</th>
+                                    <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">Tenaga Kerja</th>
+                                    <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">Tahun Berdiri</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                                {data.map((u, i) => (
+                                    <tr key={u.id}>
+                                        <td className="py-2 pl-6 pr-3">{i + 1}</td>
+                                        <td className="px-3 py-2">
+                                            <div className="font-semibold text-purple-700 dark:text-purple-400">{u.nama_usaha}</div>
+                                            <div className="text-xs text-slate-500 capitalize">{u.sektor_usaha}</div>
+                                        </td>
+                                        <td className="px-3 py-2">{u.resident?.nama_lengkap}</td>
+                                        <td className="px-3 py-2">{u.resident?.familyCard?.wilayah ? `RT ${u.resident.familyCard.wilayah.rt}/RW ${u.resident.familyCard.wilayah.rw}` : '-'}</td>
+                                        <td className="px-3 py-2">{u.rentang_omzet}</td>
+                                        <td className="px-3 py-2">{u.jumlah_karyawan} org</td>
+                                        <td className="px-3 py-2">{u.tahun_berdiri}</td>
+                                    </tr>
                                 ))}
                             </tbody>
                         </table>

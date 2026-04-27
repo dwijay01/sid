@@ -32,9 +32,16 @@ class RtRukemController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        $rukemStats = [
+            'aktif' => RukemMember::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))->where('status_keanggotaan', 'aktif')->count(),
+            'khusus' => RukemMember::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))->where('status_keanggotaan', 'khusus')->count(),
+            'nonaktif' => RukemMember::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))->where('status_keanggotaan', 'nonaktif')->count(),
+        ];
+
         return Inertia::render('Rt/Rukem/Index', [
             'members' => $members,
             'filters' => $request->only('search', 'status'),
+            'rukemStats' => $rukemStats,
         ]);
     }
 

@@ -37,6 +37,9 @@ class MutationController extends Controller
     public function create()
     {
         $residents = Resident::where('status_penduduk', 'aktif')
+            ->whereDoesntHave('mutations', function ($q) {
+                $q->whereIn('type', ['mati', 'pindah_keluar']);
+            })
             ->get(['id', 'nik', 'nama_lengkap']);
 
         return Inertia::render('Admin/Mutations/Create', [
@@ -147,6 +150,9 @@ class MutationController extends Controller
     public function createDeath()
     {
         $residents = Resident::where('status_penduduk', 'aktif')
+            ->whereDoesntHave('mutations', function ($q) {
+                $q->whereIn('type', ['mati', 'pindah_keluar']);
+            })
             ->get(['id', 'nik', 'nama_lengkap']);
 
         return Inertia::render('Admin/Mutations/CreateDeath', [

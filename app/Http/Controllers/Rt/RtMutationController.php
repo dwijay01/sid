@@ -42,6 +42,9 @@ class RtMutationController extends Controller
     {
         $wilayahId = $this->getWilayahId();
         $residents = Resident::where('status_penduduk', 'aktif')
+            ->whereDoesntHave('mutations', function ($q) {
+                $q->whereIn('type', ['mati', 'pindah_keluar']);
+            })
             ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
             ->get(['id', 'nik', 'nama_lengkap']);
 
@@ -135,6 +138,9 @@ class RtMutationController extends Controller
     {
         $wilayahId = $this->getWilayahId();
         $residents = Resident::where('status_penduduk', 'aktif')
+            ->whereDoesntHave('mutations', function ($q) {
+                $q->whereIn('type', ['mati', 'pindah_keluar']);
+            })
             ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
             ->get(['id', 'nik', 'nama_lengkap']);
 

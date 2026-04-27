@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Search, Plus, MoreVertical, Edit2, Trash2, Eye, Download, Upload, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Search, Plus, MoreVertical, Edit2, Trash2, Eye, Download, Upload, CheckCircle2, AlertCircle, Heart } from 'lucide-react';
+import { RUKEM_STATUS, RUKEM_STATUS_COLORS } from '@/Helpers/constants';
 import Dropdown from '@/Components/Dropdown';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import PrimaryButton from '@/Components/PrimaryButton';
 
-export default function Index({ residents, filters }) {
+export default function Index({ residents, filters, rukemStats = {} }) {
     const { flash, import_results } = usePage().props;
     const [search, setSearch] = useState(filters.search || '');
     const [sortBy, setSortBy] = useState(typeof filters?.sort === 'string' ? filters.sort : 'name');
@@ -94,6 +95,38 @@ export default function Index({ residents, filters }) {
                     </Link>
                 </div>
             </div>
+
+            {rukemStats && Object.keys(rukemStats).length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 flex items-center gap-4 shadow-sm">
+                        <div className="bg-emerald-100 dark:bg-emerald-900/40 p-3 rounded-lg text-emerald-600 dark:text-emerald-400">
+                            <Heart size={20} />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Rukem Aktif</p>
+                            <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{rukemStats.aktif || 0}</p>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 flex items-center gap-4 shadow-sm">
+                        <div className="bg-purple-100 dark:bg-purple-900/40 p-3 rounded-lg text-purple-600 dark:text-purple-400">
+                            <Heart size={20} />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Warga Khusus (Kurang Mampu)</p>
+                            <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{rukemStats.khusus || 0}</p>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 flex items-center gap-4 shadow-sm">
+                        <div className="bg-amber-100 dark:bg-amber-900/40 p-3 rounded-lg text-amber-600 dark:text-amber-400">
+                            <Heart size={20} />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Rukem Nonaktif</p>
+                            <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{rukemStats.nonaktif || 0}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="glass bg-white dark:bg-slate-800 p-4 mb-6 shadow-sm rounded-xl">
                 <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4">
@@ -191,13 +224,20 @@ export default function Index({ residents, filters }) {
                                             </span>
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
-                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
+                                            <div className="flex flex-col gap-1">
+                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset w-fit ${
                                                 resident.status_penduduk === 'aktif' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 ring-emerald-600/20' : 
                                                 resident.status_penduduk === 'meninggal' ? 'bg-red-50 dark:bg-red-900/30 text-red-700 ring-red-600/20' : 
                                                 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 ring-slate-600/20'
                                             }`}>
-                                            {resident.status_penduduk.charAt(0).toUpperCase() + resident.status_penduduk.slice(1)}
-                                        </span>
+                                                {resident.status_penduduk.charAt(0).toUpperCase() + resident.status_penduduk.slice(1)}
+                                            </span>
+                                            {resident.family_card?.rukem_member && (
+                                                <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset w-fit ${RUKEM_STATUS_COLORS[resident.family_card.rukem_member.status_keanggotaan] || ''}`}>
+                                                    Rukem: {RUKEM_STATUS[resident.family_card.rukem_member.status_keanggotaan] || resident.family_card.rukem_member.status_keanggotaan}
+                                                </span>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-3 py-4 text-sm text-slate-500 dark:text-slate-400 max-w-xs truncate">
                                         {resident.alamat_sekarang || resident.family_card?.alamat || '-'}
