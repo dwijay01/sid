@@ -118,15 +118,15 @@ class RwDashboardController extends Controller
 
         $wilayahList = WilayahRtRw::whereIn('id', $wilayahIds)->get(['id', 'rt', 'rw']);
 
-        $rukemStats = [
-            'aktif' => Resident::whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
-                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'aktif'))
+        $keaktifanStats = [
+            'aktif' => Resident::where('status_penduduk', 'aktif')
+                ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds)->where('kategori_aktif', 'aktif'))
                 ->count(),
-            'khusus' => Resident::whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
-                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'khusus'))
+            'kurang_mampu' => Resident::where('status_penduduk', 'aktif')
+                ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds)->where('kategori_aktif', 'kurang_mampu'))
                 ->count(),
-            'nonaktif' => Resident::whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
-                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'nonaktif'))
+            'tidak_aktif' => Resident::where('status_penduduk', 'aktif')
+                ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds)->where('kategori_aktif', 'tidak_aktif'))
                 ->count(),
         ];
 
@@ -134,7 +134,7 @@ class RwDashboardController extends Controller
             'residents' => $residents,
             'filters' => $request->only('search', 'rt', 'status', 'sort'),
             'wilayahList' => $wilayahList,
-            'rukemStats' => $rukemStats,
+            'keaktifanStats' => $keaktifanStats,
         ]);
     }
 
@@ -156,9 +156,25 @@ class RwDashboardController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        $rukemStats = [
+            'aktif' => Resident::whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'aktif'))
+                ->where('status_penduduk', 'aktif')
+                ->count(),
+            'khusus' => Resident::whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'khusus'))
+                ->where('status_penduduk', 'aktif')
+                ->count(),
+            'nonaktif' => Resident::whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'nonaktif'))
+                ->where('status_penduduk', 'aktif')
+                ->count(),
+        ];
+
         return Inertia::render('Rw/RukemMembers', [
             'members' => $members,
             'filters' => $request->only('search', 'status'),
+            'rukemStats' => $rukemStats,
         ]);
     }
 
@@ -298,7 +314,7 @@ class RwDashboardController extends Controller
     {
         $wilayahIds = $this->getWilayahIds();
 
-        $letters = LetterRequest::with(['resident', 'letterType', 'pemohon'])
+        $letters = LetterRequest::with(['resident.familyCard', 'letterType', 'pemohon'])
             ->whereIn('wilayah_id', $wilayahIds)
             ->when($request->status, fn($q, $s) => $q->where('status', $s))
             ->orderByDesc('created_at')
@@ -333,6 +349,17 @@ class RwDashboardController extends Controller
         return Inertia::render('Rw/FamilyCards', [
             'familyCards' => $familyCards,
             'filters' => $request->only('search')
+        ]);
+    }
+
+    public function showFamilyCard(FamilyCard $familyCard)
+    {
+        if (!in_array($familyCard->wilayah_id, $this->getWilayahIds())) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        return Inertia::render('Rw/FamilyCards/Show', [
+            'familyCard' => $familyCard->load(['kepalaKeluarga', 'wilayah', 'anggotaKeluarga']),
         ]);
     }
 }

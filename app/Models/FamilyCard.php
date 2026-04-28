@@ -22,6 +22,7 @@ class FamilyCard extends Model
         'sumber_air_minum',
         'alamat_domisili',
         'status',
+        'kategori_aktif',
     ];
 
     public function kepalaKeluarga(): BelongsTo
@@ -36,7 +37,7 @@ class FamilyCard extends Model
 
     public function anggotaKeluarga(): HasMany
     {
-        return $this->hasMany(Resident::class, 'family_card_id');
+        return $this->hasMany(Resident::class, 'family_card_id')->where('status_penduduk', 'aktif');
     }
 
     public function getMemberCountAttribute(): int

@@ -110,6 +110,9 @@ export default function Index({ familyCards, filters }) {
                                             <Link href={route('rt.residents.create', { family_card_id: kk.id })} className="text-emerald-600 hover:text-emerald-900 p-1.5 rounded hover:bg-emerald-50 dark:hover:bg-emerald-900/30" title="Tambah Anggota KK">
                                                 <UserPlus size={16} />
                                             </Link>
+                                            <Link href={route('rt.family-cards.show', kk.id)} className="text-indigo-600 hover:text-indigo-900 p-1.5 rounded hover:bg-indigo-50 dark:hover:bg-indigo-900/30" title="Detail KK">
+                                                <Users size={16} />
+                                            </Link>
                                             <Link href={route('rt.family-cards.edit', kk.id)} className="text-blue-600 hover:text-blue-900 p-1.5 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30" title="Edit KK">
                                                 <Edit size={16} />
                                             </Link>

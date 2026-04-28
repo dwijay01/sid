@@ -94,6 +94,15 @@ class RolePermissionSeeder extends Seeder
             'approve-letter-request',
         ]);
 
+        // Pengurus RW - view all data in RW, manage RT access (no reports)
+        Role::firstOrCreate(['name' => 'pengurus_rw'])->syncPermissions([
+            'view-residents', 'view-family-cards', 'view-wilayah',
+            'view-rukem-data',
+            'manage-rt-users',
+            'view-wilayah-letter-requests',
+            'approve-letter-request',
+        ]);
+
         // Ketua RT - input data scoped to their RT
         Role::firstOrCreate(['name' => 'rt'])->syncPermissions([
             'view-residents', 'create-residents', 'edit-residents',

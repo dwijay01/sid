@@ -48,6 +48,7 @@ class FamilyCardController extends Controller
             'wilayah_id' => 'required|exists:wilayah_rt_rw,id',
             'alamat' => 'required|string',
             'kode_pos' => 'nullable|string|max:10',
+            'kategori_aktif' => 'required|in:aktif,kurang_mampu,tidak_aktif',
         ]);
 
         $familyCard = FamilyCard::create($validated);
@@ -87,6 +88,7 @@ class FamilyCardController extends Controller
             'alamat' => 'required|string',
             'kode_pos' => 'nullable|string|max:10',
             'status' => 'required|in:aktif,pecah_kk,pindah,hilang',
+            'kategori_aktif' => 'required|in:aktif,kurang_mampu,tidak_aktif',
         ]);
 
         // If head of family changes, update logic here...

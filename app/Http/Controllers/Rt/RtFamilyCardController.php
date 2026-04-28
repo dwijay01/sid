@@ -69,6 +69,7 @@ class RtFamilyCardController extends Controller
             'fasilitas_sanitasi' => 'nullable|string|in:milik_sendiri,mck_umum,tidak_punya',
             'sumber_air_minum' => 'nullable|string|in:pdam,sumur_bor,sumur_gali,mata_air,sungai',
             'alamat_domisili' => 'nullable|string',
+            'kategori_aktif' => 'required|in:aktif,kurang_mampu,tidak_aktif',
         ]);
 
         $validated['wilayah_id'] = $this->getWilayahId();
@@ -101,6 +102,17 @@ class RtFamilyCardController extends Controller
         return response()->json([
             'success' => true,
             'family_card' => $familyCard
+        ]);
+    }
+
+    public function show(FamilyCard $familyCard)
+    {
+        if ($familyCard->wilayah_id != $this->getWilayahId()) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        return Inertia::render('Rt/FamilyCards/Show', [
+            'familyCard' => $familyCard->load(['kepalaKeluarga', 'wilayah', 'anggotaKeluarga']),
         ]);
     }
 
@@ -142,6 +154,7 @@ class RtFamilyCardController extends Controller
             'sumber_air_minum' => 'nullable|string|in:pdam,sumur_bor,sumur_gali,mata_air,sungai',
             'alamat_domisili' => 'nullable|string',
             'status' => 'required|in:aktif,pecah_kk,pindah,hilang',
+            'kategori_aktif' => 'required|in:aktif,kurang_mampu,tidak_aktif',
         ]);
 
         $familyCard->update($validated);

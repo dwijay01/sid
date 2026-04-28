@@ -87,11 +87,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is Ketua RW.
+     * Check if user is Ketua RW or Pengurus RW.
      */
     public function isRw(): bool
     {
-        return $this->hasRole('rw');
+        return $this->hasRole(['rw', 'pengurus_rw']);
     }
 
     /**

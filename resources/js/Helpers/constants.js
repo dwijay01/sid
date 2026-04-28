@@ -106,12 +106,28 @@ export const RESIDENT_STATUS_COLORS = {
 };
 
 /**
+ * Kategori Keaktifan Warga (Level KK)
+ */
+export const KATEGORI_AKTIF = {
+    aktif: 'Aktif',
+    kurang_mampu: 'Kurang Mampu',
+    tidak_aktif: 'Tidak Aktif',
+};
+
+export const KATEGORI_AKTIF_COLORS = {
+    aktif: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
+    kurang_mampu: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+    tidak_aktif: 'bg-rose-50 text-rose-700 ring-rose-600/20',
+};
+
+/**
  * Role labels
  */
 export const ROLE_LABELS = {
     kades: 'Kepala Desa',
     operator: 'Operator/Admin',
     rw: 'Ketua RW',
+    pengurus_rw: 'Pengurus RW',
     rt: 'Ketua RT',
     sie_rukem: 'Sie. Rukun Kematian',
     kepala_kk: 'Kepala Keluarga',

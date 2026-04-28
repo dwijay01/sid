@@ -40,6 +40,11 @@ export default function Letters({ letters, filters = {} }) {
                                     <td className="whitespace-nowrap py-4 pl-6 pr-3">
                                         <div className="font-bold text-slate-900 dark:text-white text-sm">{l.resident?.nama_lengkap}</div>
                                         <div className="text-xs text-slate-500 font-mono">{l.resident?.nik}</div>
+                                        {l.resident?.family_card?.kategori_aktif === 'tidak_aktif' && (
+                                            <div className="mt-1 inline-flex items-center rounded-md bg-red-50 dark:bg-red-900/20 px-2 py-1 text-xs font-bold text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/20">
+                                                ⚠️ Warga Tidak Aktif
+                                            </div>
+                                        )}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm font-semibold text-slate-800 dark:text-slate-200">{l.letter_type?.nama_surat || l.letter_type?.name}</td>
                                     <td className="px-3 py-4 text-sm text-slate-600 dark:text-slate-400 max-w-xs truncate">{l.keperluan}</td>

@@ -28,9 +28,13 @@ export default function RwLayout({ header, children }) {
         { name: 'Data UMKM', href: route('rw.umkm'), icon: Store, current: route().current('rw.umkm') },
         { name: 'Data Rukun Kematian', href: route('rw.rukem'), icon: Heart, current: route().current('rw.rukem') },
         { name: 'Pengaduan Warga', href: route('rw.complaints.index'), icon: MessageSquareWarning, current: route().current('rw.complaints.*') },
-        { name: 'Report & Cetak', href: route('rw.reports'), icon: FileBarChart, current: route().current('rw.reports') },
+        { name: 'Report & Cetak', href: route('rw.reports'), icon: FileBarChart, current: route().current('rw.reports'), show: user.roles.includes('rw') },
         { name: 'Kelola Akses RT', href: route('rw.rt-users.index'), icon: UserCog, current: route().current('rw.rt-users.*') },
-    ];
+    ].filter(item => item.show !== false);
+
+    const isPengurus = user.roles.includes('pengurus_rw');
+    const portalTitle = isPengurus ? 'Portal Pengurus RW' : 'Portal Ketua RW';
+    const roleTitle = isPengurus ? 'Pengurus RW' : 'Ketua RW';
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200">
@@ -45,7 +49,7 @@ export default function RwLayout({ header, children }) {
             <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-teal-900 text-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="flex h-16 shrink-0 items-center px-6 border-b border-teal-800">
                     <div className="h-8 w-8 rounded-lg bg-teal-500 flex items-center justify-center text-white font-bold text-sm">RW</div>
-                    <span className="ml-3 text-lg font-bold tracking-tight text-white">Portal Ketua RW</span>
+                    <span className="ml-3 text-lg font-bold tracking-tight text-white">{portalTitle}</span>
                 </div>
                 
                 <div className="flex flex-col h-[calc(100vh-4rem)]">
@@ -83,7 +87,7 @@ export default function RwLayout({ header, children }) {
                             </div>
                             <div className="ml-3 flex-1 overflow-hidden">
                                 <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                                <p className="text-xs text-teal-300 truncate">Ketua RW</p>
+                                <p className="text-xs text-teal-300 truncate">{roleTitle}</p>
                             </div>
                         </div>
                     </div>

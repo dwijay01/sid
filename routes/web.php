@@ -132,16 +132,21 @@ Route::middleware('auth')->group(function () {
     });
 
     // -------------------------------------------------------------
-    // RW ROUTES (KETUA RW)
+    // RW ROUTES (KETUA RW & PENGURUS RW)
     // -------------------------------------------------------------
-    Route::middleware(['role:rw'])->prefix('rw')->name('rw.')->group(function () {
+    Route::middleware(['role:rw|pengurus_rw'])->prefix('rw')->name('rw.')->group(function () {
         Route::get('/dashboard', [RwDashboardController::class, 'index'])->name('dashboard');
         Route::get('/residents', [RwDashboardController::class, 'residents'])->name('residents');
         Route::get('/family-cards', [RwDashboardController::class, 'familyCards'])->name('family-cards');
+        Route::get('/family-cards/{familyCard}', [RwDashboardController::class, 'showFamilyCard'])->name('family-cards.show');
         Route::get('/rukem', [RwDashboardController::class, 'rukemMembers'])->name('rukem');
         Route::get('/umkm', [RwDashboardController::class, 'umkm'])->name('umkm');
-        Route::get('/reports', [RwDashboardController::class, 'reports'])->name('reports');
         Route::get('/letters', [RwDashboardController::class, 'letters'])->name('letters');
+
+        // Only RW can access reports
+        Route::middleware(['role:rw'])->group(function () {
+            Route::get('/reports', [RwDashboardController::class, 'reports'])->name('reports');
+        });
 
         // Manage RT Users
         Route::get('/rt-users', [RtUserController::class, 'index'])->name('rt-users.index');
@@ -166,7 +171,7 @@ Route::middleware('auth')->group(function () {
         
         // Family Cards
         Route::post('/family-cards/quick-store', [RtFamilyCardController::class, 'quickStore'])->name('family-cards.quick-store');
-        Route::resource('family-cards', RtFamilyCardController::class)->except(['show']);
+        Route::resource('family-cards', RtFamilyCardController::class);
 
         // Resident CRUD
         Route::get('/residents/create', [RtResidentController::class, 'create'])->name('residents.create');

@@ -58,6 +58,7 @@ export default function FamilyCards({ familyCards, filters = {} }) {
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Anggota</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Alamat</th>
                                 <th className="px-3 py-3.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                                <th className="py-3.5 pl-3 pr-6 text-right text-xs font-bold text-slate-500 uppercase">Aksi</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -87,9 +88,14 @@ export default function FamilyCards({ familyCards, filters = {} }) {
                                             {kk.status.toUpperCase()}
                                         </span>
                                     </td>
+                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                        <Link href={route('rw.family-cards.show', kk.id)} className="text-teal-600 hover:text-teal-900 p-1.5 rounded hover:bg-teal-50 dark:hover:bg-teal-900/30 inline-flex items-center gap-1">
+                                            <Users size={16} /> Detail
+                                        </Link>
+                                    </td>
                                 </tr>
                             )) : (
-                                <tr><td colSpan="5" className="px-6 py-12 text-center text-sm text-slate-500">Tidak ada data Kartu Keluarga.</td></tr>
+                                <tr><td colSpan="6" className="px-6 py-12 text-center text-sm text-slate-500">Tidak ada data Kartu Keluarga.</td></tr>
                             )}
                         </tbody>
                     </table>

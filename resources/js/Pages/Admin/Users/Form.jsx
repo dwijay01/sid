@@ -82,8 +82,7 @@ export default function Form({ user, roles = [], wilayah = [] }) {
                             </select>
                             {errors.role && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.role}</p>}
                         </div>
-
-                        {(data.role === 'rt' || data.role === 'rw' || data.role === 'sie_rukem' || data.role === 'sie_pemberdayaan') && (
+                        {(data.role === 'rt' || data.role === 'rw' || data.role === 'pengurus_rw' || data.role === 'sie_rukem' || data.role === 'sie_pemberdayaan') && (
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Wilayah Kerja *</label>
                                 <select 

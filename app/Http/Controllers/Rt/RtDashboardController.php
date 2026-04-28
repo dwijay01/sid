@@ -95,22 +95,22 @@ class RtDashboardController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        $rukemStats = [
-            'aktif' => Resident::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
-                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'aktif'))
+        $keaktifanStats = [
+            'aktif' => Resident::where('status_penduduk', 'aktif')
+                ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId)->where('kategori_aktif', 'aktif'))
                 ->count(),
-            'khusus' => Resident::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
-                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'khusus'))
+            'kurang_mampu' => Resident::where('status_penduduk', 'aktif')
+                ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId)->where('kategori_aktif', 'kurang_mampu'))
                 ->count(),
-            'nonaktif' => Resident::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
-                ->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'nonaktif'))
+            'tidak_aktif' => Resident::where('status_penduduk', 'aktif')
+                ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId)->where('kategori_aktif', 'tidak_aktif'))
                 ->count(),
         ];
 
         return Inertia::render('Rt/Residents/Index', [
             'residents' => $residents,
             'filters' => $request->only('search', 'status', 'sort'),
-            'rukemStats' => $rukemStats,
+            'keaktifanStats' => $keaktifanStats,
         ]);
     }
 

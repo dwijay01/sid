@@ -10,6 +10,7 @@ export default function Form({ familyCard = null, residents = [] }) {
         alamat: familyCard?.alamat || '',
         kode_pos: familyCard?.kode_pos || '',
         status: familyCard?.status || 'aktif',
+        kategori_aktif: familyCard?.kategori_aktif || 'aktif',
         status_kepemilikan_bangunan: familyCard?.status_kepemilikan_bangunan || '',
         jenis_lantai: familyCard?.jenis_lantai || '',
         jenis_dinding: familyCard?.jenis_dinding || '',
@@ -83,6 +84,16 @@ export default function Form({ familyCard = null, residents = [] }) {
                                     {errors.status && <p className="mt-1 text-sm text-red-600">{errors.status}</p>}
                                 </div>
                             )}
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kategori Keaktifan Warga *</label>
+                                <select value={data.kategori_aktif} onChange={(e) => setData('kategori_aktif', e.target.value)} className={inputClass}>
+                                    <option value="aktif">Aktif</option>
+                                    <option value="kurang_mampu">Kurang Mampu</option>
+                                    <option value="tidak_aktif">Tidak Aktif</option>
+                                </select>
+                                {errors.kategori_aktif && <p className="mt-1 text-sm text-red-600">{errors.kategori_aktif}</p>}
+                            </div>
                         </div>
                     </div>
 

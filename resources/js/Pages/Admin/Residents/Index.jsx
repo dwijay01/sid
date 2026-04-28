@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Search, Plus, MoreVertical, Edit2, Trash2, Eye, Download, Upload, CheckCircle2, AlertCircle, Heart } from 'lucide-react';
-import { RUKEM_STATUS, RUKEM_STATUS_COLORS } from '@/Helpers/constants';
+import { GENDER_LABELS, RESIDENT_STATUS, RESIDENT_STATUS_COLORS, RUKEM_STATUS, RUKEM_STATUS_COLORS, KATEGORI_AKTIF, KATEGORI_AKTIF_COLORS } from '@/Helpers/constants';
 import Dropdown from '@/Components/Dropdown';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
@@ -184,6 +184,9 @@ export default function Index({ residents, filters, rukemStats = {} }) {
                                     Status
                                 </th>
                                 <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-slate-900 dark:text-white">
+                                    Keaktifan
+                                </th>
+                                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-slate-900 dark:text-white">
                                     Alamat
                                 </th>
                                 <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -238,6 +241,15 @@ export default function Index({ residents, filters, rukemStats = {} }) {
                                                 </span>
                                             )}
                                         </div>
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                        {resident.family_card?.kategori_aktif ? (
+                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${KATEGORI_AKTIF_COLORS[resident.family_card.kategori_aktif] || ''}`}>
+                                                {KATEGORI_AKTIF[resident.family_card.kategori_aktif] || resident.family_card.kategori_aktif}
+                                            </span>
+                                        ) : (
+                                            <span className="text-slate-400">-</span>
+                                        )}
                                     </td>
                                     <td className="px-3 py-4 text-sm text-slate-500 dark:text-slate-400 max-w-xs truncate">
                                         {resident.alamat_sekarang || resident.family_card?.alamat || '-'}

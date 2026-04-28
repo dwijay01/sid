@@ -13,6 +13,7 @@ export default function Form({ familyCard, residents, wilayah }) {
         alamat: familyCard?.alamat || '',
         kode_pos: familyCard?.kode_pos || '',
         status: familyCard?.status || 'aktif',
+        kategori_aktif: familyCard?.kategori_aktif || 'aktif',
     });
 
     const handleSubmit = (e) => {
@@ -150,6 +151,23 @@ export default function Form({ familyCard, residents, wilayah }) {
                                         </div>
                                     </div>
                                 )}
+
+                                <div className="sm:col-span-2">
+                                    <label htmlFor="kategori_aktif" className="block text-sm font-medium leading-6 text-slate-900 dark:text-white">Kategori Keaktifan</label>
+                                    <div className="mt-2">
+                                        <select
+                                            id="kategori_aktif"
+                                            value={data.kategori_aktif}
+                                            onChange={e => setData('kategori_aktif', e.target.value)}
+                                            className={`block w-full rounded-md border-0 py-2 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ${errors.kategori_aktif ? 'ring-red-500 focus:ring-red-500' : 'ring-slate-300 dark:ring-slate-700 focus:ring-emerald-600'} sm:text-sm sm:leading-6 bg-slate-50 dark:bg-slate-800/50`}
+                                        >
+                                            <option value="aktif">Aktif</option>
+                                            <option value="kurang_mampu">Kurang Mampu</option>
+                                            <option value="tidak_aktif">Tidak Aktif</option>
+                                        </select>
+                                        {errors.kategori_aktif && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.kategori_aktif}</p>}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
