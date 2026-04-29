@@ -21,8 +21,8 @@ class RtResidentController extends Controller
     public function create(Request $request)
     {
         $wilayahId = $this->getWilayahId();
-        $familyCards = FamilyCard::with('kepalaKeluarga:id,family_card_id,nama_lengkap')->where('wilayah_id', $wilayahId)
-            ->select('id', 'no_kk')
+        $familyCards = FamilyCard::with('kepalaKeluarga:id,nama_lengkap')->where('wilayah_id', $wilayahId)
+            ->select('id', 'no_kk', 'kepala_keluarga_id')
             ->get();
 
         return Inertia::render('Rt/Residents/Form', [
@@ -71,8 +71,8 @@ class RtResidentController extends Controller
             abort(403, 'Warga bukan anggota wilayah Anda.');
         }
 
-        $familyCards = FamilyCard::with('kepalaKeluarga:id,family_card_id,nama_lengkap')->where('wilayah_id', $wilayahId)
-            ->select('id', 'no_kk')
+        $familyCards = FamilyCard::with('kepalaKeluarga:id,nama_lengkap')->where('wilayah_id', $wilayahId)
+            ->select('id', 'no_kk', 'kepala_keluarga_id')
             ->get();
 
         return Inertia::render('Rt/Residents/Form', [

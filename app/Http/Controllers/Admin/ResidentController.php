@@ -56,7 +56,7 @@ class ResidentController extends Controller
     public function create()
     {
         return Inertia::render('Admin/Residents/Form', [
-            'familyCards' => FamilyCard::with('kepalaKeluarga:id,family_card_id,nama_lengkap')->select('id', 'no_kk')->get(),
+            'familyCards' => FamilyCard::with('kepalaKeluarga:id,nama_lengkap')->select('id', 'no_kk', 'kepala_keluarga_id')->get(),
         ]);
     }
 
@@ -95,7 +95,7 @@ class ResidentController extends Controller
     {
         return Inertia::render('Admin/Residents/Form', [
             'resident' => $resident,
-            'familyCards' => FamilyCard::with('kepalaKeluarga:id,family_card_id,nama_lengkap')->select('id', 'no_kk')->get(),
+            'familyCards' => FamilyCard::with('kepalaKeluarga:id,nama_lengkap')->select('id', 'no_kk', 'kepala_keluarga_id')->get(),
         ]);
     }
 
