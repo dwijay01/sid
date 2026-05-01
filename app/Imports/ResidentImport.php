@@ -41,6 +41,8 @@ class ResidentImport implements ToCollection, WithStartRow, WithMultipleSheets
         return 7; // Data starts at Row 7
     }
 
+    private $currentHeadNik = null;
+
     public function collection(Collection $rows)
     {
         $currentFamilyCard = null;
@@ -57,30 +59,48 @@ class ResidentImport implements ToCollection, WithStartRow, WithMultipleSheets
             }
 
             $nik = trim((string)$row[4]);
+            $noKkFromExcel = trim((string)($row[5] ?? ''));
             $nama = trim((string)$row[2]);
             $hubungan = trim((string)$row[3]);
 
-            // If it's Head of Family (KK), create or find Family Card
+            // If it's Head of Family (KK), update tracked KK NIK
             if ($hubungan === 'KK' || $hubungan === 'Kepala Keluarga') {
+                $this->currentHeadNik = $nik;
+                $finalNoKk = $noKkFromExcel ?: $nik;
+                
                 $currentFamilyCard = FamilyCard::updateOrCreate(
-                    ['no_kk' => $nik], // User request: use NIK as temporary No KK
+                    ['no_kk' => $finalNoKk],
                     [
                         'wilayah_id' => $this->wilayahId,
-                        'alamat' => $row[9] ?? '-',
+                        'alamat' => $row[10] ?? '-', // shifted from 9
                         'status' => 'aktif'
                     ]
                 );
+            } else {
+                // For members, if No KK is empty, use the current head's NIK
+                $finalNoKk = $noKkFromExcel ?: $this->currentHeadNik;
+                
+                if ($finalNoKk) {
+                    $currentFamilyCard = FamilyCard::firstOrCreate(
+                        ['no_kk' => $finalNoKk],
+                        [
+                            'wilayah_id' => $this->wilayahId,
+                            'alamat' => $row[10] ?? '-', // shifted from 9
+                            'status' => 'aktif'
+                        ]
+                    );
+                }
             }
 
-            // Parse Birth Info
-            $birthInfo = $this->parseBirthInfo($row[7] ?? '');
+            // Parse Birth Info - shifted from 7 to 8
+            $birthInfo = $this->parseBirthInfo($row[8] ?? '');
             $needsUpdate = ($birthInfo['date'] === null);
             
-            // Gender
+            // Gender - shifted from 5/6 to 6/7
             $gender = 'L';
-            if (!empty($row[6]) && strtoupper(trim((string)$row[6])) === 'P') {
+            if (!empty($row[7]) && strtoupper(trim((string)$row[7])) === 'P') {
                 $gender = 'P';
-            } elseif (empty($row[5]) && !empty($row[6])) {
+            } elseif (empty($row[6]) && !empty($row[7])) {
                 $gender = 'P';
             }
 
@@ -92,10 +112,10 @@ class ResidentImport implements ToCollection, WithStartRow, WithMultipleSheets
                 'jenis_kelamin' => $gender,
                 'tempat_lahir' => $birthInfo['place'],
                 'tanggal_lahir' => $birthInfo['date'],
-                'alamat_sekarang' => $row[9] ?? '-',
-                'agama' => $this->mapAgama($row[10] ?? ''),
-                'pendidikan' => $this->mapPendidikan($row[11] ?? ''),
-                'pekerjaan' => $row[12] ?? '-',
+                'alamat_sekarang' => $row[10] ?? '-', // shifted from 9
+                'agama' => $this->mapAgama($row[11] ?? ''), // shifted from 10
+                'pendidikan' => $this->mapPendidikan($row[12] ?? ''), // shifted from 11
+                'pekerjaan' => $row[13] ?? '-', // shifted from 12
                 'status_penduduk' => 'aktif',
                 'needs_update' => $needsUpdate,
             ];
@@ -119,7 +139,7 @@ class ResidentImport implements ToCollection, WithStartRow, WithMultipleSheets
             }
 
             // Update Family Card's head if not set
-            if ($hubungan === 'KK' && $currentFamilyCard) {
+            if (($hubungan === 'KK' || $hubungan === 'Kepala Keluarga') && $currentFamilyCard) {
                 $currentFamilyCard->update(['kepala_keluarga_id' => $resident->id ?? null]);
             }
 

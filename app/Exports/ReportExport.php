@@ -26,7 +26,7 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping
     {
         switch ($this->type) {
             case 'penduduk':
-                return ['No', 'NIK', 'Nama Lengkap', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir', 'RT/RW', 'Agama', 'Pekerjaan', 'Status'];
+                return ['No', 'NIK', 'Nama Lengkap', 'Hubungan Keluarga', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir', 'RT/RW', 'Agama', 'Pekerjaan', 'Status'];
             case 'rukem':
                 return ['No', 'No. Anggota', 'Kepala Keluarga', 'No. KK', 'RT/RW', 'Tanggal Gabung', 'Status'];
             case 'pindah':
@@ -54,6 +54,7 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping
                     $index,
                     $row->nik,
                     $row->nama_lengkap,
+                    ucfirst($row->hubungan_keluarga ?? '-'),
                     $row->jenis_kelamin,
                     $row->tempat_lahir,
                     date('d/m/Y', strtotime($row->tanggal_lahir)),

@@ -36,7 +36,7 @@ class RtDashboardController extends Controller
         $totalKK = FamilyCard::where('wilayah_id', $wilayahId)->where('status', 'aktif')->count();
 
         $totalRukem = RukemMember::where('status_keanggotaan', 'aktif')
-            ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+            ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId)->where('status', 'aktif'))
             ->count();
 
         $recentMutations = PopulationMutation::with('resident')
@@ -55,6 +55,7 @@ class RtDashboardController extends Controller
                 'total_kk' => $totalKK,
                 'total_rukem' => $totalRukem,
                 'total_umkm' => Umkm::where('status', 'aktif')
+                    ->whereHas('resident', fn($q) => $q->where('status_penduduk', 'aktif'))
                     ->whereHas('resident.familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
                     ->count(),
                 'active_complaints' => $activeComplaintsCount,

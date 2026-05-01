@@ -1,0 +1,81 @@
+name: Deploy to Production (Docker)
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=,suffix=,format=short
+            latest
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.REMOTE_PORT || 22 }}
+          script: |
+            cd ${{ secrets.REMOTE_PATH }}
+            git pull origin main
+            
+            # Login to GHCR on server
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # Pull latest image
+            docker pull ghcr.io/${{ env.IMAGE_NAME }}:latest
+            
+            # Update image name in docker-compose.yml (or use env variable)
+            # Assuming docker-compose.yml is already on server
+            # We can use a trick: export the image name as env var
+            export IMAGE_NAME=ghcr.io/${{ env.IMAGE_NAME }}:latest
+            
+            docker compose up -d --remove-orphans
+            
+            # Run migrations inside the app container
+            docker exec sid_app php artisan migrate --force
+            
+            # Clear caches
+            docker exec sid_app php artisan config:cache
+            docker exec sid_app php artisan route:cache
+            docker exec sid_app php artisan view:cache

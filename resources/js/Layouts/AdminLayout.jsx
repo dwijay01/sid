@@ -16,7 +16,8 @@ import {
     FilePlus,
     PieChart,
     UserCog,
-    ClipboardList
+    ClipboardList,
+    Database
 } from 'lucide-react';
 import Dropdown from '@/Components/Dropdown';
 import ThemeToggle from '@/Components/ThemeToggle';
@@ -36,6 +37,7 @@ export default function AdminLayout({ header, children }) {
         { name: 'Manajemen User', href: route('admin.users.index'), icon: UserCog, current: route().current('admin.users.*') },
         { name: 'Laporan', href: route('admin.reports.demography'), icon: PieChart, current: route().current('admin.reports.*') },
         { name: 'Log Import', href: route('admin.import-logs.index'), icon: ClipboardList, current: route().current('admin.import-logs.*') },
+        { name: 'Backup Database', href: route('admin.backup.index'), icon: Database, current: route().current('admin.backup.*') },
         { name: 'Pengaturan', href: route('admin.settings.index'), icon: Settings, current: route().current('admin.settings.*') },
     ];
 

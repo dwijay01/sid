@@ -8,9 +8,11 @@ import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import PrimaryButton from '@/Components/PrimaryButton';
 
-export default function Index({ residents, filters, rukemStats = {} }) {
+export default function Index({ residents, filters, wilayahList = [], rukemStats = {} }) {
     const { flash, import_results } = usePage().props;
     const [search, setSearch] = useState(filters.search || '');
+    const [rtFilter, setRtFilter] = useState(filters.rt || '');
+    const [statusFilter, setStatusFilter] = useState(filters.status || '');
     const [sortBy, setSortBy] = useState(typeof filters?.sort === 'string' ? filters.sort : 'name');
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [importFile, setImportFile] = useState(null);
@@ -24,14 +26,27 @@ export default function Index({ residents, filters, rukemStats = {} }) {
         }
     }, [import_results]);
 
+    useEffect(() => {
+        const isChanged = search !== (filters.search || '') || 
+                          rtFilter !== (filters.rt || '') || 
+                          statusFilter !== (filters.status || '') ||
+                          sortBy !== (filters.sort || '');
+
+        if (isChanged) {
+            const timeout = setTimeout(() => {
+                router.get(route('admin.residents.index'), { search, rt: rtFilter, status: statusFilter, sort: sortBy }, { preserveState: true });
+            }, 400);
+            return () => clearTimeout(timeout);
+        }
+    }, [search, rtFilter, statusFilter, sortBy]);
+
     const handleSearch = (e) => {
         e.preventDefault();
-        router.get(route('admin.residents.index'), { search, sort: sortBy }, { preserveState: true });
+        router.get(route('admin.residents.index'), { search, rt: rtFilter, status: statusFilter, sort: sortBy }, { preserveState: true });
     };
 
     const handleSortChange = (newSort) => {
         setSortBy(newSort);
-        router.get(route('admin.residents.index'), { search, sort: newSort }, { preserveState: true });
     };
 
     const handleDelete = (id) => {
@@ -93,6 +108,51 @@ export default function Index({ residents, filters, rukemStats = {} }) {
                         <Plus size={16} />
                         Tambah Penduduk
                     </Link>
+                </div>
+            </div>
+
+            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 mb-6 shadow-sm">
+                <div className="flex flex-col lg:flex-row gap-4">
+                    <form onSubmit={handleSearch} className="flex-1 relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="block w-full rounded-lg border-0 py-2 pl-10 pr-3 text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-600 sm:text-sm bg-slate-50 dark:bg-slate-800/50"
+                            placeholder="Cari NIK, Nama, atau Alamat..."
+                        />
+                    </form>
+                    <div className="flex flex-wrap gap-3">
+                        <select 
+                            value={rtFilter} 
+                            onChange={(e) => setRtFilter(e.target.value)}
+                            className="rounded-lg border-0 py-2 text-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-600"
+                        >
+                            <option value="">Semua RT</option>
+                            {wilayahList.map((w) => (
+                                <option key={w.id} value={w.rt}>RT {w.rt}</option>
+                            ))}
+                        </select>
+                        <select 
+                            value={statusFilter} 
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="rounded-lg border-0 py-2 text-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-600"
+                        >
+                            <option value="">Semua Status</option>
+                            {Object.entries(RESIDENT_STATUS).map(([k, v]) => (
+                                <option key={k} value={k}>{v}</option>
+                            ))}
+                        </select>
+                        <select 
+                            value={sortBy} 
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className="rounded-lg border-0 py-2 text-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-600"
+                        >
+                            <option value="name">Urutan: Nama</option>
+                            <option value="kk">Urutan: Kartu Keluarga</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 

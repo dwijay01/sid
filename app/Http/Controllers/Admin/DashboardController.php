@@ -43,7 +43,7 @@ class DashboardController extends Controller
             'stats' => [
                 'total_penduduk' => $demographics['summary']['total_penduduk'],
                 'total_kk' => $demographics['summary']['total_kk'],
-                'total_umkm' => Umkm::where('status', 'aktif')->count(),
+                'total_umkm' => Umkm::where('status', 'aktif')->whereHas('resident', fn($q) => $q->where('status_penduduk', 'aktif'))->count(),
                 'surat_pending' => \App\Models\LetterRequest::where('status', 'menunggu_review_admin')->count(),
                 'surat_selesai' => \App\Models\LetterRequest::where('status', 'selesai')->count(),
             ],

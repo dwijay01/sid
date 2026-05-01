@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: sid-app
+    image: ${IMAGE_NAME:-sid-app}
     container_name: sid_app
     restart: unless-stopped
     working_dir: /var/www

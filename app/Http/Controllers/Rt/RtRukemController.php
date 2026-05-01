@@ -33,9 +33,9 @@ class RtRukemController extends Controller
             ->withQueryString();
 
         $rukemStats = [
-            'aktif' => RukemMember::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))->where('status_keanggotaan', 'aktif')->count(),
-            'khusus' => RukemMember::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))->where('status_keanggotaan', 'khusus')->count(),
-            'nonaktif' => RukemMember::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))->where('status_keanggotaan', 'nonaktif')->count(),
+            'aktif' => RukemMember::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId)->where('status', 'aktif'))->where('status_keanggotaan', 'aktif')->count(),
+            'khusus' => RukemMember::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId)->where('status', 'aktif'))->where('status_keanggotaan', 'khusus')->count(),
+            'nonaktif' => RukemMember::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId)->where('status', 'aktif'))->where('status_keanggotaan', 'nonaktif')->count(),
         ];
 
         return Inertia::render('Rt/Rukem/Index', [

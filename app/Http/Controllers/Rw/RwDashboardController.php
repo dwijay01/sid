@@ -34,7 +34,7 @@ class RwDashboardController extends Controller
             ->where('status_penduduk', 'aktif')->count();
 
         $totalRukem = RukemMember::where('status_keanggotaan', 'aktif')
-            ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+            ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds)->where('status', 'aktif'))
             ->count();
 
         $totalKK = FamilyCard::whereIn('wilayah_id', $wilayahIds)->where('status', 'aktif')->count();
@@ -62,15 +62,19 @@ class RwDashboardController extends Controller
                 'total_kk' => $totalKK,
                 'total_rt' => $totalRT,
                 'total_umkm' => Umkm::where('status', 'aktif')
+                    ->whereHas('resident', fn($q) => $q->where('status_penduduk', 'aktif'))
                     ->whereHas('resident.familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
                     ->count(),
                 'total_bebas_sewa' => FamilyCard::whereIn('wilayah_id', $wilayahIds)
+                    ->where('status', 'aktif')
                     ->where('status_kepemilikan_bangunan', 'bebas_sewa')
                     ->count(),
                 'total_tanpa_jamban' => FamilyCard::whereIn('wilayah_id', $wilayahIds)
+                    ->where('status', 'aktif')
                     ->where('fasilitas_sanitasi', 'tidak_punya')
                     ->count(),
                 'total_pendatang' => FamilyCard::whereIn('wilayah_id', $wilayahIds)
+                    ->where('status', 'aktif')
                     ->whereNotNull('alamat_domisili')
                     ->where('alamat_domisili', '!=', '')
                     ->count(),

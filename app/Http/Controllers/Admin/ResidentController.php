@@ -38,17 +38,28 @@ class ResidentController extends Controller
             });
         }
 
+        if ($request->rt) {
+            $query->whereHas('familyCard.wilayah', fn($q) => $q->where('rt', $request->rt));
+        }
+
+        if ($request->status) {
+            $query->where('status_penduduk', $request->status);
+        }
+
         $residents = $query->paginate(15)->withQueryString();
 
+        $wilayahList = WilayahRtRw::select('id', 'rt', 'rw')->orderBy('rt')->get();
+
         $rukemStats = [
-            'aktif' => Resident::whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'aktif'))->count(),
-            'khusus' => Resident::whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'khusus'))->count(),
-            'nonaktif' => Resident::whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'nonaktif'))->count(),
+            'aktif' => Resident::where('status_penduduk', 'aktif')->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'aktif'))->count(),
+            'khusus' => Resident::where('status_penduduk', 'aktif')->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'khusus'))->count(),
+            'nonaktif' => Resident::where('status_penduduk', 'aktif')->whereHas('familyCard.rukemMember', fn($q) => $q->where('status_keanggotaan', 'nonaktif'))->count(),
         ];
 
         return Inertia::render('Admin/Residents/Index', [
             'residents' => $residents,
-            'filters' => $request->only('search', 'sort'),
+            'filters' => $request->only('search', 'sort', 'rt', 'status'),
+            'wilayahList' => $wilayahList,
             'rukemStats' => $rukemStats,
         ]);
     }

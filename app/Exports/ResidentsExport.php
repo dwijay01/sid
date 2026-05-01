@@ -27,6 +27,7 @@ class ResidentsExport implements FromCollection, WithHeadings, WithMapping, Shou
             'NIK',
             'No. KK',
             'Nama Lengkap',
+            'Hubungan Keluarga',
             'Tempat Lahir',
             'Tanggal Lahir',
             'Jenis Kelamin',
@@ -49,6 +50,7 @@ class ResidentsExport implements FromCollection, WithHeadings, WithMapping, Shou
             "'" . $resident->nik, // Force as string in Excel
             $resident->familyCard ? "'" . $resident->familyCard->no_kk : '-',
             $resident->nama_lengkap,
+            ucfirst($resident->hubungan_keluarga ?? '-'),
             $resident->tempat_lahir,
             $resident->tanggal_lahir,
             $resident->jenis_kelamin,

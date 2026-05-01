@@ -129,6 +129,12 @@ Route::middleware('auth')->group(function () {
         // Import Logs
         Route::get('/import-logs', [\App\Http\Controllers\ImportLogController::class, 'index'])->name('import-logs.index');
         Route::get('/import-logs/{importLog}', [\App\Http\Controllers\ImportLogController::class, 'show'])->name('import-logs.show');
+
+        // Backup
+        Route::get('/backup', [\App\Http\Controllers\Admin\BackupController::class, 'index'])->name('backup.index');
+        Route::post('/backup', [\App\Http\Controllers\Admin\BackupController::class, 'create'])->name('backup.create');
+        Route::get('/backup/{filename}/download', [\App\Http\Controllers\Admin\BackupController::class, 'download'])->name('backup.download');
+        Route::delete('/backup/{filename}', [\App\Http\Controllers\Admin\BackupController::class, 'destroy'])->name('backup.destroy');
     });
 
     // -------------------------------------------------------------
