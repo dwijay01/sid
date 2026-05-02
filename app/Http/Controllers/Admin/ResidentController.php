@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ResidentImport;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ResidentController extends Controller
 {
@@ -158,49 +157,24 @@ class ResidentController extends Controller
         $file = $request->file('file');
         
         try {
-            $spreadsheet = IOFactory::load($file->getRealPath());
-            $sheetNames = $spreadsheet->getSheetNames();
+            $import = new ResidentImport(null, null, $request->duplicate_action ?? 'skip');
+            Excel::import($import, $file);
+
+            $successCount = $import->getSuccessCount();
+            $skipped = $import->getSkipped();
             
-            $summary = [];
-            $totalSuccess = 0;
-            $totalSkipped = 0;
-            $allSkippedDetails = [];
+            $summary = ["Total Berhasil: $successCount", "Total Dilewati: " . count($skipped)];
 
-            foreach ($sheetNames as $sheetName) {
-                // Look for "RT. 01", "RT. 02", etc.
-                if (preg_match('/RT\.?\s*(\d+)/i', $sheetName, $matches)) {
-                    $rtNumber = (int)$matches[1];
-                    
-                    // Find or create Wilayah
-                    $wilayah = WilayahRtRw::firstOrCreate(
-                        ['rt' => $rtNumber, 'rw' => 30], // RW default from user's file title
-                        ['is_active' => true]
-                    );
-
-                    $import = new ResidentImport($wilayah->id, $sheetName, $request->duplicate_action ?? 'skip');
-                    Excel::import($import, $file);
-
-                    $successCount = $import->getSuccessCount();
-                    $skipped = $import->getSkipped();
-                    
-                    $totalSuccess += $successCount;
-                    $totalSkipped += count($skipped);
-                    $allSkippedDetails = array_merge($allSkippedDetails, $skipped);
-
-                    $summary[] = "$sheetName: $successCount Berhasil, " . count($skipped) . " Dilewati";
-                }
-            }
-
-            $message = "Import selesai. Total: $totalSuccess Berhasil, $totalSkipped Dilewati.";
+            $message = "Import selesai. Total: $successCount Berhasil, " . count($skipped) . " Dilewati.";
             
             \App\Models\ImportLog::create([
                 'user_id' => auth()->id(),
                 'filename' => $file->getClientOriginalName(),
-                'total_success' => $totalSuccess,
-                'total_skipped' => $totalSkipped,
+                'total_success' => $successCount,
+                'total_skipped' => count($skipped),
                 'details' => [
                     'summary' => $summary,
-                    'skipped_details' => $allSkippedDetails
+                    'skipped_details' => $skipped
                 ],
                 'type' => 'resident_admin',
             ]);
@@ -209,9 +183,9 @@ class ResidentController extends Controller
                 'success' => $message,
                 'import_results' => [
                     'summary' => $summary,
-                    'total_success' => $totalSuccess,
-                    'total_skipped' => $totalSkipped,
-                    'skipped_details' => $allSkippedDetails
+                    'total_success' => $successCount,
+                    'total_skipped' => count($skipped),
+                    'skipped_details' => $skipped
                 ]
             ]);
 

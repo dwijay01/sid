@@ -122,7 +122,7 @@ export default function Index({ residents, filters = {}, keaktifanStats = {} }) 
                             <Users size={20} />
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Keluarga Aktif</p>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Warga Aktif</p>
                             <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{keaktifanStats.aktif || 0}</p>
                         </div>
                     </div>
@@ -131,7 +131,7 @@ export default function Index({ residents, filters = {}, keaktifanStats = {} }) 
                             <Users size={20} />
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Keluarga Kurang Mampu</p>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Warga Kurang Mampu</p>
                             <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{keaktifanStats.kurang_mampu || 0}</p>
                         </div>
                     </div>
@@ -140,7 +140,7 @@ export default function Index({ residents, filters = {}, keaktifanStats = {} }) 
                             <Users size={20} />
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Keluarga Tidak Aktif</p>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Warga Tidak Aktif</p>
                             <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{keaktifanStats.tidak_aktif || 0}</p>
                         </div>
                     </div>

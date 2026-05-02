@@ -125,9 +125,7 @@ class RtResidentController extends Controller
             return back()->with('error', 'Wilayah RT tidak ditemukan.');
         }
 
-        // Format sheet name: "RT. 01", "RT. 02", etc.
-        $sheetName = 'RT. ' . str_pad($wilayah->rt, 2, '0', STR_PAD_LEFT);
-        $import = new ResidentImport($wilayah->id, $sheetName, $request->duplicate_action ?? 'skip');
+        $import = new ResidentImport($wilayah->id, null, $request->duplicate_action ?? 'skip');
         
         try {
             Excel::import($import, $request->file('file'));

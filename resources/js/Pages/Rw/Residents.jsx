@@ -11,10 +11,10 @@ export default function Residents({ residents, filters = {}, wilayahList = [], k
     const [sortBy, setSortBy] = useState(typeof filters?.sort === 'string' ? filters.sort : 'name');
 
     useEffect(() => {
-        const isChanged = search !== (filters.search || '') || 
-                          rtFilter !== (filters.rt || '') || 
-                          statusFilter !== (filters.status || '') ||
-                          sortBy !== (filters.sort || '');
+        const isChanged = search !== (filters.search || '') ||
+            rtFilter !== (filters.rt || '') ||
+            statusFilter !== (filters.status || '') ||
+            sortBy !== (filters.sort || '');
 
         if (isChanged) {
             const timeout = setTimeout(() => {
@@ -79,7 +79,7 @@ export default function Residents({ residents, filters = {}, wilayahList = [], k
                             <Users size={20} />
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Keluarga Aktif</p>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Warga Aktif</p>
                             <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{keaktifanStats.aktif || 0}</p>
                         </div>
                     </div>
@@ -88,7 +88,7 @@ export default function Residents({ residents, filters = {}, wilayahList = [], k
                             <Users size={20} />
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Keluarga Kurang Mampu</p>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Warga Kurang Mampu</p>
                             <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{keaktifanStats.kurang_mampu || 0}</p>
                         </div>
                     </div>
@@ -97,7 +97,7 @@ export default function Residents({ residents, filters = {}, wilayahList = [], k
                             <Users size={20} />
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Keluarga Tidak Aktif</p>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Warga Tidak Aktif</p>
                             <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{keaktifanStats.tidak_aktif || 0}</p>
                         </div>
                     </div>
@@ -179,11 +179,11 @@ export default function Residents({ residents, filters = {}, wilayahList = [], k
                     <div className="border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-6 py-4 flex items-center justify-center">
                         <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm">
                             {residents.links.map((link, i) => (
-                                <Link 
-                                    key={i} 
-                                    href={link.url || '#'} 
-                                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${link.active ? 'z-10 bg-teal-600 text-white' : 'text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50'} ${i === 0 ? 'rounded-l-md' : ''} ${i === residents.links.length - 1 ? 'rounded-r-md' : ''}`} 
-                                    dangerouslySetInnerHTML={{ __html: link.label }} 
+                                <Link
+                                    key={i}
+                                    href={link.url || '#'}
+                                    className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${link.active ? 'z-10 bg-teal-600 text-white' : 'text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50'} ${i === 0 ? 'rounded-l-md' : ''} ${i === residents.links.length - 1 ? 'rounded-r-md' : ''}`}
+                                    dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}
                         </nav>
