@@ -35,8 +35,7 @@ class RtDashboardController extends Controller
 
         $totalKK = FamilyCard::where('wilayah_id', $wilayahId)->where('status', 'aktif')->count();
 
-        $totalRukem = RukemMember::where('status_keanggotaan', 'aktif')
-            ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId)->where('status', 'aktif'))
+        $totalRukem = RukemMember::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId)->where('status', 'aktif'))
             ->count();
 
         $recentMutations = PopulationMutation::with('resident')
@@ -97,14 +96,17 @@ class RtDashboardController extends Controller
             ->withQueryString();
 
         $keaktifanStats = [
-            'aktif' => Resident::where('status_penduduk', 'aktif')
-                ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId)->where('kategori_aktif', 'aktif'))
+            'aktif' => FamilyCard::where('wilayah_id', $wilayahId)
+                ->where('kategori_aktif', 'aktif')
+                ->where('status', 'aktif')
                 ->count(),
-            'kurang_mampu' => Resident::where('status_penduduk', 'aktif')
-                ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId)->where('kategori_aktif', 'kurang_mampu'))
+            'kurang_mampu' => FamilyCard::where('wilayah_id', $wilayahId)
+                ->where('kategori_aktif', 'kurang_mampu')
+                ->where('status', 'aktif')
                 ->count(),
-            'tidak_aktif' => Resident::where('status_penduduk', 'aktif')
-                ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId)->where('kategori_aktif', 'tidak_aktif'))
+            'tidak_aktif' => FamilyCard::where('wilayah_id', $wilayahId)
+                ->where('kategori_aktif', 'tidak_aktif')
+                ->where('status', 'aktif')
                 ->count(),
         ];
 
@@ -133,7 +135,6 @@ class RtDashboardController extends Controller
             case 'rukem':
                 $data = RukemMember::with('familyCard.kepalaKeluarga', 'familyCard.wilayah')
                     ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
-                    ->where('status_keanggotaan', 'aktif')
                     ->get();
                 break;
             case 'pindah':

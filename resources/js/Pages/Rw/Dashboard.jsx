@@ -21,10 +21,9 @@ export default function Dashboard({ stats, recentMutations }) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
                 {[
                     { label: 'Total Penduduk', value: stats.total_penduduk, icon: Users, color: 'emerald', link: route('rw.residents') },
-                    { label: 'Anggota Rukem', value: stats.total_rukem, icon: Heart, color: 'rose', link: route('rw.rukem') },
                     { label: 'Unit UMKM', value: stats.total_umkm, icon: Store, color: 'amber', link: route('rw.umkm') },
                     { label: 'Kartu Keluarga', value: stats.total_kk, icon: CreditCard, color: 'blue' },
                 ].map((stat) => (

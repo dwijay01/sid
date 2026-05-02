@@ -5,8 +5,11 @@ namespace App\Exports;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ReportExport implements FromCollection, WithHeadings, WithMapping
+class ReportExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
 {
     protected $data;
     protected $type;
@@ -26,7 +29,26 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping
     {
         switch ($this->type) {
             case 'penduduk':
-                return ['No', 'NIK', 'Nama Lengkap', 'Hubungan Keluarga', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir', 'RT/RW', 'Agama', 'Pekerjaan', 'Status'];
+                return [
+                    'ID',
+                    'NIK',
+                    'No. KK',
+                    'RT/RW',
+                    'Nama Lengkap',
+                    'Hubungan Keluarga',
+                    'Tempat Lahir',
+                    'Tanggal Lahir',
+                    'Jenis Kelamin',
+                    'Agama',
+                    'Pendidikan',
+                    'Status Kawin',
+                    'Pekerjaan',
+                    'Golongan Darah',
+                    'Alamat Tetap (KK)',
+                    'Alamat Domisili',
+                    'Status Penduduk',
+                    'Didaftarkan Pada'
+                ];
             case 'rukem':
                 return ['No', 'No. Anggota', 'Kepala Keluarga', 'No. KK', 'RT/RW', 'Tanggal Gabung', 'Status'];
             case 'pindah':
@@ -48,20 +70,27 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping
             case 'penduduk':
                 $rtRw = '-';
                 if ($row->familyCard && $row->familyCard->wilayah) {
-                    $rtRw = 'RT ' . $row->familyCard->wilayah->rt . '/RW ' . $row->familyCard->wilayah->rw;
+                    $rtRw = 'RT ' . str_pad($row->familyCard->wilayah->rt, 2, '0', STR_PAD_LEFT) . '/RW ' . str_pad($row->familyCard->wilayah->rw, 2, '0', STR_PAD_LEFT);
                 }
                 return [
-                    $index,
-                    $row->nik,
+                    $row->id,
+                    "'" . $row->nik, // Force as string in Excel
+                    $row->familyCard ? "'" . $row->familyCard->no_kk : '-',
+                    $rtRw,
                     $row->nama_lengkap,
                     ucfirst($row->hubungan_keluarga ?? '-'),
-                    $row->jenis_kelamin,
                     $row->tempat_lahir,
-                    date('d/m/Y', strtotime($row->tanggal_lahir)),
-                    $rtRw,
+                    $row->tanggal_lahir,
+                    $row->jenis_kelamin,
                     $row->agama,
+                    $row->pendidikan,
+                    $row->status_perkawinan ?? $row->status_kawin,
                     $row->pekerjaan,
+                    $row->golongan_darah,
+                    $row->familyCard->alamat ?? '-',
+                    $row->familyCard->alamat_domisili ?? '-',
                     $row->status_penduduk,
+                    $row->created_at ? $row->created_at->format('Y-m-d H:i:s') : '-',
                 ];
             case 'rukem':
                 $kk = '-';
@@ -106,5 +135,12 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping
             default:
                 return [];
         }
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        return [
+            1 => ['font' => ['bold' => true]],
+        ];
     }
 }

@@ -17,7 +17,7 @@ class ResidentsExport implements FromCollection, WithHeadings, WithMapping, Shou
     */
     public function collection()
     {
-        return Resident::with('familyCard')->get();
+        return Resident::with('familyCard.wilayah')->get();
     }
 
     public function headings(): array
@@ -26,6 +26,7 @@ class ResidentsExport implements FromCollection, WithHeadings, WithMapping, Shou
             'ID',
             'NIK',
             'No. KK',
+            'RT/RW',
             'Nama Lengkap',
             'Hubungan Keluarga',
             'Tempat Lahir',
@@ -45,10 +46,16 @@ class ResidentsExport implements FromCollection, WithHeadings, WithMapping, Shou
 
     public function map($resident): array
     {
+        $rtRw = '-';
+        if ($resident->familyCard && $resident->familyCard->wilayah) {
+            $rtRw = 'RT ' . str_pad($resident->familyCard->wilayah->rt, 2, '0', STR_PAD_LEFT) . '/RW ' . str_pad($resident->familyCard->wilayah->rw, 2, '0', STR_PAD_LEFT);
+        }
+
         return [
             $resident->id,
             "'" . $resident->nik, // Force as string in Excel
             $resident->familyCard ? "'" . $resident->familyCard->no_kk : '-',
+            $rtRw,
             $resident->nama_lengkap,
             ucfirst($resident->hubungan_keluarga ?? '-'),
             $resident->tempat_lahir,
@@ -56,7 +63,7 @@ class ResidentsExport implements FromCollection, WithHeadings, WithMapping, Shou
             $resident->jenis_kelamin,
             $resident->agama,
             $resident->pendidikan,
-            $resident->status_kawin,
+            $resident->status_perkawinan ?? $resident->status_kawin, // added fallback to status_perkawinan
             $resident->pekerjaan,
             $resident->golongan_darah,
             $resident->familyCard->alamat ?? '-',

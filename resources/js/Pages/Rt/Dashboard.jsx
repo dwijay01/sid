@@ -25,7 +25,6 @@ export default function Dashboard({ stats, recentMutations }) {
                 {[
                     { label: 'Total Penduduk', value: stats.total_penduduk, icon: Users, color: 'emerald' },
                     { label: 'Kartu Keluarga', value: stats.total_kk, icon: CreditCard, color: 'blue' },
-                    { label: 'Anggota Rukem', value: stats.total_rukem, icon: Heart, color: 'rose' },
                     { label: 'Unit UMKM', value: stats.total_umkm, icon: Store, color: 'amber' },
                     { label: 'Pengaduan Aktif', value: stats.active_complaints, icon: MessageSquareWarning, color: 'indigo', link: route('rt.complaints.index') },
                 ].map((stat) => (
