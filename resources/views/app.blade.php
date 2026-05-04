@@ -8,7 +8,7 @@
         <meta name="theme-color" content="#059669">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
-        <meta name="apple-mobile-web-app-title" content="SIRAWE">
+        <meta name="apple-mobile-web-app-title" content="SIERWE">
         <meta name="description" content="Sistem Informasi RT-RW — Layanan administrasi desa digital">
         <meta name="mobile-web-app-capable" content="yes">
         <link rel="manifest" href="/manifest.json">
@@ -35,11 +35,11 @@
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('/sw.js')
                         .then(reg => {
-                            console.log('[SIRAWE] Service Worker registered:', reg.scope);
+                            console.log('[SIERWE] Service Worker registered:', reg.scope);
                             // Check for updates periodically
                             setInterval(() => reg.update(), 60 * 60 * 1000); // every hour
                         })
-                        .catch(err => console.error('[SIRAWE] SW registration failed:', err));
+                        .catch(err => console.error('[SIERWE] SW registration failed:', err));
                 });
             }
         </script>

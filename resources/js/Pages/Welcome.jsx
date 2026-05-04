@@ -149,7 +149,7 @@ export default function Welcome({ auth, desa, landing, statistik }) {
                                         className={`text-lg font-bold tracking-tight transition-colors duration-500 ${scrolled ? 'text-slate-900 dark:text-white' : 'text-white'
                                             }`}
                                     >
-                                        SIRAWE
+                                        SIERWE
                                     </h1>
                                     <p
                                         className={`text-[10px] font-medium -mt-0.5 tracking-wider uppercase transition-colors duration-500 ${scrolled ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-300'
@@ -434,7 +434,7 @@ export default function Welcome({ auth, desa, landing, statistik }) {
                                         <Building2 className="w-5 h-5 text-white" />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold">SIRAWE</h3>
+                                        <h3 className="text-lg font-bold">SIERWE</h3>
                                         <p className="text-xs text-emerald-400 font-medium">{namaDesa}</p>
                                     </div>
                                 </div>
@@ -483,7 +483,7 @@ export default function Welcome({ auth, desa, landing, statistik }) {
 
                         <div className="mt-12 pt-8 border-t border-slate-800 text-center">
                             <p className="text-slate-500 dark:text-slate-400 text-sm">
-                                © {new Date().getFullYear()} SIRAWE {namaDesa}. Hak Cipta Dilindungi.
+                                © {new Date().getFullYear()} SIERWE {namaDesa}. Hak Cipta Dilindungi.
                             </p>
                         </div>
                     </div>

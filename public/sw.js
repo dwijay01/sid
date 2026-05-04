@@ -1,12 +1,12 @@
 // =============================================================================
-// SIRAWE Service Worker
+// SIERWE Service Worker
 // Strategi Caching:
 //   - Cache First: Aset statis (CSS, JS, font, ikon)
 //   - Network First: API data & halaman navigasi
 //   - Stale While Revalidate: Gambar
 // =============================================================================
 
-const CACHE_VERSION = 'sirawe-v1';
+const CACHE_VERSION = 'sierwe-v1';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
@@ -39,7 +39,7 @@ self.addEventListener('activate', (event) => {
             .then((cacheNames) => {
                 return Promise.all(
                     cacheNames
-                        .filter((name) => name.startsWith('sirawe-') && name !== STATIC_CACHE && name !== DYNAMIC_CACHE && name !== IMAGE_CACHE)
+                        .filter((name) => name.startsWith('sierwe-') && name !== STATIC_CACHE && name !== DYNAMIC_CACHE && name !== IMAGE_CACHE)
                         .map((name) => {
                             console.log('[SW] Deleting old cache:', name);
                             return caches.delete(name);
@@ -172,7 +172,7 @@ async function staleWhileRevalidate(request, cacheName) {
 
 // ─── PUSH NOTIFICATION (Foundation) ─────────────────────────────────────────────
 self.addEventListener('push', (event) => {
-    let data = { title: 'SIRAWE', body: 'Ada pemberitahuan baru dari desa.' };
+    let data = { title: 'SIERWE', body: 'Ada pemberitahuan baru dari desa.' };
 
     if (event.data) {
         try {
@@ -195,7 +195,7 @@ self.addEventListener('push', (event) => {
             { action: 'open', title: 'Buka Aplikasi' },
             { action: 'close', title: 'Tutup' },
         ],
-        tag: data.tag || 'sirawe-notification',
+        tag: data.tag || 'sierwe-notification',
         renotify: true,
     };
 

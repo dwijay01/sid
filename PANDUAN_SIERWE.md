@@ -1,7 +1,7 @@
-# 📘 Buku Panduan Pengguna SIRAWE
+# 📘 Buku Panduan Pengguna SIERWE
 **Sistem Informasi RT-RW (Digital Village Administration)**
 
-Selamat datang di panduan resmi penggunaan aplikasi **SIRAWE**. Dokumen ini dirancang untuk membantu setiap kategori pengguna dalam mengoperasikan sistem sesuai dengan hak akses masing-masing.
+Selamat datang di panduan resmi penggunaan aplikasi **SIERWE**. Dokumen ini dirancang untuk membantu setiap kategori pengguna dalam mengoperasikan sistem sesuai dengan hak akses masing-masing.
 
 ---
 
@@ -17,7 +17,7 @@ Selamat datang di panduan resmi penggunaan aplikasi **SIRAWE**. Dokumen ini dira
 ---
 
 ## 1. Pengenalan Sistem
-SIRAWE adalah platform digital untuk memudahkan administrasi kependudukan di tingkat RT/RW dan Desa. Sistem ini mengintegrasikan data penduduk, kartu keluarga, mutasi (lahir/mati/pindah), persuratan, hingga pendataan UMKM.
+SIERWE adalah platform digital untuk memudahkan administrasi kependudukan di tingkat RT/RW dan Desa. Sistem ini mengintegrasikan data penduduk, kartu keluarga, mutasi (lahir/mati/pindah), persuratan, hingga pendataan UMKM.
 
 ### Akses Umum
 - **URL**: `http://localhost:8000` (atau URL server yang disediakan)
@@ -100,5 +100,5 @@ Layanan mandiri untuk efisiensi urusan administrasi.
 > [!IMPORTANT]
 > **Keamanan Data**: Jaga kerahasiaan password Anda. Selalu logout setelah menggunakan aplikasi di komputer publik.
 
-**Tim Support SIRAWE**
+**Tim Support SIERWE**
 *Hubungi Admin Desa untuk bantuan teknis lebih lanjut.*

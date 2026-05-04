@@ -3,7 +3,7 @@ import { Download, X, Smartphone, Zap, WifiOff } from 'lucide-react';
 
 /**
  * InstallPWA — Custom install prompt untuk warga desa.
- * Menampilkan banner ajakan install aplikasi SIRAWE ke home screen.
+ * Menampilkan banner ajakan install aplikasi SIERWE ke home screen.
  * - Intercept `beforeinstallprompt` event
  * - Simpan preferensi dismiss di localStorage
  * - Auto-hide setelah app terinstall
@@ -16,7 +16,7 @@ export default function InstallPWA() {
 
     useEffect(() => {
         // Cek apakah sudah diinstall atau user sudah dismiss sebelumnya
-        const isDismissed = localStorage.getItem('sirawe-pwa-dismissed');
+        const isDismissed = localStorage.getItem('sierwe-pwa-dismissed');
         const dismissedAt = isDismissed ? parseInt(isDismissed, 10) : 0;
         const daysSinceDismiss = (Date.now() - dismissedAt) / (1000 * 60 * 60 * 24);
 
@@ -43,7 +43,7 @@ export default function InstallPWA() {
             setIsInstalled(true);
             setShowBanner(false);
             setDeferredPrompt(null);
-            localStorage.removeItem('sirawe-pwa-dismissed');
+            localStorage.removeItem('sierwe-pwa-dismissed');
         };
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstall);
@@ -74,7 +74,7 @@ export default function InstallPWA() {
 
     const handleDismiss = () => {
         setShowBanner(false);
-        localStorage.setItem('sirawe-pwa-dismissed', Date.now().toString());
+        localStorage.setItem('sierwe-pwa-dismissed', Date.now().toString());
     };
 
     // Jangan render apapun jika sudah install atau tidak ada prompt

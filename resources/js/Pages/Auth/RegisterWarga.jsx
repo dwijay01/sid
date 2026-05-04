@@ -58,7 +58,7 @@ export default function RegisterWarga({ status }) {
                                 <Building2 className="w-6 h-6 text-teal-600" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-bold text-white tracking-tight">SIRAWE</h1>
+                                <h1 className="text-xl font-bold text-white tracking-tight">SIERWE</h1>
                                 <p className="text-xs text-teal-200 font-medium">Sistem Informasi RT-RW</p>
                             </div>
                         </div>
@@ -294,7 +294,7 @@ export default function RegisterWarga({ status }) {
 
                         {/* Footer */}
                         <p className="mt-8 text-center text-xs text-slate-400">
-                            © {new Date().getFullYear()} SIRAWE — Sistem Informasi RT-RW
+                            © {new Date().getFullYear()} SIERWE — Sistem Informasi RT-RW
                         </p>
                     </div>
                 </div>
