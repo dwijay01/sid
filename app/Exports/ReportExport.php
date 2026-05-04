@@ -56,6 +56,20 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, ShouldA
             case 'meninggal':
             case 'lahir':
                 return ['No', 'NIK', 'Nama Lengkap', 'Tanggal Mutasi', 'Asal/Tujuan', 'Keterangan'];
+            case 'umkm':
+                return [
+                    'No',
+                    'Nama Usaha',
+                    'Sektor Usaha',
+                    'Pemilik',
+                    'RT/RW',
+                    'Alamat Usaha',
+                    'Memiliki NIB',
+                    'Nomor NIB',
+                    'Omzet',
+                    'Jumlah Karyawan',
+                    'Status'
+                ];
             default:
                 return [];
         }
@@ -131,6 +145,28 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, ShouldA
                     date('d/m/Y', strtotime($row->tanggal_mutasi)),
                     $row->asal_tujuan,
                     $row->keterangan,
+                ];
+            case 'umkm':
+                $pemilik = '-';
+                $rtRw = '-';
+                if ($row->resident) {
+                    $pemilik = $row->resident->nama_lengkap;
+                    if ($row->resident->familyCard && $row->resident->familyCard->wilayah) {
+                        $rtRw = 'RT ' . $row->resident->familyCard->wilayah->rt . '/RW ' . $row->resident->familyCard->wilayah->rw;
+                    }
+                }
+                return [
+                    $index,
+                    $row->nama_usaha,
+                    $row->sektor_usaha,
+                    $pemilik,
+                    $rtRw,
+                    $row->alamat_usaha,
+                    $row->memiliki_nib ? 'Ya' : 'Tidak',
+                    $row->nomor_nib ?? '-',
+                    $row->rentang_omzet,
+                    $row->jumlah_karyawan,
+                    $row->status,
                 ];
             default:
                 return [];

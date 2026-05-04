@@ -165,6 +165,12 @@ class RtDashboardController extends Controller
                     ->orderByDesc('tanggal_mutasi')
                     ->get();
                 break;
+            case 'umkm':
+                $data = Umkm::with('resident.familyCard.wilayah')
+                    ->whereHas('resident.familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+                    ->orderByDesc('created_at')
+                    ->get();
+                break;
         }
 
         if ($request->input('export') === 'excel') {
