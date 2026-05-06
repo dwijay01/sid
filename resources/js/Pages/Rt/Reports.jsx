@@ -114,9 +114,9 @@ export default function Reports({ data, type }) {
                                     </th>
                                     <th className="py-3 pl-2 pr-3 text-left text-xs font-bold text-slate-500 uppercase hidden print:table-cell">No</th>
                                     <th className="py-3 pl-2 pr-3 text-left text-xs font-bold text-slate-500 uppercase print:hidden">No</th>
+                                    <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">Nama</th>
                                     <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">No KK</th>
                                     <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">NIK</th>
-                                    <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">Nama</th>
                                     <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">Alamat KTP</th>
                                     <th className="px-3 py-3 text-left text-xs font-bold text-slate-500 uppercase">Alamat Domisili</th>
                                 </tr>
@@ -135,9 +135,9 @@ export default function Reports({ data, type }) {
                                             </td>
                                             <td className="py-2 pl-2 pr-3 hidden print:table-cell before:content-[counter(row-num)]"></td>
                                             <td className="py-2 pl-2 pr-3 print:hidden">{i + 1}</td>
+                                            <td className="px-3 py-2 font-semibold">{r.nama_lengkap}</td>
                                             <td className="px-3 py-2 font-mono">{r.family_card?.no_kk || '-'}</td>
                                             <td className="px-3 py-2 font-mono">{r.nik}</td>
-                                            <td className="px-3 py-2 font-semibold">{r.nama_lengkap}</td>
                                             <td className="px-3 py-2">{r.family_card?.alamat || '-'}</td>
                                             <td className="px-3 py-2">{r.alamat_sekarang || r.family_card?.alamat_domisili || r.family_card?.alamat || '-'}</td>
                                         </tr>
