@@ -45,7 +45,7 @@ export default function RtLayout({ header, children }) {
             )}
 
             {/* Sidebar */}
-            <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-blue-900 text-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-blue-900 text-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 print:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="flex h-16 shrink-0 items-center px-6 border-b border-blue-800">
                     <div className="h-8 w-8 rounded-lg bg-blue-500 flex items-center justify-center text-white font-bold text-sm">RT</div>
                     <span className="ml-3 text-lg font-bold tracking-tight text-white">Portal Ketua RT</span>
@@ -94,8 +94,8 @@ export default function RtLayout({ header, children }) {
             </div>
 
             {/* Main content wrapper */}
-            <div className="lg:pl-72 flex flex-col min-h-screen">
-                <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-x-4 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+            <div className="lg:pl-72 print:pl-0 flex flex-col min-h-screen">
+                <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-x-4 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8 print:hidden">
                     <button type="button" className="-m-2.5 p-2.5 text-slate-700 lg:hidden" onClick={() => setSidebarOpen(true)}>
                         <span className="sr-only">Open sidebar</span>
                         <Menu className="h-6 w-6" aria-hidden="true" />

@@ -173,6 +173,11 @@ class RtDashboardController extends Controller
                 break;
         }
 
+        if ($request->filled('selected_ids')) {
+            $selectedIds = explode(',', $request->input('selected_ids'));
+            $data = $data->whereIn('id', $selectedIds)->values();
+        }
+
         if ($request->input('export') === 'excel') {
             return Excel::download(new ReportExport($data, $type), 'Report_RT_' . ucfirst($type) . '_' . date('Ymd') . '.xlsx');
         }
