@@ -39,23 +39,35 @@ class SieRukemDashboardController extends Controller
 
     public function members(Request $request)
     {
-        $members = RukemMember::with(['familyCard.kepalaKeluarga', 'familyCard.wilayah', 'familyCard.anggotaKeluarga'])
+        $query = RukemMember::query()
             ->when($request->search, function ($q, $search) {
                 $q->whereHas('familyCard', fn($fc) => $fc->where('no_kk', 'like', "%{$search}%")
                     ->orWhereHas('kepalaKeluarga', fn($k) => $k->where('nama_lengkap', 'like', "%{$search}%")
                         ->orWhere('nik', 'like', "%{$search}%")));
             })
-            ->when($request->status, fn($q, $status) => $q->where('status_keanggotaan', $status))
             ->when($request->rt, function ($q, $rt) {
                 $q->whereHas('familyCard.wilayah', fn($q2) => $q2->where('rt', $rt));
-            })
+            });
+
+        $filterStats = [
+            'aktif' => (clone $query)->where('status_keanggotaan', 'aktif')->count(),
+            'khusus' => (clone $query)->where('status_keanggotaan', 'khusus')->count(),
+            'nonaktif' => (clone $query)->whereIn('status_keanggotaan', ['nonaktif', 'keluar', 'tidak_ikut'])->count(),
+        ];
+
+        $members = $query->with(['familyCard.kepalaKeluarga', 'familyCard.wilayah', 'familyCard.anggotaKeluarga'])
+            ->when($request->status, fn($q, $status) => $q->where('status_keanggotaan', $status))
             ->orderByDesc('created_at')
             ->paginate(20)
             ->withQueryString();
 
+        $rts = \App\Models\WilayahRtRw::select('rt')->distinct()->orderBy('rt')->pluck('rt');
+
         return Inertia::render('SieRukem/Members', [
             'members' => $members,
             'filters' => $request->only('search', 'status', 'rt'),
+            'filterStats' => $filterStats,
+            'rts' => $rts,
         ]);
     }
 }
