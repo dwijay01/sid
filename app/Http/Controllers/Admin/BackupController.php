@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Exception;
 
 class BackupController extends Controller
 {
@@ -31,56 +33,82 @@ class BackupController extends Controller
 
     public function create()
     {
-        $filename = 'backup-' . date('Y-m-d-His') . '.sql';
-        if (!Storage::exists('backups')) {
-            Storage::makeDirectory('backups');
-        }
-
-        $path = Storage::path('backups/' . $filename);
-
-        $dbConfig = config('database.connections.mysql');
-        $port = $dbConfig['port'] ?? 3306;
-
-        // Build mysqldump command with port and redirect stderr to capture errors
-        $command = sprintf(
-            'mysqldump --user=%s --password=%s --host=%s --port=%s --single-transaction --quick %s > %s 2>&1',
-            escapeshellarg($dbConfig['username']),
-            escapeshellarg($dbConfig['password']),
-            escapeshellarg($dbConfig['host']),
-            escapeshellarg($port),
-            escapeshellarg($dbConfig['database']),
-            escapeshellarg($path)
-        );
-
-        exec($command, $output, $returnVar);
-
-        if ($returnVar !== 0) {
-            $errorMsg = implode("\n", $output);
-            \Log::error('Backup failed', ['return_var' => $returnVar, 'output' => $errorMsg]);
-
-            // Clean up empty/failed file
-            if (file_exists($path)) {
-                unlink($path);
+        try {
+            $filename = 'backup-' . date('Y-m-d-His') . '.sql';
+            if (!Storage::exists('backups')) {
+                Storage::makeDirectory('backups');
             }
 
-            return back()->with('error', 'Gagal membuat backup database: ' . ($errorMsg ?: 'mysqldump tidak ditemukan atau tidak dapat diakses. Cek log server.'));
-        }
+            $path = Storage::path('backups/' . $filename);
 
-        // Verify the file is not empty (mysqldump sometimes exits 0 but writes errors to the file)
-        if (!file_exists($path) || filesize($path) < 100) {
-            $content = file_exists($path) ? file_get_contents($path) : '';
-            \Log::error('Backup file empty or too small', ['content' => substr($content, 0, 500)]);
+            $connection = config('database.default', 'mysql');
+            $dbConfig = config("database.connections.{$connection}");
 
-            if (file_exists($path)) {
-                unlink($path);
+            if (!$dbConfig) {
+                throw new Exception("Konfigurasi database untuk koneksi '{$connection}' tidak ditemukan.");
             }
 
-            return back()->with('error', 'Backup file kosong atau corrupt. Cek koneksi database dan kredensial.');
+            $port = $dbConfig['port'] ?? 3306;
+            $username = $dbConfig['username'] ?? '';
+            $password = $dbConfig['password'] ?? '';
+            $host = $dbConfig['host'] ?? '127.0.0.1';
+            $database = $dbConfig['database'] ?? '';
+
+            if (empty($database)) {
+                throw new Exception("Nama database belum dikonfigurasi.");
+            }
+
+            // Build mysqldump command with port and redirect stderr to capture errors
+            // Note: Using short flags for compatibility and reliability
+            $command = sprintf(
+                'mysqldump -h %s -P %s -u %s -p%s --single-transaction --quick %s > %s 2>&1',
+                escapeshellarg($host),
+                escapeshellarg($port),
+                escapeshellarg($username),
+                escapeshellarg($password), // In -p%s there's no space between -p and the password
+                escapeshellarg($database),
+                escapeshellarg($path)
+            );
+
+            // Special handling for the password: if it has spaces or special chars, 
+            // some shells might struggle with -p'pass'. 
+            // Let's try the more standard --password version if it fails, but for now stick to one.
+            
+            exec($command, $output, $returnVar);
+
+            if ($returnVar !== 0) {
+                $errorMsg = implode("\n", $output);
+                Log::error('Backup failed', ['return_var' => $returnVar, 'output' => $errorMsg]);
+
+                // Clean up empty/failed file
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+
+                // Mask password in error message if it appears
+                $safeErrorMsg = str_replace($password, '******', $errorMsg);
+                return back()->with('error', 'Gagal membuat backup database: ' . ($safeErrorMsg ?: 'mysqldump tidak ditemukan atau tidak dapat diakses.'));
+            }
+
+            // Verify the file is not empty (mysqldump sometimes exits 0 but writes errors to the file)
+            if (!file_exists($path) || filesize($path) < 100) {
+                $content = file_exists($path) ? file_get_contents($path) : '';
+                Log::error('Backup file empty or too small', ['content' => substr($content, 0, 500)]);
+
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+
+                return back()->with('error', 'Backup file kosong atau corrupt. Pastikan mysqldump tersedia di server.');
+            }
+
+            $sizeFormatted = $this->formatBytes(filesize($path));
+
+            return back()->with('success', "Backup database berhasil dibuat: {$filename} ({$sizeFormatted})");
+        } catch (Exception $e) {
+            Log::error('Backup exception', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return back()->with('error', 'Terjadi kesalahan sistem saat memproses backup: ' . $e->getMessage());
         }
-
-        $sizeFormatted = $this->formatBytes(filesize($path));
-
-        return back()->with('success', "Backup database berhasil dibuat: {$filename} ({$sizeFormatted})");
     }
 
     public function download($filename)
