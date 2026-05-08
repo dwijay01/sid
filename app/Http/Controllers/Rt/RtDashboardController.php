@@ -121,21 +121,30 @@ class RtDashboardController extends Controller
     {
         $wilayahId = $this->getWilayahId();
         $type = $request->input('type', 'penduduk');
+        $status = $request->input('status');
 
         $data = [];
 
         switch ($type) {
             case 'penduduk':
                 $data = Resident::with('familyCard.wilayah')
-                    ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+                    ->whereHas('familyCard', function($q) use ($wilayahId, $status) {
+                        $q->where('wilayah_id', $wilayahId);
+                        if ($status) {
+                            $q->where('kategori_aktif', $status);
+                        }
+                    })
                     ->where('status_penduduk', 'aktif')
                     ->orderBy('nama_lengkap')
                     ->get();
                 break;
             case 'rukem':
-                $data = RukemMember::with('familyCard.kepalaKeluarga', 'familyCard.wilayah')
-                    ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
-                    ->get();
+                $query = RukemMember::with('familyCard.kepalaKeluarga', 'familyCard.wilayah')
+                    ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId));
+                if ($status) {
+                    $query->where('status_keanggotaan', $status);
+                }
+                $data = $query->get();
                 break;
             case 'pindah':
                 $data = PopulationMutation::with('resident.familyCard.wilayah')
@@ -185,6 +194,7 @@ class RtDashboardController extends Controller
         return Inertia::render('Rt/Reports', [
             'data' => $data,
             'type' => $type,
+            'filters' => $request->only('type', 'status'),
         ]);
     }
 }

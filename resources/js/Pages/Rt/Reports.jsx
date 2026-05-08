@@ -12,14 +12,38 @@ const reportTypes = [
     { key: 'lahir', label: 'Data Kelahiran', icon: Baby, color: 'pink' },
 ];
 
-export default function Reports({ data, type }) {
+const statusOptions = {
+    penduduk: [
+        { value: '', label: 'Semua Status' },
+        { value: 'aktif', label: 'Warga Aktif' },
+        { value: 'kurang_mampu', label: 'Warga Kurang Mampu' },
+        { value: 'tidak_aktif', label: 'Warga Tidak Aktif' },
+    ],
+    rukem: [
+        { value: '', label: 'Semua Status' },
+        { value: 'aktif', label: 'Aktif' },
+        { value: 'khusus', label: 'Khusus' },
+        { value: 'nonaktif', label: 'Nonaktif' },
+    ],
+};
+
+export default function Reports({ data, type, filters = {} }) {
     const [activeType, setActiveType] = useState(type || 'penduduk');
     const [selectedIds, setSelectedIds] = useState([]);
+    const [selectedStatus, setSelectedStatus] = useState(filters.status || '');
 
     const handleSwitch = (newType) => {
         setActiveType(newType);
         setSelectedIds([]);
+        setSelectedStatus('');
         router.get(route('rt.reports'), { type: newType }, { preserveState: true });
+    };
+
+    const handleStatusChange = (e) => {
+        const status = e.target.value;
+        setSelectedStatus(status);
+        setSelectedIds([]);
+        router.get(route('rt.reports'), { type: activeType, status }, { preserveState: true });
     };
 
     const handlePrint = () => {
@@ -27,7 +51,7 @@ export default function Reports({ data, type }) {
     };
 
     const handleExportExcel = () => {
-        let url = route('rt.reports', { type: activeType, export: 'excel' });
+        let url = route('rt.reports', { type: activeType, status: selectedStatus, export: 'excel' });
         if (selectedIds.length > 0) {
             url += `&selected_ids=${selectedIds.join(',')}`;
         }
@@ -52,6 +76,7 @@ export default function Reports({ data, type }) {
 
     const activeReport = reportTypes.find(r => r.key === activeType);
     const hasSelection = selectedIds.length > 0;
+    const hasStatusFilter = statusOptions[activeType];
 
     return (
         <RtLayout header="Report & Cetak">
@@ -59,7 +84,7 @@ export default function Reports({ data, type }) {
 
             <div className="mb-6 print:hidden">
                 <div className="rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
                         <div className="flex items-center gap-3">
                             <div className="bg-blue-100 dark:bg-blue-900/40 p-3 rounded-xl text-blue-600 dark:text-blue-400"><FileBarChart size={24} /></div>
                             <div>
@@ -67,13 +92,26 @@ export default function Reports({ data, type }) {
                                 <p className="text-sm text-slate-500 dark:text-slate-400">Pilih jenis report untuk ditampilkan dan dicetak.</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <button onClick={handleExportExcel} className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-bold shadow-sm transition-colors print:hidden">
-                                <FileSpreadsheet size={16} /> Export {hasSelection ? `(${selectedIds.length})` : 'Excel'}
-                            </button>
-                            <button onClick={handlePrint} className="inline-flex items-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-sm font-bold shadow-sm transition-colors print:hidden">
-                                <Printer size={16} /> Cetak {hasSelection ? `(${selectedIds.length})` : ''}
-                            </button>
+                        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                            {hasStatusFilter && (
+                                <select
+                                    value={selectedStatus}
+                                    onChange={handleStatusChange}
+                                    className="w-full sm:w-auto border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm focus:ring-teal-500 focus:border-teal-500 print:hidden"
+                                >
+                                    {statusOptions[activeType].map((opt) => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                </select>
+                            )}
+                            <div className="flex gap-2 w-full sm:w-auto">
+                                <button onClick={handleExportExcel} className="flex-1 sm:flex-none justify-center inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-bold shadow-sm transition-colors print:hidden">
+                                    <FileSpreadsheet size={16} /> Export {hasSelection ? `(${selectedIds.length})` : 'Excel'}
+                                </button>
+                                <button onClick={handlePrint} className="flex-1 sm:flex-none justify-center inline-flex items-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-sm font-bold shadow-sm transition-colors print:hidden">
+                                    <Printer size={16} /> Cetak {hasSelection ? `(${selectedIds.length})` : ''}
+                                </button>
+                            </div>
                         </div>
                     </div>
 

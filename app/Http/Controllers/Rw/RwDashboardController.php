@@ -214,16 +214,20 @@ class RwDashboardController extends Controller
         $wilayahIds = $this->getWilayahIds();
         $type = $request->input('type', 'penduduk');
         $rt = $request->input('rt');
+        $status = $request->input('status');
 
         $data = [];
 
         switch ($type) {
             case 'penduduk':
                 $data = Resident::with('familyCard.wilayah')
-                    ->whereHas('familyCard', function($q) use ($wilayahIds, $rt) {
+                    ->whereHas('familyCard', function($q) use ($wilayahIds, $rt, $status) {
                         $q->whereIn('wilayah_id', $wilayahIds);
                         if ($rt) {
                             $q->whereHas('wilayah', fn($q2) => $q2->where('rt', $rt));
+                        }
+                        if ($status) {
+                            $q->where('kategori_aktif', $status);
                         }
                     })
                     ->where('status_penduduk', 'aktif')
@@ -231,14 +235,17 @@ class RwDashboardController extends Controller
                     ->get();
                 break;
             case 'rukem':
-                $data = RukemMember::with('familyCard.kepalaKeluarga', 'familyCard.wilayah')
+                $query = RukemMember::with('familyCard.kepalaKeluarga', 'familyCard.wilayah')
                     ->whereHas('familyCard', function($q) use ($wilayahIds, $rt) {
                         $q->whereIn('wilayah_id', $wilayahIds);
                         if ($rt) {
                             $q->whereHas('wilayah', fn($q2) => $q2->where('rt', $rt));
                         }
-                    })
-                    ->get();
+                    });
+                if ($status) {
+                    $query->where('status_keanggotaan', $status);
+                }
+                $data = $query->get();
                 break;
             case 'pindah':
                 $data = PopulationMutation::with('resident.familyCard.wilayah')
@@ -311,7 +318,7 @@ class RwDashboardController extends Controller
             'data' => $data,
             'type' => $type,
             'wilayahList' => $wilayahList,
-            'filters' => $request->only('type', 'rt'),
+            'filters' => $request->only('type', 'rt', 'status'),
         ]);
     }
 

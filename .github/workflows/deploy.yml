@@ -54,7 +54,7 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.REMOTE_PORT || 22 }}
+          port: ${{ secrets.REMOTE_PORT || 2222 }}
           script: |
             cd ${{ secrets.REMOTE_PATH }}
             git pull origin main

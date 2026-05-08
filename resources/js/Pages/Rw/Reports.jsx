@@ -13,19 +13,42 @@ const reportTypes = [
     { key: 'lahir', label: 'Data Kelahiran', icon: Baby, color: 'pink' },
 ];
 
+const statusOptions = {
+    penduduk: [
+        { value: '', label: 'Semua Status' },
+        { value: 'aktif', label: 'Warga Aktif' },
+        { value: 'kurang_mampu', label: 'Warga Kurang Mampu' },
+        { value: 'tidak_aktif', label: 'Warga Tidak Aktif' },
+    ],
+    rukem: [
+        { value: '', label: 'Semua Status' },
+        { value: 'aktif', label: 'Aktif' },
+        { value: 'khusus', label: 'Khusus' },
+        { value: 'nonaktif', label: 'Nonaktif' },
+    ],
+};
+
 export default function Reports({ data, type, wilayahList = [], filters = {} }) {
     const [activeType, setActiveType] = useState(type || 'penduduk');
     const [selectedRt, setSelectedRt] = useState(filters.rt || '');
+    const [selectedStatus, setSelectedStatus] = useState(filters.status || '');
 
     const handleSwitch = (newType) => {
         setActiveType(newType);
+        setSelectedStatus('');
         router.get(route('rw.reports'), { type: newType, rt: selectedRt }, { preserveState: true });
     };
 
     const handleRtChange = (e) => {
         const rt = e.target.value;
         setSelectedRt(rt);
-        router.get(route('rw.reports'), { type: activeType, rt }, { preserveState: true });
+        router.get(route('rw.reports'), { type: activeType, rt, status: selectedStatus }, { preserveState: true });
+    };
+
+    const handleStatusChange = (e) => {
+        const status = e.target.value;
+        setSelectedStatus(status);
+        router.get(route('rw.reports'), { type: activeType, rt: selectedRt, status }, { preserveState: true });
     };
 
     const handlePrint = () => {
@@ -33,10 +56,11 @@ export default function Reports({ data, type, wilayahList = [], filters = {} }) 
     };
 
     const handleExportExcel = () => {
-        window.location.href = route('rw.reports', { type: activeType, rt: selectedRt, export: 'excel' });
+        window.location.href = route('rw.reports', { type: activeType, rt: selectedRt, status: selectedStatus, export: 'excel' });
     };
 
     const activeReport = reportTypes.find(r => r.key === activeType);
+    const hasStatusFilter = statusOptions[activeType];
 
     return (
         <RwLayout header="Report & Cetak">
@@ -63,6 +87,17 @@ export default function Reports({ data, type, wilayahList = [], filters = {} }) 
                                     <option key={w.id} value={w.rt}>RT {w.rt}</option>
                                 ))}
                             </select>
+                            {hasStatusFilter && (
+                                <select
+                                    value={selectedStatus}
+                                    onChange={handleStatusChange}
+                                    className="w-full sm:w-auto border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm focus:ring-teal-500 focus:border-teal-500 print:hidden"
+                                >
+                                    {statusOptions[activeType].map((opt) => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                </select>
+                            )}
                             <div className="flex gap-2 w-full sm:w-auto">
                                 <button onClick={handleExportExcel} className="flex-1 sm:flex-none justify-center inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-bold shadow-sm transition-colors print:hidden">
                                     <FileSpreadsheet size={16} /> Export
