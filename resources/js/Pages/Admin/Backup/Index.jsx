@@ -1,13 +1,19 @@
-import React from 'react';
-import { Head, router } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { Head, router, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Database, Download, Trash2, Plus, Clock, HardDrive, AlertTriangle } from 'lucide-react';
+import { Database, Download, Trash2, Plus, Clock, HardDrive, AlertTriangle, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import PrimaryButton from '@/Components/PrimaryButton';
 
 export default function Index({ backups = [] }) {
+    const { flash } = usePage().props;
+    const [processing, setProcessing] = useState(false);
+
     const handleCreateBackup = () => {
         if (confirm('Apakah Anda yakin ingin membuat backup database sekarang? Proses ini mungkin memakan waktu beberapa saat.')) {
-            router.post(route('admin.backup.create'));
+            setProcessing(true);
+            router.post(route('admin.backup.create'), {}, {
+                onFinish: () => setProcessing(false),
+            });
         }
     };
 
@@ -30,11 +36,38 @@ export default function Index({ backups = [] }) {
                 <PrimaryButton 
                     onClick={handleCreateBackup}
                     className="flex items-center gap-2"
+                    disabled={processing}
                 >
-                    <Plus size={18} />
-                    Buat Backup Baru
+                    {processing ? (
+                        <>
+                            <Loader2 size={18} className="animate-spin" />
+                            Memproses Backup...
+                        </>
+                    ) : (
+                        <>
+                            <Plus size={18} />
+                            Buat Backup Baru
+                        </>
+                    )}
                 </PrimaryButton>
             </div>
+
+            {/* Flash Messages */}
+            {flash?.success && (
+                <div className="mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 flex items-start gap-3">
+                    <CheckCircle className="text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" size={20} />
+                    <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">{flash.success}</p>
+                </div>
+            )}
+            {flash?.error && (
+                <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 flex items-start gap-3">
+                    <XCircle className="text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" size={20} />
+                    <div>
+                        <p className="text-sm font-bold text-red-800 dark:text-red-300 mb-1">Backup Gagal</p>
+                        <p className="text-sm text-red-700 dark:text-red-400">{flash.error}</p>
+                    </div>
+                </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-4">
