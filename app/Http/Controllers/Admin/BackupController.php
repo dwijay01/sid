@@ -79,6 +79,10 @@ class BackupController extends Controller
                 return redirect()->route('admin.backup.index')->with('error', 'Nama database tidak dikonfigurasi.');
             }
 
+            // Diagnostic: Check if mysqldump exists
+            exec('which mysqldump', $whichOutput, $whichReturn);
+            Log::info('Diagnostic: which mysqldump', ['output' => $whichOutput, 'return' => $whichReturn]);
+
             // Using standard mysqldump command
             $command = sprintf(
                 'mysqldump --user=%s --password=%s --host=%s --port=%s --single-transaction --quick %s > %s 2>&1',
@@ -90,15 +94,19 @@ class BackupController extends Controller
                 escapeshellarg($path)
             );
 
+            Log::info('Executing backup command', ['command' => str_replace($password, '******', $command)]);
+
             exec($command, $output, $returnVar);
 
             if ($returnVar !== 0) {
                 if (Storage::exists($relativePath)) {
                     Storage::delete($relativePath);
                 }
-                $errorMsg = substr(implode("\n", $output), 0, 500);
+                $errorMsg = implode("\n", $output);
+                Log::error('Backup failed', ['return_var' => $returnVar, 'output' => substr($errorMsg, 0, 1000)]);
+                
                 $safeError = str_replace($password, '******', $errorMsg);
-                return redirect()->route('admin.backup.index')->with('error', 'Gagal: ' . ($safeError ?: 'Perintah mysqldump gagal.'));
+                return redirect()->route('admin.backup.index')->with('error', 'Gagal (' . $returnVar . '): ' . (substr($safeError, 0, 200) ?: 'Perintah mysqldump gagal.'));
             }
 
             if (!Storage::exists($relativePath) || Storage::size($relativePath) < 10) {
