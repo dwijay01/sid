@@ -34,7 +34,11 @@ class BackupController extends Controller
     public function create()
     {
         try {
+            set_time_limit(300); // Allow up to 5 minutes
+            
             $filename = 'backup-' . date('Y-m-d-His') . '.sql';
+            Log::info('Backup process started', ['filename' => $filename]);
+
             if (!Storage::exists('backups')) {
                 Storage::makeDirectory('backups');
             }
@@ -75,6 +79,7 @@ class BackupController extends Controller
             // Let's try the more standard --password version if it fails, but for now stick to one.
             
             exec($command, $output, $returnVar);
+            Log::info('Mysqldump command finished', ['return_var' => $returnVar]);
 
             if ($returnVar !== 0) {
                 $errorMsg = implode("\n", $output);
