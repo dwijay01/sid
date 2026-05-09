@@ -38,22 +38,19 @@ class BackupController extends Controller
             
             $filename = 'backup-' . date('Y-m-d-His') . '.sql';
             $relativeDir = 'backups';
-            $relativeWeight = $relativeDir . '/' . $filename;
-
-            Log::info('Backup starting', ['filename' => $filename]);
+            $relativePath = $relativeDir . '/' . $filename;
 
             if (!Storage::exists($relativeDir)) {
                 Storage::makeDirectory($relativeDir);
             }
 
-            // Get absolute path for mysqldump
-            $path = Storage::path($relativeWeight);
+            $path = Storage::path($relativePath);
 
             $connection = config('database.default', 'mysql');
             $dbConfig = config("database.connections.{$connection}");
 
             if (!$dbConfig) {
-                throw new Exception("Database configuration for '{$connection}' not found.");
+                return redirect()->route('admin.backup.index')->with('error', 'Konfigurasi database tidak ditemukan.');
             }
 
             $host = $dbConfig['host'] ?? '127.0.0.1';
@@ -63,10 +60,10 @@ class BackupController extends Controller
             $database = $dbConfig['database'] ?? '';
 
             if (empty($database)) {
-                throw new Exception("Database name is not configured.");
+                return redirect()->route('admin.backup.index')->with('error', 'Nama database tidak dikonfigurasi.');
             }
 
-            // Using --user and --password format which is generally more robust
+            // Using standard mysqldump command
             $command = sprintf(
                 'mysqldump --user=%s --password=%s --host=%s --port=%s --single-transaction --quick %s > %s 2>&1',
                 escapeshellarg($username),
@@ -78,68 +75,66 @@ class BackupController extends Controller
             );
 
             exec($command, $output, $returnVar);
-            
-            Log::info('Mysqldump finished', ['return_var' => $returnVar]);
 
             if ($returnVar !== 0) {
-                $errorMsg = substr(implode("\n", $output), 0, 1000); // Limit error message size
-                Log::error('Backup command failed', ['output' => $errorMsg]);
-
-                if (Storage::exists($relativeWeight)) {
-                    Storage::delete($relativeWeight);
+                if (Storage::exists($relativePath)) {
+                    Storage::delete($relativePath);
                 }
-
+                $errorMsg = substr(implode("\n", $output), 0, 500);
                 $safeError = str_replace($password, '******', $errorMsg);
-                return back()->with('error', 'Gagal: ' . ($safeError ?: 'Perintah mysqldump gagal.'));
+                return redirect()->route('admin.backup.index')->with('error', 'Gagal: ' . ($safeError ?: 'Perintah mysqldump gagal.'));
             }
 
-            if (!Storage::exists($relativeWeight) || Storage::size($relativeWeight) < 100) {
-                Log::error('Backup file missing or too small');
-                if (Storage::exists($relativeWeight)) {
-                    Storage::delete($relativeWeight);
+            if (!Storage::exists($relativePath) || Storage::size($relativePath) < 10) {
+                if (Storage::exists($relativePath)) {
+                    Storage::delete($relativePath);
                 }
-                return back()->with('error', 'File backup tidak valid atau kosong.');
+                return redirect()->route('admin.backup.index')->with('error', 'File backup tidak terbentuk dengan benar.');
             }
 
-            $size = Storage::size($relativeWeight);
+            $size = Storage::size($relativePath);
             $sizeFormatted = $this->formatBytes($size);
 
-            Log::info('Backup success', ['filename' => $filename, 'size' => $sizeFormatted]);
-
-            return back()->with('success', "Backup berhasil: {$filename} ({$sizeFormatted})");
+            return redirect()->route('admin.backup.index')->with('success', "Backup berhasil: {$filename} ({$sizeFormatted})");
 
         } catch (Exception $e) {
-            Log::error('Backup exception: ' . $e->getMessage());
-            return back()->with('error', 'Error sistem: ' . $e->getMessage());
+            Log::error('Backup Error: ' . $e->getMessage());
+            return redirect()->route('admin.backup.index')->with('error', 'Kesalahan sistem: ' . $e->getMessage());
         }
     }
 
     public function download($filename)
     {
-        $path = 'backups/' . $filename;
-        if (!Storage::exists($path)) {
-            return back()->with('error', 'File tidak ditemukan.');
+        try {
+            $path = 'backups/' . $filename;
+            if (!Storage::exists($path)) {
+                return redirect()->route('admin.backup.index')->with('error', 'File tidak ditemukan.');
+            }
+            return Storage::download($path);
+        } catch (Exception $e) {
+            return redirect()->route('admin.backup.index')->with('error', 'Gagal mengunduh: ' . $e->getMessage());
         }
-
-        return Storage::download($path);
     }
 
     public function destroy($filename)
     {
-        $path = 'backups/' . $filename;
-        if (Storage::exists($path)) {
-            Storage::delete($path);
-            return back()->with('success', 'File backup berhasil dihapus.');
+        try {
+            $path = 'backups/' . $filename;
+            if (Storage::exists($path)) {
+                Storage::delete($path);
+                return redirect()->route('admin.backup.index')->with('success', 'Backup berhasil dihapus.');
+            }
+            return redirect()->route('admin.backup.index')->with('error', 'File tidak ditemukan.');
+        } catch (Exception $e) {
+            return redirect()->route('admin.backup.index')->with('error', 'Gagal menghapus: ' . $e->getMessage());
         }
-
-        return back()->with('error', 'File tidak ditemukan.');
     }
 
     private function formatBytes($bytes, $precision = 2)
     {
+        if ($bytes <= 0) return '0 B';
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = floor(log($bytes, 1024));
         $pow = min($pow, count($units) - 1);
         $value = $bytes / pow(1024, $pow);
 
