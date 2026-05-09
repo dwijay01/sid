@@ -13,24 +13,38 @@ class BackupController extends Controller
 {
     public function index()
     {
-        if (!Storage::exists('backups')) {
-            Storage::makeDirectory('backups');
+        try {
+            if (!Storage::exists('backups')) {
+                Storage::makeDirectory('backups');
+            }
+
+            $files = Storage::files('backups');
+            
+            $backups = collect($files)->map(function ($file) {
+                try {
+                    if (!Storage::exists($file)) return null;
+                    
+                    $size = Storage::size($file);
+                    $lastModified = Storage::lastModified($file);
+                    
+                    return [
+                        'name' => basename($file),
+                        'size' => $this->formatBytes($size),
+                        'created_at' => $lastModified ? date('Y-m-d H:i:s', $lastModified) : 'N/A',
+                    ];
+                } catch (Exception $e) {
+                    Log::warning('Failed to process backup file: ' . $file, ['error' => $e->getMessage()]);
+                    return null;
+                }
+            })->filter()->sortByDesc('created_at')->values();
+
+            return Inertia::render('Admin/Backup/Index', [
+                'backups' => $backups
+            ]);
+        } catch (Exception $e) {
+            Log::error('Backup Index Error: ' . $e->getMessage());
+            return redirect()->route('admin.dashboard')->with('error', 'Gagal memuat halaman backup: ' . $e->getMessage());
         }
-
-        $files = Storage::files('backups');
-        Log::info('Listing backups', ['count' => count($files)]);
-        
-        $backups = collect($files)->map(function ($file) {
-            return [
-                'name' => basename($file),
-                'size' => $this->formatBytes(Storage::size($file)),
-                'created_at' => date('Y-m-d H:i:s', Storage::lastModified($file)),
-            ];
-        })->sortByDesc('created_at')->values();
-
-        return Inertia::render('Admin/Backup/Index', [
-            'backups' => $backups
-        ]);
     }
 
     public function create()
