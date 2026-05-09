@@ -34,85 +34,83 @@ class BackupController extends Controller
     public function create()
     {
         try {
-            set_time_limit(300); // Allow up to 5 minutes
+            set_time_limit(300);
             
             $filename = 'backup-' . date('Y-m-d-His') . '.sql';
-            Log::info('Backup process started', ['filename' => $filename]);
+            $relativeDir = 'backups';
+            $relativeWeight = $relativeDir . '/' . $filename;
 
-            if (!Storage::exists('backups')) {
-                Storage::makeDirectory('backups');
+            Log::info('Backup starting', ['filename' => $filename]);
+
+            if (!Storage::exists($relativeDir)) {
+                Storage::makeDirectory($relativeDir);
             }
 
-            $path = Storage::path('backups/' . $filename);
+            // Get absolute path for mysqldump
+            $path = Storage::path($relativeWeight);
 
             $connection = config('database.default', 'mysql');
             $dbConfig = config("database.connections.{$connection}");
 
             if (!$dbConfig) {
-                throw new Exception("Konfigurasi database untuk koneksi '{$connection}' tidak ditemukan.");
+                throw new Exception("Database configuration for '{$connection}' not found.");
             }
 
+            $host = $dbConfig['host'] ?? '127.0.0.1';
             $port = $dbConfig['port'] ?? 3306;
             $username = $dbConfig['username'] ?? '';
             $password = $dbConfig['password'] ?? '';
-            $host = $dbConfig['host'] ?? '127.0.0.1';
             $database = $dbConfig['database'] ?? '';
 
             if (empty($database)) {
-                throw new Exception("Nama database belum dikonfigurasi.");
+                throw new Exception("Database name is not configured.");
             }
 
-            // Build mysqldump command with port and redirect stderr to capture errors
-            // Note: Using short flags for compatibility and reliability
+            // Using --user and --password format which is generally more robust
             $command = sprintf(
-                'mysqldump -h %s -P %s -u %s -p%s --single-transaction --quick %s > %s 2>&1',
+                'mysqldump --user=%s --password=%s --host=%s --port=%s --single-transaction --quick %s > %s 2>&1',
+                escapeshellarg($username),
+                escapeshellarg($password),
                 escapeshellarg($host),
                 escapeshellarg($port),
-                escapeshellarg($username),
-                escapeshellarg($password), // In -p%s there's no space between -p and the password
                 escapeshellarg($database),
                 escapeshellarg($path)
             );
 
-            // Special handling for the password: if it has spaces or special chars, 
-            // some shells might struggle with -p'pass'. 
-            // Let's try the more standard --password version if it fails, but for now stick to one.
-            
             exec($command, $output, $returnVar);
-            Log::info('Mysqldump command finished', ['return_var' => $returnVar]);
+            
+            Log::info('Mysqldump finished', ['return_var' => $returnVar]);
 
             if ($returnVar !== 0) {
-                $errorMsg = implode("\n", $output);
-                Log::error('Backup failed', ['return_var' => $returnVar, 'output' => $errorMsg]);
+                $errorMsg = substr(implode("\n", $output), 0, 1000); // Limit error message size
+                Log::error('Backup command failed', ['output' => $errorMsg]);
 
-                // Clean up empty/failed file
-                if (file_exists($path)) {
-                    unlink($path);
+                if (Storage::exists($relativeWeight)) {
+                    Storage::delete($relativeWeight);
                 }
 
-                // Mask password in error message if it appears
-                $safeErrorMsg = str_replace($password, '******', $errorMsg);
-                return back()->with('error', 'Gagal membuat backup database: ' . ($safeErrorMsg ?: 'mysqldump tidak ditemukan atau tidak dapat diakses.'));
+                $safeError = str_replace($password, '******', $errorMsg);
+                return back()->with('error', 'Gagal: ' . ($safeError ?: 'Perintah mysqldump gagal.'));
             }
 
-            // Verify the file is not empty (mysqldump sometimes exits 0 but writes errors to the file)
-            if (!file_exists($path) || filesize($path) < 100) {
-                $content = file_exists($path) ? file_get_contents($path) : '';
-                Log::error('Backup file empty or too small', ['content' => substr($content, 0, 500)]);
-
-                if (file_exists($path)) {
-                    unlink($path);
+            if (!Storage::exists($relativeWeight) || Storage::size($relativeWeight) < 100) {
+                Log::error('Backup file missing or too small');
+                if (Storage::exists($relativeWeight)) {
+                    Storage::delete($relativeWeight);
                 }
-
-                return back()->with('error', 'Backup file kosong atau corrupt. Pastikan mysqldump tersedia di server.');
+                return back()->with('error', 'File backup tidak valid atau kosong.');
             }
 
-            $sizeFormatted = $this->formatBytes(filesize($path));
+            $size = Storage::size($relativeWeight);
+            $sizeFormatted = $this->formatBytes($size);
 
-            return back()->with('success', "Backup database berhasil dibuat: {$filename} ({$sizeFormatted})");
+            Log::info('Backup success', ['filename' => $filename, 'size' => $sizeFormatted]);
+
+            return back()->with('success', "Backup berhasil: {$filename} ({$sizeFormatted})");
+
         } catch (Exception $e) {
-            Log::error('Backup exception', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            return back()->with('error', 'Terjadi kesalahan sistem saat memproses backup: ' . $e->getMessage());
+            Log::error('Backup exception: ' . $e->getMessage());
+            return back()->with('error', 'Error sistem: ' . $e->getMessage());
         }
     }
 
@@ -143,8 +141,8 @@ class BackupController extends Controller
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
-        $bytes /= pow(1024, $pow);
+        $value = $bytes / pow(1024, $pow);
 
-        return round($bytes, $precision) . ' ' . $units[$pow];
+        return round($value, $precision) . ' ' . $units[$pow];
     }
 }
