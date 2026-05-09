@@ -18,6 +18,8 @@ class BackupController extends Controller
         }
 
         $files = Storage::files('backups');
+        Log::info('Listing backups', ['count' => count($files)]);
+        
         $backups = collect($files)->map(function ($file) {
             return [
                 'name' => basename($file),

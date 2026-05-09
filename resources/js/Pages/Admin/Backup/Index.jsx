@@ -4,9 +4,16 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import { Database, Download, Trash2, Plus, Clock, HardDrive, AlertTriangle, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import PrimaryButton from '@/Components/PrimaryButton';
 
-export default function Index({ backups = [] }) {
+export default function Index({ backups = [], auth }) {
     const { flash } = usePage().props;
     const [processing, setProcessing] = useState(false);
+
+    // Debug flash messages
+    React.useEffect(() => {
+        if (flash?.success || flash?.error) {
+            console.log('Flash messages received:', flash);
+        }
+    }, [flash]);
 
     const handleCreateBackup = () => {
         if (confirm('Apakah Anda yakin ingin membuat backup database sekarang? Proses ini mungkin memakan waktu beberapa saat.')) {
