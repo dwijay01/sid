@@ -18,7 +18,7 @@ class BansosController extends Controller
     {
         $wilayahIds = $this->getManagedWilayahIds();
 
-        $families = FamilyCard::with(['wilayah', 'head'])
+        $families = FamilyCard::with(['wilayah', 'kepalaKeluarga'])
             ->whereIn('wilayah_id', $wilayahIds)
             // Filtering by housing condition criteria (example: non-permanent wall/floor)
             ->when($request->priority === 'high', function ($q) {

@@ -21,13 +21,16 @@ class InternetController extends Controller
     {
         $wilayahIds = $this->getManagedWilayahIds();
 
-        $subscriptions = InternetSubscription::with('familyCard.wilayah')
+        $subscriptions = InternetSubscription::with(['resident', 'familyCard.wilayah'])
             ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
             ->when($request->search, function ($q, $search) {
-                $q->whereHas('familyCard', fn($f) => $f->where('no_kk', 'like', "%{$search}%")
+                $q->whereHas('resident', fn($r) => $r->where('nama_lengkap', 'like', "%{$search}%")
+                    ->orWhere('nik', 'like', "%{$search}%"))
+                  ->orWhereHas('familyCard', fn($f) => $f->where('no_kk', 'like', "%{$search}%")
                     ->orWhere('alamat', 'like', "%{$search}%"));
             })
             ->when($request->status, fn($q, $status) => $q->where('status', $status))
+            ->latest()
             ->paginate(20)
             ->withQueryString();
 
@@ -40,20 +43,21 @@ class InternetController extends Controller
     public function create()
     {
         $wilayahIds = $this->getManagedWilayahIds();
-        $familyCards = FamilyCard::with(['kepalaKeluarga', 'wilayah'])
-            ->whereIn('wilayah_id', $wilayahIds)
-            ->orderBy('no_kk')
+        $residents = \App\Models\Resident::with('familyCard.wilayah')
+            ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+            ->where('status_penduduk', 'aktif')
+            ->orderBy('nama_lengkap')
             ->get();
 
         return Inertia::render('SiePemberdayaan/Internet/Form', [
-            'familyCards' => $familyCards,
+            'residents' => $residents,
         ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'family_card_id' => 'required|exists:family_cards,id',
+            'resident_id' => 'required|exists:residents,id',
             'package_name' => 'required|string|max:255',
             'installation_date' => 'required|date',
             'access_point_location' => 'nullable|string|max:255',
@@ -61,40 +65,45 @@ class InternetController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        // Automatically associate family card if available
+        $resident = \App\Models\Resident::find($validated['resident_id']);
+        $validated['family_card_id'] = $resident->family_card_id;
+
         InternetSubscription::create($validated);
 
         return redirect()->route('sie-pemberdayaan.internet.index')
-            ->with('success', 'Berlangganan internet berhasil didaftarkan.');
+            ->with('success', 'Berlangganan internet warga berhasil didaftarkan.');
     }
 
     public function edit(InternetSubscription $internetSubscription)
     {
         $wilayahIds = $this->getManagedWilayahIds();
         
-        // Ensure access to this RW's data
-        if (!in_array($internetSubscription->familyCard->wilayah_id, $wilayahIds)) {
-            abort(403);
-        }
-
-        $familyCards = FamilyCard::with(['kepalaKeluarga', 'wilayah'])
-            ->whereIn('wilayah_id', $wilayahIds)
+        $residents = \App\Models\Resident::with('familyCard.wilayah')
+            ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+            ->where('status_penduduk', 'aktif')
+            ->orderBy('nama_lengkap')
             ->get();
 
         return Inertia::render('SiePemberdayaan/Internet/Form', [
             'subscription' => $internetSubscription,
-            'familyCards' => $familyCards,
+            'residents' => $residents,
         ]);
     }
 
     public function update(Request $request, InternetSubscription $internetSubscription)
     {
         $validated = $request->validate([
+            'resident_id' => 'required|exists:residents,id',
             'package_name' => 'required|string|max:255',
             'installation_date' => 'required|date',
             'access_point_location' => 'nullable|string|max:255',
             'status' => 'required|in:aktif,isolir,berhenti',
             'notes' => 'nullable|string',
         ]);
+
+        $resident = \App\Models\Resident::find($validated['resident_id']);
+        $validated['family_card_id'] = $resident->family_card_id;
 
         $internetSubscription->update($validated);
 
@@ -118,7 +127,7 @@ class InternetController extends Controller
         }
 
         return Inertia::render('SiePemberdayaan/Internet/Payments', [
-            'subscription' => $internetSubscription->load('familyCard'),
+            'subscription' => $internetSubscription->load(['familyCard', 'resident']),
             'year' => $year,
             'months' => $months,
         ]);

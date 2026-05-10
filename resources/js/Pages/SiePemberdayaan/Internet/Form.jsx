@@ -7,10 +7,11 @@ import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 
-export default function Form({ subscription, familyCards }) {
+export default function Form({ subscription, residents }) {
     const isEdit = !!subscription;
 
     const { data, setData, post, put, processing, errors } = useForm({
+        resident_id: subscription?.resident_id || '',
         family_card_id: subscription?.family_card_id || '',
         package_name: subscription?.package_name || '',
         installation_date: subscription?.installation_date || '',
@@ -28,6 +29,16 @@ export default function Form({ subscription, familyCards }) {
         }
     };
 
+    const [searchResident, setSearchResident] = React.useState('');
+    const [showResidentList, setShowResidentList] = React.useState(false);
+
+    const filteredResidents = residents.filter(res => 
+        res.nama_lengkap.toLowerCase().includes(searchResident.toLowerCase()) ||
+        res.nik.includes(searchResident)
+    );
+
+    const selectedResident = residents.find(res => res.id == data.resident_id);
+
     return (
         <SiePemberdayaanLayout header={isEdit ? 'Edit Langganan' : 'Daftar Langganan Baru'}>
             <Head title={isEdit ? 'Edit Langganan' : 'Daftar Langganan'} />
@@ -40,31 +51,63 @@ export default function Form({ subscription, familyCards }) {
                     <ChevronLeft size={20} />
                 </Link>
                 <div>
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">{isEdit ? 'Edit Data Langganan' : 'Pendaftaran Internet Komunitas'}</h2>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Formulir pendataan infrastruktur internet RW.</p>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">{isEdit ? 'Edit Data Langganan' : 'Pendaftaran Internet Warga'}</h2>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Formulir pendataan infrastruktur internet warga.</p>
                 </div>
             </div>
 
             <div className="max-w-3xl">
                 <form onSubmit={submit} className="space-y-6 bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700">
-                    <div>
-                        <InputLabel htmlFor="family_card_id" value="Pilih Kartu Keluarga" />
-                        <select
-                            id="family_card_id"
-                            className="mt-1 block w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm transition-all h-11"
-                            value={data.family_card_id}
-                            onChange={(e) => setData('family_card_id', e.target.value)}
-                            disabled={isEdit}
-                            required
-                        >
-                            <option value="">Pilih KK...</option>
-                            {familyCards.map((kk) => (
-                                <option key={kk.id} value={kk.id}>
-                                    {kk.no_kk} - {kk.kepala_keluarga?.nama_lengkap || 'Tanpa Kepala'} [RT {kk.wilayah?.rt}/RW {kk.wilayah?.rw}]
-                                </option>
-                            ))}
-                        </select>
-                        <InputError message={errors.family_card_id} className="mt-2" />
+                    <div className="relative">
+                        <InputLabel htmlFor="resident_id" value="Pilih Penduduk (Cari Nama / NIK)" />
+                        
+                        <div className="relative mt-1">
+                            <TextInput
+                                type="text"
+                                className="w-full pl-4 pr-10 rounded-xl"
+                                placeholder="Ketik nama atau NIK untuk mencari..."
+                                value={searchResident || (selectedResident ? `${selectedResident.nama_lengkap} - ${selectedResident.nik}` : '')}
+                                onChange={(e) => {
+                                    setSearchResident(e.target.value);
+                                    setShowResidentList(true);
+                                    if (!e.target.value) setData('resident_id', '');
+                                }}
+                                onFocus={() => setShowResidentList(true)}
+                                disabled={isEdit}
+                            />
+                            {showResidentList && !isEdit && (
+                                <div className="absolute z-50 w-full mt-2 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-xl max-h-64 overflow-y-auto">
+                                    {filteredResidents.length > 0 ? (
+                                        filteredResidents.map((res) => (
+                                            <div
+                                                key={res.id}
+                                                className="px-4 py-3 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 cursor-pointer border-b border-slate-50 dark:border-slate-800 last:border-0"
+                                                onClick={() => {
+                                                    setData('resident_id', res.id);
+                                                    setSearchResident(`${res.nama_lengkap} - ${res.nik}`);
+                                                    setShowResidentList(false);
+                                                }}
+                                            >
+                                                <p className="text-sm font-bold text-slate-800 dark:text-white">{res.nama_lengkap}</p>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                    NIK: {res.nik} | RT {res.family_card?.wilayah?.rt || '-'}/RW {res.family_card?.wilayah?.rw || '-'}
+                                                </p>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="px-4 py-6 text-center text-slate-500 italic text-sm">
+                                            Penduduk tidak ditemukan.
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        <InputError message={errors.resident_id} className="mt-2" />
+                        
+                        {/* Overlay to close dropdown when clicking outside */}
+                        {showResidentList && !isEdit && (
+                            <div className="fixed inset-0 z-40" onClick={() => setShowResidentList(false)}></div>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

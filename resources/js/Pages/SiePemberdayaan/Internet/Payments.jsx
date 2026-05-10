@@ -49,7 +49,9 @@ export default function Payments({ subscription, year, months }) {
                 </Link>
                 <div>
                     <h2 className="text-xl font-bold text-slate-900 dark:text-white">Monitoring Iuran Bulanan</h2>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">No. KK: {subscription.family_card.no_kk} - {subscription.package_name}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                        {subscription.resident?.nama_lengkap || 'N/A'} ({subscription.resident?.nik || '-'}) - {subscription.package_name}
+                    </p>
                 </div>
             </div>
 

@@ -103,7 +103,7 @@ export default function Index({ families, filters }) {
                                     </div>
                                     <div className="truncate">
                                         <h4 className="font-bold text-slate-900 dark:text-white uppercase truncate">
-                                            {family.head?.nama_lengkap || 'Kepala Keluarga Tidak Ditemukan'}
+                                            {family.kepala_keluarga?.nama_lengkap || 'Kepala Keluarga Tidak Ditemukan'}
                                         </h4>
                                         <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">No. KK: {family.no_kk}</p>
                                     </div>

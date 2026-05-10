@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class InternetSubscription extends Model
 {
     protected $fillable = [
+        'resident_id',
         'family_card_id',
         'package_name',
         'installation_date',
@@ -20,6 +21,11 @@ class InternetSubscription extends Model
     protected $casts = [
         'installation_date' => 'date',
     ];
+
+    public function resident(): BelongsTo
+    {
+        return $this->belongsTo(Resident::class);
+    }
 
     public function familyCard(): BelongsTo
     {

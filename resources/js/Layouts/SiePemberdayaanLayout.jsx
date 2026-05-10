@@ -20,7 +20,7 @@ export default function SiePemberdayaanLayout({ header, children }) {
 
     const navigation = [
         { name: 'Dashboard', href: route('sie-pemberdayaan.dashboard'), icon: Home, current: route().current('sie-pemberdayaan.dashboard') },
-        { name: 'Internet Komunitas', href: route('sie-pemberdayaan.internet.index'), icon: Wifi, current: route().current('sie-pemberdayaan.internet.*') },
+        { name: 'Internet Warga', href: route('sie-pemberdayaan.internet.index'), icon: Wifi, current: route().current('sie-pemberdayaan.internet.*') },
         { name: 'Database Keahlian', href: route('sie-pemberdayaan.skills.index'), icon: Briefcase, current: route().current('sie-pemberdayaan.skills.*') },
         { name: 'Rekomendasi Bansos', href: route('sie-pemberdayaan.bansos.index'), icon: HeartHandshake, current: route().current('sie-pemberdayaan.bansos.index') },
         { name: 'Pengelolaan Sampah', href: route('sie-pemberdayaan.waste.index'), icon: Recycle, current: route().current('sie-pemberdayaan.waste.*') },

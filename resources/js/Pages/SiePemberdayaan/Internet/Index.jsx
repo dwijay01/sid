@@ -40,8 +40,8 @@ export default function Index({ subscriptions, filters }) {
     };
 
     return (
-        <SiePemberdayaanLayout header="Internet Komunitas">
-            <Head title="Internet Komunitas" />
+        <SiePemberdayaanLayout header="Internet Warga">
+            <Head title="Internet Warga" />
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                 <div>
@@ -62,7 +62,7 @@ export default function Index({ subscriptions, filters }) {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <TextInput
                         className="w-full pl-10 h-11 bg-slate-50 dark:bg-slate-900 border-none focus:ring-2 focus:ring-indigo-500 rounded-xl"
-                        placeholder="Cari No. KK atau Alamat..."
+                        placeholder="Cari Nama, NIK atau Alamat..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
@@ -95,7 +95,7 @@ export default function Index({ subscriptions, filters }) {
                     <table className="w-full text-left">
                         <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs uppercase font-bold tracking-wider">
                             <tr>
-                                <th className="px-6 py-4">No. KK / Wilayah</th>
+                                <th className="px-6 py-4">Nama Penduduk / NIK</th>
                                 <th className="px-6 py-4">Paket & Lokasi</th>
                                 <th className="px-6 py-4">Tgl Instalasi</th>
                                 <th className="px-6 py-4">Status</th>
@@ -106,8 +106,17 @@ export default function Index({ subscriptions, filters }) {
                             {subscriptions.data.length > 0 ? subscriptions.data.map((sub) => (
                                 <tr key={sub.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-colors">
                                     <td className="px-6 py-4">
-                                        <p className="text-sm font-bold text-slate-800 dark:text-white">{sub.family_card.no_kk}</p>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400">RT {sub.family_card.wilayah.rt} / RW {sub.family_card.wilayah.rw}</p>
+                                        <p className="text-sm font-bold text-slate-800 dark:text-white">
+                                            {sub.resident?.nama_lengkap || 'N/A'}
+                                        </p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+                                            NIK: {sub.resident?.nik || '-'}
+                                        </p>
+                                        {sub.family_card && (
+                                            <p className="text-[10px] text-slate-400 mt-0.5">
+                                                RT {sub.family_card.wilayah.rt} / RW {sub.family_card.wilayah.rw}
+                                            </p>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
