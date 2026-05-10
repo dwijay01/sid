@@ -1,6 +1,6 @@
 import React from 'react';
 import SiePemberdayaanLayout from '@/Layouts/SiePemberdayaanLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { 
     ChevronLeft, 
     Calendar, 
@@ -11,21 +11,14 @@ import {
 } from 'lucide-react';
 
 export default function Payments({ subscription, year, months }) {
-    const { post, processing } = useForm({
-        month: null,
-        year: year,
-        amount: 50000, // Default amount, could be dynamic based on package
-    });
-
     const togglePayment = (month) => {
-        if (processing) return;
-
-        post(route('sie-pemberdayaan.internet.toggle-payment', { 
-            internetSubscription: subscription.id,
+        router.post(route('sie-pemberdayaan.internet.toggle-payment', { 
+            internetSubscription: subscription.id
+        }), {
             month: month,
             year: year,
-            amount: 50000 // In a real app, this would be from the package
-        }), {
+            amount: 50000 
+        }, {
             preserveScroll: true
         });
     };
@@ -115,13 +108,12 @@ export default function Payments({ subscription, year, months }) {
                                 </div>
                             )}
 
-                            <button
-                                onClick={() => togglePayment(m)}
-                                disabled={processing}
-                                className={`w-full mt-2 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${data.payment 
-                                    ? 'bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400' 
-                                    : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-100 dark:shadow-none'}`}
-                            >
+                                <button
+                                    onClick={() => togglePayment(m)}
+                                    className={`w-full mt-2 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${data.payment 
+                                        ? 'bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400' 
+                                        : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-100 dark:shadow-none'}`}
+                                >
                                 {data.payment ? (
                                     <>Batalkan Lunas</>
                                 ) : (
