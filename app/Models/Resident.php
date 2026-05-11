@@ -16,6 +16,7 @@ class Resident extends Model
 
     protected $fillable = [
         'family_card_id',
+        'wilayah_id',
         'nik',
         'nama_lengkap',
         'tempat_lahir',
@@ -43,6 +44,11 @@ class Resident extends Model
     public function familyCard(): BelongsTo
     {
         return $this->belongsTo(FamilyCard::class, 'family_card_id');
+    }
+
+    public function wilayah(): BelongsTo
+    {
+        return $this->belongsTo(WilayahRtRw::class, 'wilayah_id');
     }
 
     public function user(): HasOne

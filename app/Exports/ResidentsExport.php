@@ -66,8 +66,8 @@ class ResidentsExport implements FromCollection, WithHeadings, WithMapping, Shou
             $resident->status_perkawinan ?? $resident->status_kawin, // added fallback to status_perkawinan
             $resident->pekerjaan,
             $resident->golongan_darah,
-            $resident->familyCard->alamat ?? '-',
-            $resident->familyCard->alamat_domisili ?? '-',
+            $resident->familyCard?->alamat ?? '-',
+            $resident->familyCard?->alamat_domisili ?? '-',
             $resident->status_penduduk,
             $resident->created_at->format('Y-m-d H:i:s'),
         ];

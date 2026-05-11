@@ -38,7 +38,10 @@ class ResidentController extends Controller
         }
 
         if ($request->rt) {
-            $query->whereHas('familyCard.wilayah', fn($q) => $q->where('rt', $request->rt));
+            $query->where(function($q) use ($request) {
+                $q->whereHas('familyCard.wilayah', fn($sq) => $sq->where('rt', $request->rt))
+                  ->orWhereHas('wilayah', fn($sq) => $sq->where('rt', $request->rt));
+            });
         }
 
         if ($request->status) {

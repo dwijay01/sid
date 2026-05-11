@@ -137,6 +137,7 @@ class ResidentImport implements ToCollection, WithStartRow
             
             $data = [
                 'family_card_id' => $currentFamilyCard ? $currentFamilyCard->id : null,
+                'wilayah_id' => $rowWilayahId,
                 'nik' => $nik,
                 'nama_lengkap' => $nama,
                 'hubungan_keluarga' => $mappedHubungan,

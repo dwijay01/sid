@@ -30,7 +30,7 @@ class RwDashboardController extends Controller
     {
         $wilayahIds = $this->getWilayahIds();
 
-        $totalPenduduk = Resident::whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+        $totalPenduduk = Resident::whereIn('wilayah_id', $wilayahIds)
             ->where('status_penduduk', 'aktif')->count();
 
         $totalRukem = RukemMember::whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds)->where('status', 'aktif'))
@@ -41,7 +41,7 @@ class RwDashboardController extends Controller
         $totalRT = WilayahRtRw::whereIn('id', $wilayahIds)->count();
 
         $recentMutations = PopulationMutation::with('resident')
-            ->whereHas('resident.familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+            ->whereHas('resident', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
             ->orderByDesc('tanggal_mutasi')
             ->take(5)
             ->get();
@@ -62,7 +62,7 @@ class RwDashboardController extends Controller
                 'total_rt' => $totalRT,
                 'total_umkm' => Umkm::where('status', 'aktif')
                     ->whereHas('resident', fn($q) => $q->where('status_penduduk', 'aktif'))
-                    ->whereHas('resident.familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+                    ->whereHas('resident', fn($q) => $q->where('status_penduduk', 'aktif')->whereIn('wilayah_id', $wilayahIds))
                     ->count(),
                 'total_bebas_sewa' => FamilyCard::whereIn('wilayah_id', $wilayahIds)
                     ->where('status', 'aktif')
@@ -89,7 +89,7 @@ class RwDashboardController extends Controller
         $wilayahIds = $this->getWilayahIds();
 
         $query = Resident::with(['familyCard.wilayah', 'familyCard.rukemMember'])
-            ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds));
+            ->whereIn('wilayah_id', $wilayahIds);
 
         if ($request->sort === 'kk') {
             $query->leftJoin('family_cards', 'residents.family_card_id', '=', 'family_cards.id')

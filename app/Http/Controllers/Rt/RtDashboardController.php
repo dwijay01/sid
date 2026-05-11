@@ -30,7 +30,7 @@ class RtDashboardController extends Controller
     {
         $wilayahId = $this->getWilayahId();
 
-        $totalPenduduk = Resident::whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+        $totalPenduduk = Resident::where('wilayah_id', $wilayahId)
             ->where('status_penduduk', 'aktif')->count();
 
         $totalKK = FamilyCard::where('wilayah_id', $wilayahId)->where('status', 'aktif')->count();
@@ -39,7 +39,7 @@ class RtDashboardController extends Controller
             ->count();
 
         $recentMutations = PopulationMutation::with('resident')
-            ->whereHas('resident.familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+            ->whereHas('resident', fn($q) => $q->where('wilayah_id', $wilayahId))
             ->orderByDesc('tanggal_mutasi')
             ->take(5)
             ->get();
@@ -55,7 +55,7 @@ class RtDashboardController extends Controller
                 'total_rukem' => $totalRukem,
                 'total_umkm' => Umkm::where('status', 'aktif')
                     ->whereHas('resident', fn($q) => $q->where('status_penduduk', 'aktif'))
-                    ->whereHas('resident.familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+                    ->whereHas('resident', fn($q) => $q->where('status_penduduk', 'aktif')->where('wilayah_id', $wilayahId))
                     ->count(),
                 'active_complaints' => $activeComplaintsCount,
             ],
@@ -68,7 +68,7 @@ class RtDashboardController extends Controller
         $wilayahId = $this->getWilayahId();
 
         $query = Resident::with(['familyCard.wilayah', 'familyCard.rukemMember'])
-            ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId));
+            ->where('wilayah_id', $wilayahId);
 
         if ($request->sort === 'kk') {
             $query->leftJoin('family_cards', 'residents.family_card_id', '=', 'family_cards.id')
