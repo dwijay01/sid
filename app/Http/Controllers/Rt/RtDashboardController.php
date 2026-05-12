@@ -127,12 +127,13 @@ class RtDashboardController extends Controller
 
         switch ($type) {
             case 'penduduk':
-                $data = Resident::with('familyCard.wilayah')
-                    ->whereHas('familyCard', function($q) use ($wilayahId, $status) {
-                        $q->where('wilayah_id', $wilayahId);
-                        if ($status) {
-                            $q->where('kategori_aktif', $status);
-                        }
+                $data = Resident::with(['familyCard.wilayah', 'wilayah'])
+                    ->where(function($q) use ($wilayahId) {
+                        $q->where('wilayah_id', $wilayahId)
+                          ->orWhereHas('familyCard', fn($sq) => $sq->where('wilayah_id', $wilayahId));
+                    })
+                    ->when($status, function($q) use ($status) {
+                        $q->whereHas('familyCard', fn($sq) => $sq->where('kategori_aktif', $status));
                     })
                     ->where('status_penduduk', 'aktif')
                     ->orderBy('nama_lengkap')

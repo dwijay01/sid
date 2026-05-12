@@ -20,8 +20,8 @@ class RtUmkmController extends Controller
     {
         $wilayahId = $this->getWilayahId();
 
-        $umkm = Umkm::with('resident.familyCard.wilayah')
-            ->whereHas('resident.familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+        $umkm = Umkm::with(['resident.familyCard.wilayah', 'resident.wilayah'])
+            ->whereHas('resident', fn($q) => $q->where('wilayah_id', $wilayahId))
             ->when($request->search, function ($q, $search) {
                 $q->where('nama_usaha', 'like', "%{$search}%")
                   ->orWhereHas('resident', fn($r) => $r->where('nama_lengkap', 'like', "%{$search}%"));
@@ -43,7 +43,7 @@ class RtUmkmController extends Controller
         $wilayahId = $this->getWilayahId();
 
         $residents = Resident::where('status_penduduk', 'aktif')
-            ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+            ->where('wilayah_id', $wilayahId)
             ->orderBy('nama_lengkap')
             ->get(['id', 'nik', 'nama_lengkap', 'alamat_sekarang', 'family_card_id']);
 
@@ -86,7 +86,7 @@ class RtUmkmController extends Controller
         $wilayahId = $this->getWilayahId();
 
         $residents = Resident::where('status_penduduk', 'aktif')
-            ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+            ->where('wilayah_id', $wilayahId)
             ->orderBy('nama_lengkap')
             ->get(['id', 'nik', 'nama_lengkap', 'alamat_sekarang', 'family_card_id']);
 

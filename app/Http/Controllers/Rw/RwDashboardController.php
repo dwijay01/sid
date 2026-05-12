@@ -111,7 +111,10 @@ class RwDashboardController extends Controller
                 });
             })
             ->when($request->rt, function ($q, $rt) {
-                $q->whereHas('familyCard.wilayah', fn($q2) => $q2->where('rt', $rt));
+                $q->where(function($sq) use ($rt) {
+                    $sq->whereHas('familyCard.wilayah', fn($q2) => $q2->where('rt', $rt))
+                       ->orWhereHas('wilayah', fn($q2) => $q2->where('rt', $rt));
+                });
             })
             ->when($request->status, function ($q, $status) {
                 $q->where('residents.status_penduduk', $status);
@@ -220,15 +223,22 @@ class RwDashboardController extends Controller
 
         switch ($type) {
             case 'penduduk':
-                $data = Resident::with('familyCard.wilayah')
-                    ->whereHas('familyCard', function($q) use ($wilayahIds, $rt, $status) {
-                        $q->whereIn('wilayah_id', $wilayahIds);
+                $data = Resident::with(['familyCard.wilayah', 'wilayah'])
+                    ->where(function($q) use ($wilayahIds, $rt) {
+                        $q->where(function($sq) use ($wilayahIds) {
+                            $sq->whereIn('wilayah_id', $wilayahIds)
+                               ->orWhereHas('familyCard', fn($f) => $f->whereIn('wilayah_id', $wilayahIds));
+                        });
+                        
                         if ($rt) {
-                            $q->whereHas('wilayah', fn($q2) => $q2->where('rt', $rt));
+                            $q->where(function($sq) use ($rt) {
+                                $sq->whereHas('wilayah', fn($w) => $w->where('rt', $rt))
+                                   ->orWhereHas('familyCard.wilayah', fn($w) => $w->where('rt', $rt));
+                            });
                         }
-                        if ($status) {
-                            $q->where('kategori_aktif', $status);
-                        }
+                    })
+                    ->when($status, function($q) use ($status) {
+                        $q->whereHas('familyCard', fn($sq) => $sq->where('kategori_aktif', $status));
                     })
                     ->where('status_penduduk', 'aktif')
                     ->orderBy('nama_lengkap')

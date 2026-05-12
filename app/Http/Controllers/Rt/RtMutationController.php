@@ -21,7 +21,7 @@ class RtMutationController extends Controller
         $wilayahId = $this->getWilayahId();
 
         $mutations = PopulationMutation::with(['resident.familyCard', 'processor'])
-            ->whereHas('resident.familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+            ->whereHas('resident', fn($q) => $q->where('wilayah_id', $wilayahId))
             ->when($request->search, function ($q, $search) {
                 $q->whereHas('resident', fn($q2) => $q2->where('nama_lengkap', 'like', "%{$search}%")
                     ->orWhere('nik', 'like', "%{$search}%"));
@@ -45,7 +45,7 @@ class RtMutationController extends Controller
             ->whereDoesntHave('mutations', function ($q) {
                 $q->whereIn('type', ['mati', 'pindah_keluar']);
             })
-            ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+            ->where('wilayah_id', $wilayahId)
             ->get(['id', 'nik', 'nama_lengkap']);
 
         return Inertia::render('Rt/Mutations/FormMoveOut', [
@@ -116,6 +116,7 @@ class RtMutationController extends Controller
             'jenis_kelamin' => $validated['jenis_kelamin'],
             'agama' => $validated['agama'],
             'family_card_id' => $validated['family_card_id'],
+            'wilayah_id' => $this->getWilayahId(),
             'hubungan_keluarga' => $validated['hubungan_keluarga'],
             'status_penduduk' => 'aktif',
         ]);
@@ -141,7 +142,7 @@ class RtMutationController extends Controller
             ->whereDoesntHave('mutations', function ($q) {
                 $q->whereIn('type', ['mati', 'pindah_keluar']);
             })
-            ->whereHas('familyCard', fn($q) => $q->where('wilayah_id', $wilayahId))
+            ->where('wilayah_id', $wilayahId)
             ->get(['id', 'nik', 'nama_lengkap']);
 
         return Inertia::render('Rt/Mutations/FormDeath', [
@@ -213,6 +214,7 @@ class RtMutationController extends Controller
             'tanggal_lahir' => $validated['tanggal_lahir'],
             'jenis_kelamin' => $validated['jenis_kelamin'],
             'family_card_id' => $validated['family_card_id'],
+            'wilayah_id' => $this->getWilayahId(),
             'hubungan_keluarga' => $validated['hubungan_keluarga'],
             'status_penduduk' => 'aktif',
             'agama' => 'Islam',
