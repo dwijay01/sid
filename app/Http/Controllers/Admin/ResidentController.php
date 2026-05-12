@@ -90,6 +90,10 @@ class ResidentController extends Controller
             'family_card_id' => 'nullable|exists:family_cards,id',
             'alamat_sekarang' => 'nullable|string',
         ]);
+        if (!empty($validated['family_card_id'])) {
+            $fc = FamilyCard::find($validated['family_card_id']);
+            if ($fc) $validated['wilayah_id'] = $fc->wilayah_id;
+        }
 
         Resident::create($validated);
 
@@ -130,6 +134,12 @@ class ResidentController extends Controller
             'alamat_sekarang' => 'nullable|string',
             'status_penduduk' => 'required|in:aktif,meninggal,pindah,hilang',
         ]);
+        if (!empty($validated['family_card_id'])) {
+            $fc = FamilyCard::find($validated['family_card_id']);
+            if ($fc) $validated['wilayah_id'] = $fc->wilayah_id;
+        } else {
+            $validated['wilayah_id'] = null; // Clear if unlinked
+        }
 
         $resident->update($validated);
 

@@ -90,7 +90,7 @@ export default function Form({ subscription, residents }) {
                                             >
                                                 <p className="text-sm font-bold text-slate-800 dark:text-white">{res.nama_lengkap}</p>
                                                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                    NIK: {res.nik} | RT {res.family_card?.wilayah?.rt || '-'}/RW {res.family_card?.wilayah?.rw || '-'}
+                                                    NIK: {res.nik} | RT {res.wilayah?.rt || '-'}/RW {res.wilayah?.rw || '-'}
                                                 </p>
                                             </div>
                                         ))

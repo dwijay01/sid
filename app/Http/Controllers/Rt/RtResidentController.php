@@ -56,6 +56,8 @@ class RtResidentController extends Controller
                 return back()->with('error', 'Kartu Keluarga tidak termasuk dalam wilayah Anda.');
             }
         }
+        // Always set the wilayah_id to the RT's current wilayah
+        $validated['wilayah_id'] = $this->getWilayahId();
 
         Resident::create($validated);
 
@@ -105,6 +107,8 @@ class RtResidentController extends Controller
             'alamat_sekarang' => 'nullable|string',
         ]);
 
+        $validated['wilayah_id'] = $this->getWilayahId();
+        
         $resident->update($validated);
 
         return redirect()->route('rt.residents')

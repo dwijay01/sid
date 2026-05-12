@@ -21,8 +21,8 @@ class InternetController extends Controller
     {
         $wilayahIds = $this->getManagedWilayahIds();
 
-        $subscriptions = InternetSubscription::with(['resident', 'familyCard.wilayah'])
-            ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+        $subscriptions = InternetSubscription::with(['resident.wilayah', 'familyCard.wilayah'])
+            ->whereHas('resident', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
             ->when($request->search, function ($q, $search) {
                 $q->whereHas('resident', fn($r) => $r->where('nama_lengkap', 'like', "%{$search}%")
                     ->orWhere('nik', 'like', "%{$search}%"))
@@ -43,8 +43,8 @@ class InternetController extends Controller
     public function create()
     {
         $wilayahIds = $this->getManagedWilayahIds();
-        $residents = \App\Models\Resident::with('familyCard.wilayah')
-            ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+        $residents = \App\Models\Resident::with(['wilayah', 'familyCard.wilayah'])
+            ->whereIn('wilayah_id', $wilayahIds)
             ->where('status_penduduk', 'aktif')
             ->orderBy('nama_lengkap')
             ->get();
@@ -79,8 +79,8 @@ class InternetController extends Controller
     {
         $wilayahIds = $this->getManagedWilayahIds();
         
-        $residents = \App\Models\Resident::with('familyCard.wilayah')
-            ->whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+        $residents = \App\Models\Resident::with(['wilayah', 'familyCard.wilayah'])
+            ->whereIn('wilayah_id', $wilayahIds)
             ->where('status_penduduk', 'aktif')
             ->orderBy('nama_lengkap')
             ->get();

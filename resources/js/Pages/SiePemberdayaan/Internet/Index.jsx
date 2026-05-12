@@ -112,9 +112,9 @@ export default function Index({ subscriptions, filters }) {
                                         <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                                             NIK: {sub.resident?.nik || '-'}
                                         </p>
-                                        {sub.family_card && (
+                                        {sub.resident?.wilayah && (
                                             <p className="text-[10px] text-slate-400 mt-0.5">
-                                                RT {sub.family_card.wilayah.rt} / RW {sub.family_card.wilayah.rw}
+                                                RT {sub.resident.wilayah.rt} / RW {sub.resident.wilayah.rw}
                                             </p>
                                         )}
                                     </td>
