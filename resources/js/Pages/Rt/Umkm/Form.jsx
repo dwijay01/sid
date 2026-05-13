@@ -3,6 +3,7 @@ import { Head, useForm, Link, router } from '@inertiajs/react';
 import RtLayout from '@/Layouts/RtLayout';
 import { SEKTOR_USAHA, RENTANG_OMZET, JUMLAH_KARYAWAN, UMKM_STATUS } from '@/Helpers/constants';
 import { Store, Upload, Camera, X } from 'lucide-react';
+import SearchableSelect from '@/Components/SearchableSelect';
 
 export default function Form({ umkm, residents = [] }) {
     const isEdit = !!umkm;
@@ -81,30 +82,22 @@ export default function Form({ umkm, residents = [] }) {
                         {!isEdit ? (
                             <div>
                                 <label className={labelClass}>Cari & Pilih Warga *</label>
-                                <input
-                                    type="text" value={residentSearch} onChange={(e) => setResidentSearch(e.target.value)}
-                                    className={inputClass} placeholder="Ketik nama atau NIK warga..."
+                                <SearchableSelect
+                                    options={residents.map(r => ({
+                                        value: r.id,
+                                        label: `${r.nama_lengkap} (NIK: ${r.nik})`
+                                    }))}
+                                    value={data.resident_id}
+                                    onChange={(val) => setData('resident_id', val)}
+                                    placeholder="Ketik nama atau NIK warga..."
+                                    error={errors.resident_id}
                                 />
-                                {residentSearch && (
-                                    <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800">
-                                        {filteredResidents.length > 0 ? filteredResidents.slice(0, 10).map(r => (
-                                            <button key={r.id} type="button" onClick={() => { setData('resident_id', r.id); setResidentSearch(''); }}
-                                                className={`w-full text-left px-4 py-3 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors ${data.resident_id == r.id ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}>
-                                                <div className="font-semibold text-sm text-slate-900 dark:text-white">{r.nama_lengkap}</div>
-                                                <div className="text-xs text-slate-500 font-mono">NIK: {r.nik}</div>
-                                            </button>
-                                        )) : (
-                                            <div className="px-4 py-3 text-sm text-slate-500">Tidak ditemukan warga dengan kata kunci tersebut.</div>
-                                        )}
-                                    </div>
-                                )}
                                 {selectedResident && (
                                     <div className="mt-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
                                         <div className="text-sm font-bold text-blue-800 dark:text-blue-300">{selectedResident.nama_lengkap}</div>
                                         <div className="text-xs text-blue-600 dark:text-blue-400 font-mono">NIK: {selectedResident.nik}</div>
                                     </div>
                                 )}
-                                {errors.resident_id && <p className="mt-1 text-sm text-red-600">{errors.resident_id}</p>}
                             </div>
                         ) : (
                             <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900/40">

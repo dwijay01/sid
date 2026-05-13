@@ -2,6 +2,7 @@ import React from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
 import RtLayout from '@/Layouts/RtLayout';
 import { GENDER_LABELS, FAMILY_RELATIONS } from '@/Helpers/constants';
+import SearchableSelect from '@/Components/SearchableSelect';
 
 export default function FormBirth({ familyCards }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -21,7 +22,19 @@ export default function FormBirth({ familyCards }) {
                         <div><label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Jenis Kelamin *</label><select value={data.jenis_kelamin} onChange={(e) => setData('jenis_kelamin', e.target.value)} className={inputClass}>{Object.entries(GENDER_LABELS).map(([k,v]) => <option key={k} value={k}>{v}</option>)}</select></div>
                         <div><label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tempat Lahir *</label><input type="text" value={data.tempat_lahir} onChange={(e) => setData('tempat_lahir', e.target.value)} className={inputClass} />{errors.tempat_lahir && <p className="mt-1 text-sm text-red-600">{errors.tempat_lahir}</p>}</div>
                         <div><label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tanggal Lahir *</label><input type="date" value={data.tanggal_lahir} onChange={(e) => setData('tanggal_lahir', e.target.value)} className={inputClass} />{errors.tanggal_lahir && <p className="mt-1 text-sm text-red-600">{errors.tanggal_lahir}</p>}</div>
-                        <div><label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kartu Keluarga *</label><select value={data.family_card_id} onChange={(e) => setData('family_card_id', e.target.value)} className={inputClass}><option value="">-- Pilih KK --</option>{familyCards.map((fc) => <option key={fc.id} value={fc.id}>{fc.no_kk} - {fc.kepala_keluarga?.nama_lengkap}</option>)}</select>{errors.family_card_id && <p className="mt-1 text-sm text-red-600">{errors.family_card_id}</p>}</div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kartu Keluarga *</label>
+                            <SearchableSelect
+                                options={familyCards.map(fc => ({
+                                    value: fc.id,
+                                    label: `${fc.no_kk} - ${fc.kepala_keluarga?.nama_lengkap || 'Belum ada Kepala Keluarga'}`
+                                }))}
+                                value={data.family_card_id}
+                                onChange={(val) => setData('family_card_id', val)}
+                                placeholder="Cari No. KK atau Kepala Keluarga..."
+                                error={errors.family_card_id}
+                            />
+                        </div>
                         <div><label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Hubungan Keluarga *</label><select value={data.hubungan_keluarga} onChange={(e) => setData('hubungan_keluarga', e.target.value)} className={inputClass}>{Object.entries(FAMILY_RELATIONS).map(([k,v]) => <option key={k} value={k}>{v}</option>)}</select></div>
                     </div>
                     <div><label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Keterangan</label><textarea value={data.keterangan} onChange={(e) => setData('keterangan', e.target.value)} rows={2} className={inputClass} /></div>

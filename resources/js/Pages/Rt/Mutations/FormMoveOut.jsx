@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
 import RtLayout from '@/Layouts/RtLayout';
+import SearchableSelect from '@/Components/SearchableSelect';
 
 export default function FormMoveOut({ residents }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -16,11 +17,16 @@ export default function FormMoveOut({ residents }) {
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-4">Data Warga Pindah Keluar</h3>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Pilih Warga *</label>
-                        <select value={data.resident_id} onChange={(e) => setData('resident_id', e.target.value)} className={inputClass}>
-                            <option value="">-- Pilih Warga --</option>
-                            {residents.map((r) => <option key={r.id} value={r.id}>{r.nama_lengkap} ({r.nik})</option>)}
-                        </select>
-                        {errors.resident_id && <p className="mt-1 text-sm text-red-600">{errors.resident_id}</p>}
+                        <SearchableSelect
+                            options={residents.map(r => ({
+                                value: r.id,
+                                label: `${r.nama_lengkap} (${r.nik})`
+                            }))}
+                            value={data.resident_id}
+                            onChange={(val) => setData('resident_id', val)}
+                            placeholder="Cari Nama atau NIK..."
+                            error={errors.resident_id}
+                        />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tanggal Pindah *</label>

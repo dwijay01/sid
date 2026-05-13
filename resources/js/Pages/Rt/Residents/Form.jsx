@@ -4,6 +4,7 @@ import RtLayout from '@/Layouts/RtLayout';
 import { RELIGIONS, BLOOD_TYPES, EDUCATION_LEVELS, FAMILY_RELATIONS, MARITAL_STATUS, GENDER_LABELS } from '@/Helpers/constants';
 import { Plus, X } from 'lucide-react';
 import axios from 'axios';
+import SearchableSelect from '@/Components/SearchableSelect';
 
 export default function Form({ resident, familyCards = [], defaultFamilyCardId = '' }) {
     const isEdit = !!resident;
@@ -136,15 +137,18 @@ export default function Form({ resident, familyCards = [], defaultFamilyCardId =
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kartu Keluarga</label>
-                                <div className="flex gap-2">
-                                    <select value={data.family_card_id} onChange={(e) => setData('family_card_id', e.target.value)} className={inputClass}>
-                                        <option value="">-- Pilih KK --</option>
-                                        {localFamilyCards.map((fc) => (
-                                            <option key={fc.id} value={fc.id}>
-                                                {fc.no_kk} {fc.kepala_keluarga ? `- ${fc.kepala_keluarga.nama_lengkap}` : ''}
-                                            </option>
-                                        ))}
-                                    </select>
+                                <div className="flex gap-2 w-full">
+                                    <SearchableSelect
+                                        options={localFamilyCards.map(fc => ({
+                                            value: fc.id,
+                                            label: `${fc.no_kk} ${fc.kepala_keluarga ? `- ${fc.kepala_keluarga.nama_lengkap}` : ''}`
+                                        }))}
+                                        value={data.family_card_id}
+                                        onChange={(val) => setData('family_card_id', val)}
+                                        placeholder="Cari No. KK..."
+                                        error={errors.family_card_id}
+                                        className="flex-1"
+                                    />
                                     <button 
                                         type="button" 
                                         onClick={() => setShowKkModal(true)}

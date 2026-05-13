@@ -69,7 +69,8 @@ class ResidentController extends Controller
     public function create()
     {
         return Inertia::render('Admin/Residents/Form', [
-            'familyCards' => FamilyCard::with('kepalaKeluarga:id,nama_lengkap')->select('id', 'no_kk', 'kepala_keluarga_id')->get(),
+            'familyCards' => FamilyCard::with('kepalaKeluarga:id,nama_lengkap')->select('id', 'no_kk', 'kepala_keluarga_id', 'wilayah_id')->get(),
+            'wilayahList' => WilayahRtRw::select('id', 'rt', 'rw')->orderBy('rt')->get(),
         ]);
     }
 
@@ -88,8 +89,10 @@ class ResidentController extends Controller
             'pendidikan' => 'required|in:tidak_sekolah,SD,SMP,SMA,D1,D2,D3,S1,S2,S3',
             'hubungan_keluarga' => 'required|in:kepala,istri,anak,menantu,cucu,orang_tua,mertua,famili_lain,lainnya',
             'family_card_id' => 'nullable|exists:family_cards,id',
+            'wilayah_id' => 'required|exists:wilayah_rt_rws,id',
             'alamat_sekarang' => 'nullable|string',
         ]);
+
         if (!empty($validated['family_card_id'])) {
             $fc = FamilyCard::find($validated['family_card_id']);
             if ($fc) $validated['wilayah_id'] = $fc->wilayah_id;
@@ -112,7 +115,8 @@ class ResidentController extends Controller
     {
         return Inertia::render('Admin/Residents/Form', [
             'resident' => $resident,
-            'familyCards' => FamilyCard::with('kepalaKeluarga:id,nama_lengkap')->select('id', 'no_kk', 'kepala_keluarga_id')->get(),
+            'familyCards' => FamilyCard::with('kepalaKeluarga:id,nama_lengkap')->select('id', 'no_kk', 'kepala_keluarga_id', 'wilayah_id')->get(),
+            'wilayahList' => WilayahRtRw::select('id', 'rt', 'rw')->orderBy('rt')->get(),
         ]);
     }
 
@@ -131,14 +135,14 @@ class ResidentController extends Controller
             'pendidikan' => 'required|in:tidak_sekolah,SD,SMP,SMA,D1,D2,D3,S1,S2,S3',
             'hubungan_keluarga' => 'required|in:kepala,istri,anak,menantu,cucu,orang_tua,mertua,famili_lain,lainnya',
             'family_card_id' => 'nullable|exists:family_cards,id',
+            'wilayah_id' => 'required|exists:wilayah_rt_rws,id',
             'alamat_sekarang' => 'nullable|string',
             'status_penduduk' => 'required|in:aktif,meninggal,pindah,hilang',
         ]);
+
         if (!empty($validated['family_card_id'])) {
             $fc = FamilyCard::find($validated['family_card_id']);
             if ($fc) $validated['wilayah_id'] = $fc->wilayah_id;
-        } else {
-            $validated['wilayah_id'] = null; // Clear if unlinked
         }
 
         $resident->update($validated);
