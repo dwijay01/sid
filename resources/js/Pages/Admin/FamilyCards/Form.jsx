@@ -2,6 +2,7 @@ import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Save, ArrowLeft } from 'lucide-react';
+import SearchableSelect from '@/Components/SearchableSelect';
 
 export default function Form({ familyCard, residents, wilayah }) {
     const isEdit = !!familyCard;
@@ -70,18 +71,16 @@ export default function Form({ familyCard, residents, wilayah }) {
                                 <div className="sm:col-span-3">
                                     <label htmlFor="kepala_keluarga_id" className="block text-sm font-medium leading-6 text-slate-900 dark:text-white">Kepala Keluarga</label>
                                     <div className="mt-2">
-                                        <select
-                                            id="kepala_keluarga_id"
+                                        <SearchableSelect
+                                            options={residents.map(r => ({
+                                                value: r.id,
+                                                label: `${r.nik} - ${r.nama_lengkap}`
+                                            }))}
                                             value={data.kepala_keluarga_id}
-                                            onChange={e => setData('kepala_keluarga_id', e.target.value)}
-                                            className={`block w-full rounded-md border-0 py-2 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ${errors.kepala_keluarga_id ? 'ring-red-500 focus:ring-red-500' : 'ring-slate-300 dark:ring-slate-700 focus:ring-emerald-600'} sm:text-sm sm:leading-6 bg-slate-50 dark:bg-slate-800/50`}
-                                        >
-                                            <option value="">- Pilih Kepala Keluarga -</option>
-                                            {residents.map(r => (
-                                                <option key={r.id} value={r.id}>{r.nik} - {r.nama_lengkap}</option>
-                                            ))}
-                                        </select>
-                                        {errors.kepala_keluarga_id && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.kepala_keluarga_id}</p>}
+                                            onChange={(val) => setData('kepala_keluarga_id', val)}
+                                            placeholder="Cari NIK atau Nama..."
+                                            error={errors.kepala_keluarga_id}
+                                        />
                                         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                                             *(Penduduk yang dipilih otomatis akan disetel hubungannya sebagai Kepala Keluarga.)
                                         </p>
@@ -105,18 +104,16 @@ export default function Form({ familyCard, residents, wilayah }) {
                                 <div className="sm:col-span-2">
                                     <label htmlFor="wilayah_id" className="block text-sm font-medium leading-6 text-slate-900 dark:text-white">Wilayah (RT/RW)</label>
                                     <div className="mt-2">
-                                        <select
-                                            id="wilayah_id"
+                                        <SearchableSelect
+                                            options={wilayah.map(w => ({
+                                                value: w.id,
+                                                label: `RT ${w.rt} / RW ${w.rw}`
+                                            }))}
                                             value={data.wilayah_id}
-                                            onChange={e => setData('wilayah_id', e.target.value)}
-                                            className={`block w-full rounded-md border-0 py-2 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ${errors.wilayah_id ? 'ring-red-500 focus:ring-red-500' : 'ring-slate-300 dark:ring-slate-700 focus:ring-emerald-600'} sm:text-sm sm:leading-6 bg-slate-50 dark:bg-slate-800/50`}
-                                        >
-                                            <option value="">- Pilih RT/RW -</option>
-                                            {wilayah.map(w => (
-                                                <option key={w.id} value={w.id}>RT {w.rt} / RW {w.rw}</option>
-                                            ))}
-                                        </select>
-                                        {errors.wilayah_id && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.wilayah_id}</p>}
+                                            onChange={(val) => setData('wilayah_id', val)}
+                                            placeholder="Pilih RT/RW..."
+                                            error={errors.wilayah_id}
+                                        />
                                     </div>
                                 </div>
 

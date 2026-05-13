@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import RtLayout from '@/Layouts/RtLayout';
+import SearchableSelect from '@/Components/SearchableSelect';
 
 export default function Form({ familyCard = null, residents = [] }) {
     const isEdit = !!familyCard;
@@ -50,14 +51,17 @@ export default function Form({ familyCard = null, residents = [] }) {
 
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kepala Keluarga</label>
-                                <select value={data.kepala_keluarga_id} onChange={(e) => setData('kepala_keluarga_id', e.target.value)} className={inputClass}>
-                                    <option value="">-- Pilih (Opsional) --</option>
-                                    {residents.map((r) => (
-                                        <option key={r.id} value={r.id}>{r.nama_lengkap} ({r.nik})</option>
-                                    ))}
-                                </select>
+                                <SearchableSelect
+                                    options={residents.map(r => ({
+                                        value: r.id,
+                                        label: `${r.nama_lengkap} (${r.nik})`
+                                    }))}
+                                    value={data.kepala_keluarga_id}
+                                    onChange={(val) => setData('kepala_keluarga_id', val)}
+                                    placeholder="Cari Nama atau NIK..."
+                                    error={errors.kepala_keluarga_id}
+                                />
                                 <p className="mt-1 text-xs text-slate-500">Kepala keluarga dapat diset setelah profil penduduk didaftarkan.</p>
-                                {errors.kepala_keluarga_id && <p className="mt-1 text-sm text-red-600">{errors.kepala_keluarga_id}</p>}
                             </div>
 
                             <div className="md:col-span-2">
