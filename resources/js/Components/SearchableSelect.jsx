@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Combobox, Transition } from '@headlessui/react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import clsx from 'clsx';
@@ -15,18 +15,27 @@ export default function SearchableSelect({
     className = ""
 }) {
     const [query, setQuery] = useState('');
+    const MAX_DISPLAY = 50; // Batasi jumlah item yang dirender untuk performa
 
-    const filteredOptions = query === ''
-        ? options
-        : options.filter((option) => {
+    const filteredOptions = useMemo(() => {
+        const cleanQuery = query.toLowerCase().trim();
+        
+        if (cleanQuery === '') return options.slice(0, MAX_DISPLAY);
+
+        const filtered = [];
+        for (const option of options) {
             const label = typeof option === 'object' ? option[labelKey] : option;
-            return label?.toString()
-                .toLowerCase()
-                .replace(/\s+/g, '')
-                .includes(query.toLowerCase().replace(/\s+/g, ''));
-        });
+            if (label?.toString().toLowerCase().includes(cleanQuery)) {
+                filtered.push(option);
+            }
+            if (filtered.length >= MAX_DISPLAY) break;
+        }
+        return filtered;
+    }, [options, query, labelKey]);
 
-    const selectedOption = options.find(opt => (typeof opt === 'object' ? opt[valueKey] : opt) == value);
+    const selectedOption = useMemo(() => 
+        options.find(opt => (typeof opt === 'object' ? opt[valueKey] : opt) == value)
+    , [options, value, valueKey]);
 
     return (
         <div className={clsx("w-full", className)}>
