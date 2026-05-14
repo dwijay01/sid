@@ -29,7 +29,7 @@ class DashboardController extends Controller
             'internet_active' => InternetSubscription::whereHas('resident', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
                 ->where('status', 'aktif')->count(),
             'total_skills' => ResidentSkill::whereHas('resident', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))->count(),
-            'waste_active' => WasteParticipation::whereHas('resident', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
+            'waste_active' => WasteParticipation::whereHas('familyCard', fn($q) => $q->whereIn('wilayah_id', $wilayahIds))
                 ->where('is_active', true)->count(),
         ];
 
