@@ -85,19 +85,32 @@ class ResidentImport implements ToCollection, WithStartRow
                 }
             }
 
+            $mappedHubungan = $this->mapHubungan($hubungan);
+            if ($mappedHubungan === 'kepala') {
+                $finalNoKk = $noKkFromExcel ?: $nik;
+            } else {
+                $finalNoKk = $noKkFromExcel ?: $this->currentHeadNik;
+            }
+
+            // Fallback: If wilayah not in Excel/Param, check existing Family Card
+            if (!$rowWilayahId && $finalNoKk) {
+                $existingFc = FamilyCard::where('no_kk', $finalNoKk)->first();
+                if ($existingFc) {
+                    $rowWilayahId = $existingFc->wilayah_id;
+                }
+            }
+
             if (!$rowWilayahId) {
                 $this->skipped[] = [
                     'nama' => $nama,
                     'nik' => $nik,
-                    'reason' => 'Wilayah RT/RW tidak diketahui.'
+                    'reason' => 'Wilayah RT/RW tidak diketahui (Harap isi kolom RT/RW).'
                 ];
                 continue;
             }
 
-            $mappedHubungan = $this->mapHubungan($hubungan);
             if ($mappedHubungan === 'kepala') {
                 $this->currentHeadNik = $nik;
-                $finalNoKk = $noKkFromExcel ?: $nik;
                 
                 $currentFamilyCard = FamilyCard::updateOrCreate(
                     ['no_kk' => $finalNoKk],
@@ -109,8 +122,6 @@ class ResidentImport implements ToCollection, WithStartRow
                     ]
                 );
             } else {
-                $finalNoKk = $noKkFromExcel ?: $this->currentHeadNik;
-                
                 if ($finalNoKk) {
                     $currentFamilyCard = FamilyCard::firstOrCreate(
                         ['no_kk' => $finalNoKk],
