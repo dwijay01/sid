@@ -89,7 +89,7 @@ class RwDashboardController extends Controller
         $wilayahIds = $this->getWilayahIds();
 
         $query = Resident::with(['familyCard.wilayah', 'familyCard.rukemMember'])
-            ->whereIn('wilayah_id', $wilayahIds);
+            ->whereIn('residents.wilayah_id', $wilayahIds);
 
         if ($request->sort === 'kk') {
             $query->leftJoin('family_cards', 'residents.family_card_id', '=', 'family_cards.id')
