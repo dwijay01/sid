@@ -122,22 +122,32 @@ class RtDashboardController extends Controller
         $wilayahId = $this->getWilayahId();
         $type = $request->input('type', 'penduduk');
         $status = $request->input('status');
+        $sort = $request->input('sort', 'name');
 
         $data = [];
 
         switch ($type) {
             case 'penduduk':
-                $data = Resident::with(['familyCard.wilayah', 'wilayah'])
+                $query = Resident::with(['familyCard.wilayah', 'wilayah'])
                     ->where(function($q) use ($wilayahId) {
-                        $q->where('wilayah_id', $wilayahId)
+                        $q->where('residents.wilayah_id', $wilayahId)
                           ->orWhereHas('familyCard', fn($sq) => $sq->where('wilayah_id', $wilayahId));
                     })
                     ->when($status, function($q) use ($status) {
                         $q->whereHas('familyCard', fn($sq) => $sq->where('kategori_aktif', $status));
                     })
-                    ->where('status_penduduk', 'aktif')
-                    ->orderBy('nama_lengkap')
-                    ->get();
+                    ->where('status_penduduk', 'aktif');
+
+                if ($sort === 'kk') {
+                    $query->leftJoin('family_cards', 'residents.family_card_id', '=', 'family_cards.id')
+                        ->select('residents.*')
+                        ->orderBy('family_cards.no_kk')
+                        ->orderByRaw("FIELD(hubungan_keluarga, 'kepala', 'istri', 'anak', 'menantu', 'cucu', 'orang_tua', 'mertua', 'famili_lain', 'lainnya')");
+                } else {
+                    $query->orderBy('nama_lengkap');
+                }
+
+                $data = $query->get();
                 break;
             case 'rukem':
                 $query = RukemMember::with('familyCard.kepalaKeluarga', 'familyCard.wilayah')
@@ -195,7 +205,7 @@ class RtDashboardController extends Controller
         return Inertia::render('Rt/Reports', [
             'data' => $data,
             'type' => $type,
-            'filters' => $request->only('type', 'status'),
+            'filters' => $request->only('type', 'status', 'sort'),
         ]);
     }
 }

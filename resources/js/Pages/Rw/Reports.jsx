@@ -32,23 +32,30 @@ export default function Reports({ data, type, wilayahList = [], filters = {} }) 
     const [activeType, setActiveType] = useState(type || 'penduduk');
     const [selectedRt, setSelectedRt] = useState(filters.rt || '');
     const [selectedStatus, setSelectedStatus] = useState(filters.status || '');
+    const [selectedSort, setSelectedSort] = useState(filters.sort || 'name');
 
     const handleSwitch = (newType) => {
         setActiveType(newType);
         setSelectedStatus('');
-        router.get(route('rw.reports'), { type: newType, rt: selectedRt }, { preserveState: true });
+        router.get(route('rw.reports'), { type: newType, rt: selectedRt, sort: selectedSort }, { preserveState: true });
     };
 
     const handleRtChange = (e) => {
         const rt = e.target.value;
         setSelectedRt(rt);
-        router.get(route('rw.reports'), { type: activeType, rt, status: selectedStatus }, { preserveState: true });
+        router.get(route('rw.reports'), { type: activeType, rt, status: selectedStatus, sort: selectedSort }, { preserveState: true });
     };
 
     const handleStatusChange = (e) => {
         const status = e.target.value;
         setSelectedStatus(status);
-        router.get(route('rw.reports'), { type: activeType, rt: selectedRt, status }, { preserveState: true });
+        router.get(route('rw.reports'), { type: activeType, rt: selectedRt, status, sort: selectedSort }, { preserveState: true });
+    };
+
+    const handleSortChange = (e) => {
+        const sort = e.target.value;
+        setSelectedSort(sort);
+        router.get(route('rw.reports'), { type: activeType, rt: selectedRt, status: selectedStatus, sort }, { preserveState: true });
     };
 
     const handlePrint = () => {
@@ -56,7 +63,7 @@ export default function Reports({ data, type, wilayahList = [], filters = {} }) 
     };
 
     const handleExportExcel = () => {
-        window.location.href = route('rw.reports', { type: activeType, rt: selectedRt, status: selectedStatus, export: 'excel' });
+        window.location.href = route('rw.reports', { type: activeType, rt: selectedRt, status: selectedStatus, sort: selectedSort, export: 'excel' });
     };
 
     const activeReport = reportTypes.find(r => r.key === activeType);
@@ -96,6 +103,16 @@ export default function Reports({ data, type, wilayahList = [], filters = {} }) 
                                     {statusOptions[activeType].map((opt) => (
                                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                                     ))}
+                                </select>
+                            )}
+                            {activeType === 'penduduk' && (
+                                <select
+                                    value={selectedSort}
+                                    onChange={handleSortChange}
+                                    className="w-full sm:w-auto border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm focus:ring-teal-500 focus:border-teal-500 print:hidden"
+                                >
+                                    <option value="name">Urutan: Nama</option>
+                                    <option value="kk">Urutan: Kartu Keluarga</option>
                                 </select>
                             )}
                             <div className="flex gap-2 w-full sm:w-auto">

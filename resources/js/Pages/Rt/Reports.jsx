@@ -31,19 +31,27 @@ export default function Reports({ data, type, filters = {} }) {
     const [activeType, setActiveType] = useState(type || 'penduduk');
     const [selectedIds, setSelectedIds] = useState([]);
     const [selectedStatus, setSelectedStatus] = useState(filters.status || '');
+    const [selectedSort, setSelectedSort] = useState(filters.sort || 'name');
 
     const handleSwitch = (newType) => {
         setActiveType(newType);
         setSelectedIds([]);
         setSelectedStatus('');
-        router.get(route('rt.reports'), { type: newType }, { preserveState: true });
+        router.get(route('rt.reports'), { type: newType, sort: selectedSort }, { preserveState: true });
     };
 
     const handleStatusChange = (e) => {
         const status = e.target.value;
         setSelectedStatus(status);
         setSelectedIds([]);
-        router.get(route('rt.reports'), { type: activeType, status }, { preserveState: true });
+        router.get(route('rt.reports'), { type: activeType, status, sort: selectedSort }, { preserveState: true });
+    };
+
+    const handleSortChange = (e) => {
+        const sort = e.target.value;
+        setSelectedSort(sort);
+        setSelectedIds([]);
+        router.get(route('rt.reports'), { type: activeType, status: selectedStatus, sort }, { preserveState: true });
     };
 
     const handlePrint = () => {
@@ -51,7 +59,7 @@ export default function Reports({ data, type, filters = {} }) {
     };
 
     const handleExportExcel = () => {
-        let url = route('rt.reports', { type: activeType, status: selectedStatus, export: 'excel' });
+        let url = route('rt.reports', { type: activeType, status: selectedStatus, sort: selectedSort, export: 'excel' });
         if (selectedIds.length > 0) {
             url += `&selected_ids=${selectedIds.join(',')}`;
         }
@@ -102,6 +110,16 @@ export default function Reports({ data, type, filters = {} }) {
                                     {statusOptions[activeType].map((opt) => (
                                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                                     ))}
+                                </select>
+                            )}
+                            {activeType === 'penduduk' && (
+                                <select
+                                    value={selectedSort}
+                                    onChange={handleSortChange}
+                                    className="w-full sm:w-auto border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm focus:ring-teal-500 focus:border-teal-500 print:hidden"
+                                >
+                                    <option value="name">Urutan: Nama</option>
+                                    <option value="kk">Urutan: Kartu Keluarga</option>
                                 </select>
                             )}
                             <div className="flex gap-2 w-full sm:w-auto">

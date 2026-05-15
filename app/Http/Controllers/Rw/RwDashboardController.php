@@ -218,15 +218,16 @@ class RwDashboardController extends Controller
         $type = $request->input('type', 'penduduk');
         $rt = $request->input('rt');
         $status = $request->input('status');
+        $sort = $request->input('sort', 'name');
 
         $data = [];
 
         switch ($type) {
             case 'penduduk':
-                $data = Resident::with(['familyCard.wilayah', 'wilayah'])
+                $query = Resident::with(['familyCard.wilayah', 'wilayah'])
                     ->where(function($q) use ($wilayahIds, $rt) {
                         $q->where(function($sq) use ($wilayahIds) {
-                            $sq->whereIn('wilayah_id', $wilayahIds)
+                            $sq->whereIn('residents.wilayah_id', $wilayahIds)
                                ->orWhereHas('familyCard', fn($f) => $f->whereIn('wilayah_id', $wilayahIds));
                         });
                         
@@ -240,9 +241,18 @@ class RwDashboardController extends Controller
                     ->when($status, function($q) use ($status) {
                         $q->whereHas('familyCard', fn($sq) => $sq->where('kategori_aktif', $status));
                     })
-                    ->where('status_penduduk', 'aktif')
-                    ->orderBy('nama_lengkap')
-                    ->get();
+                    ->where('status_penduduk', 'aktif');
+
+                if ($sort === 'kk') {
+                    $query->leftJoin('family_cards', 'residents.family_card_id', '=', 'family_cards.id')
+                        ->select('residents.*')
+                        ->orderBy('family_cards.no_kk')
+                        ->orderByRaw("FIELD(hubungan_keluarga, 'kepala', 'istri', 'anak', 'menantu', 'cucu', 'orang_tua', 'mertua', 'famili_lain', 'lainnya')");
+                } else {
+                    $query->orderBy('nama_lengkap');
+                }
+
+                $data = $query->get();
                 break;
             case 'rukem':
                 $query = RukemMember::with('familyCard.kepalaKeluarga', 'familyCard.wilayah')
@@ -328,7 +338,7 @@ class RwDashboardController extends Controller
             'data' => $data,
             'type' => $type,
             'wilayahList' => $wilayahList,
-            'filters' => $request->only('type', 'rt', 'status'),
+            'filters' => $request->only('type', 'rt', 'status', 'sort'),
         ]);
     }
 
