@@ -30,9 +30,9 @@ const statusOptions = {
 
 export default function Reports({ data, type, wilayahList = [], filters = {} }) {
     const [activeType, setActiveType] = useState(type || 'penduduk');
-    const [selectedRt, setSelectedRt] = useState(filters.rt || '');
-    const [selectedStatus, setSelectedStatus] = useState(filters.status || '');
-    const [selectedSort, setSelectedSort] = useState(filters.sort || 'name');
+    const [selectedRt, setSelectedRt] = useState(filters?.rt || '');
+    const [selectedStatus, setSelectedStatus] = useState(filters?.status || '');
+    const [selectedSort, setSelectedSort] = useState(typeof filters?.sort === 'string' ? filters.sort : 'name');
 
     const handleSwitch = (newType) => {
         setActiveType(newType);

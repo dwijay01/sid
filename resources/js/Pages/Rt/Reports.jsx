@@ -30,8 +30,8 @@ const statusOptions = {
 export default function Reports({ data, type, filters = {} }) {
     const [activeType, setActiveType] = useState(type || 'penduduk');
     const [selectedIds, setSelectedIds] = useState([]);
-    const [selectedStatus, setSelectedStatus] = useState(filters.status || '');
-    const [selectedSort, setSelectedSort] = useState(filters.sort || 'name');
+    const [selectedStatus, setSelectedStatus] = useState(filters?.status || '');
+    const [selectedSort, setSelectedSort] = useState(typeof filters?.sort === 'string' ? filters.sort : 'name');
 
     const handleSwitch = (newType) => {
         setActiveType(newType);
